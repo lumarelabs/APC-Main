@@ -108,7 +108,7 @@ def create_mock_bookings(users: List[Dict], courts: List[Dict]) -> List[Dict]:
     
     return bookings
 
-def create_mock_matches(bookings: List[Dict]) -> tuple[List[Dict], List[Dict]]:
+def create_mock_matches(bookings: List[Dict], users: List[Dict]) -> tuple[List[Dict], List[Dict]]:
     """Create mock matches and match players data."""
     matches = []
     match_players = []
@@ -147,7 +147,7 @@ def populate_database():
         users = create_mock_users()
         courts = create_mock_courts()
         bookings = create_mock_bookings(users, courts)
-        matches, match_players = create_mock_matches(bookings)
+        matches, match_players = create_mock_matches(bookings, users)
         
         # Insert data into Supabase
         print("Inserting users...")
