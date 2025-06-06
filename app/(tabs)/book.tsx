@@ -1,0 +1,317 @@
+import React, { useState } from 'react';
+import { View, Text, StyleSheet, ScrollView, TouchableOpacity } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
+import { CourtTypeSelector } from '@/components/booking/CourtTypeSelector';
+import { DateTimeSelector } from '@/components/booking/DateTimeSelector';
+import { BookingCalendar } from '@/components/booking/BookingCalendar';
+import { BookingListView } from '@/components/booking/BookingListView';
+import { WeeklyCalendar } from '@/components/booking/WeeklyCalendar';
+import { CourtList } from '@/components/booking/CourtList';
+import { RacketRental } from '@/components/booking/RacketRental';
+import { PaymentSummary } from '@/components/booking/PaymentSummary';
+import { ChevronLeft } from 'lucide-react-native';
+import type { Booking } from '@/components/booking/BookingCalendar';
+
+type BookingStep = 'court-selection' | 'date-time' | 'racket-rental' | 'payment';
+type CalendarViewMode = 'weekly' | 'monthly';
+
+export default function BookScreen() {
+  const [courtType, setCourtType] = useState<'all' | 'padel' | 'pickleball'>('all');
+  const [selectedCourt, setSelectedCourt] = useState<any>(null);
+  const [selectedDate, setSelectedDate] = useState<string | null>(null);
+  const [selectedTime, setSelectedTime] = useState<string | null>(null);
+  const [racketCount, setRacketCount] = useState(0);
+  const [currentStep, setCurrentStep] = useState<BookingStep>('court-selection');
+  const [calendarViewMode, setCalendarViewMode] = useState<CalendarViewMode>('weekly');
+
+  const handleBack = () => {
+    switch (currentStep) {
+      case 'payment':
+        setCurrentStep('racket-rental');
+        break;
+      case 'racket-rental':
+        setCurrentStep('date-time');
+        setRacketCount(0);
+        break;
+      case 'date-time':
+        setCurrentStep('court-selection');
+        setSelectedDate(null);
+        setSelectedTime(null);
+        break;
+      case 'court-selection':
+        if (selectedCourt) {
+          setSelectedCourt(null);
+        }
+        break;
+    }
+  };
+
+  const handleDateTimeSelected = (date: string, time: string) => {
+    setSelectedDate(date);
+    setSelectedTime(time);
+  };
+
+  const handleDateTimeConfirm = () => {
+    if (selectedDate && selectedTime) {
+      setCurrentStep('racket-rental');
+    }
+  };
+
+  const handleRacketRentalComplete = (count: number) => {
+    setRacketCount(count);
+    setCurrentStep('payment');
+  };
+
+  const handlePaymentConfirm = () => {
+    // Payment processing would go here
+    console.log('Processing payment...');
+  };
+
+  // Sample data for existing bookings
+  const existingBookings: Record<string, Booking[]> = {
+    '2024-03-19': [{
+      id: '1',
+      courtName: 'Padel Court 2',
+      courtType: 'padel',
+      time: '17:00',
+      date: 'March 19 - Tuesday - 5:00 PM - 2024',
+      maxPlayers: 4,
+      players: [
+        { name: 'Alex Johnson', skillLevel: 'Advanced' },
+        { name: 'Sarah Smith', skillLevel: 'Intermediate' }
+      ]
+    }],
+    '2024-03-21': [{
+      id: '2',
+      courtName: 'Pickleball Court 1',
+      courtType: 'pickleball',
+      time: '15:30',
+      date: 'March 21 - Thursday - 3:30 PM - 2024',
+      maxPlayers: 4,
+      players: [
+        { name: 'Mike Brown', skillLevel: 'Beginner' },
+        { name: 'Emma Davis', skillLevel: 'Intermediate' },
+        { name: 'John Smith', skillLevel: 'Advanced' },
+        { name: 'Lisa Wilson', skillLevel: 'Intermediate' }
+      ]
+    }],
+    '2024-03-25': [{
+      id: '3',
+      courtName: 'Padel Court 1',
+      courtType: 'padel',
+      time: '10:00',
+      date: 'March 25 - Monday - 10:00 AM - 2024',
+      maxPlayers: 4,
+      players: [
+        { name: 'Tom Wilson', skillLevel: 'Advanced' }
+      ]
+    }]
+  };
+
+  const renderBookingStep = () => {
+    switch (currentStep) {
+      case 'court-selection':
+        return (
+          <View style={styles.courtList}>
+            <CourtList
+              courtType={courtType}
+              onSelectCourt={(court) => {
+                setSelectedCourt(court);
+                setCurrentStep('date-time');
+              }}
+            />
+          </View>
+        );
+      case 'date-time':
+        return (
+          <>
+            <DateTimeSelector
+              onSelectDateTime={handleDateTimeSelected}
+            />
+            {selectedDate && selectedTime && (
+              <TouchableOpacity 
+                style={styles.confirmButton}
+                onPress={handleDateTimeConfirm}
+              >
+                <Text style={styles.confirmButtonText}>Confirm Date & Time</Text>
+              </TouchableOpacity>
+            )}
+          </>
+        );
+      case 'racket-rental':
+        return (
+          <RacketRental
+            onComplete={handleRacketRentalComplete}
+          />
+        );
+      case 'payment':
+        return (
+          <PaymentSummary
+            courtName={selectedCourt.name}
+            courtType={selectedCourt.type}
+            date={selectedDate!}
+            time={selectedTime!}
+            courtPrice={selectedCourt.price}
+            racketCount={racketCount}
+            racketPrice={5}
+            onConfirm={handlePaymentConfirm}
+          />
+        );
+    }
+  };
+
+  return (
+    <SafeAreaView style={styles.safeArea}>
+      <ScrollView style={styles.container}>
+        {/* Top Half - Booking Section */}
+        <View style={styles.topSection}>
+          <View style={styles.header}>
+            {(currentStep !== 'court-selection' || selectedCourt) && (
+              <TouchableOpacity 
+                style={styles.backButton} 
+                onPress={handleBack}
+              >
+                <ChevronLeft size={24} color="#fff" />
+              </TouchableOpacity>
+            )}
+            <Text style={styles.headerTitle}>Book a Court</Text>
+          </View>
+          
+          {currentStep === 'court-selection' && (
+            <CourtTypeSelector
+              selectedType={courtType}
+              onSelectType={setCourtType}
+            />
+          )}
+
+          <View style={styles.bookingContent}>
+            {renderBookingStep()}
+          </View>
+        </View>
+
+        {/* Bottom Half - Calendar and Bookings */}
+        {(currentStep === 'court-selection' || currentStep === 'date-time') && (
+          <View style={styles.bottomSection}>
+            {/* Calendar View Selector */}
+            <View style={styles.viewSelector}>
+              <TouchableOpacity
+                style={[styles.viewOption, calendarViewMode === 'weekly' && styles.viewOptionActive]}
+                onPress={() => setCalendarViewMode('weekly')}
+              >
+                <Text style={[styles.viewOptionText, calendarViewMode === 'weekly' && styles.viewOptionTextActive]}>
+                  Weekly View
+                </Text>
+              </TouchableOpacity>
+              <TouchableOpacity
+                style={[styles.viewOption, calendarViewMode === 'monthly' && styles.viewOptionActive]}
+                onPress={() => setCalendarViewMode('monthly')}
+              >
+                <Text style={[styles.viewOptionText, calendarViewMode === 'monthly' && styles.viewOptionTextActive]}>
+                  Monthly View
+                </Text>
+              </TouchableOpacity>
+            </View>
+
+            {/* Calendar */}
+            {calendarViewMode === 'weekly' ? (
+              <WeeklyCalendar bookings={existingBookings} />
+            ) : (
+              <BookingCalendar bookings={existingBookings} />
+            )}
+
+            {/* Bookings List */}
+            <View style={styles.bookingsListContainer}>
+              <BookingListView bookings={existingBookings} />
+            </View>
+          </View>
+        )}
+      </ScrollView>
+    </SafeAreaView>
+  );
+}
+
+const styles = StyleSheet.create({
+  safeArea: {
+    flex: 1,
+    backgroundColor: '#111827',
+  },
+  container: {
+    flex: 1,
+    backgroundColor: '#111827',
+  },
+  header: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    paddingHorizontal: 16,
+    marginBottom: 16,
+  },
+  backButton: {
+    width: 40,
+    height: 40,
+    borderRadius: 20,
+    backgroundColor: '#22293A',
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginRight: 12,
+  },
+  headerTitle: {
+    fontFamily: 'Inter-Bold',
+    fontSize: 24,
+    color: '#FFFFFF',
+    flex: 1,
+  },
+  topSection: {
+    paddingTop: 16,
+    paddingBottom: 8,
+  },
+  bookingContent: {
+    paddingHorizontal: 16,
+  },
+  courtList: {
+    marginBottom: 8,
+  },
+  bottomSection: {
+    borderTopWidth: 1,
+    borderTopColor: '#22293A',
+    paddingBottom: 100,
+  },
+  viewSelector: {
+    flexDirection: 'row',
+    padding: 12,
+    gap: 8,
+  },
+  viewOption: {
+    flex: 1,
+    paddingVertical: 8,
+    paddingHorizontal: 16,
+    borderRadius: 20,
+    backgroundColor: '#22293A',
+    alignItems: 'center',
+  },
+  viewOptionActive: {
+    backgroundColor: 'rgba(22, 255, 145, 0.15)',
+  },
+  viewOptionText: {
+    fontFamily: 'Inter-Medium',
+    fontSize: 14,
+    color: '#8F98A8',
+  },
+  viewOptionTextActive: {
+    color: '#16FF91',
+  },
+  confirmButton: {
+    backgroundColor: '#16FF91',
+    padding: 16,
+    borderRadius: 12,
+    alignItems: 'center',
+    marginTop: 16,
+  },
+  confirmButtonText: {
+    fontFamily: 'Inter-Bold',
+    fontSize: 16,
+    color: '#000000',
+  },
+  bookingsListContainer: {
+    marginTop: 8,
+  },
+});
