@@ -1,5 +1,6 @@
 import { View, Text, StyleSheet, TouchableOpacity, Image } from 'react-native';
 import { MapPin, Star } from 'lucide-react-native';
+import { colors } from '@/app/theme/colors';
 
 type CourtCardProps = {
   name: string;
@@ -31,7 +32,7 @@ export function CourtCard({
       <View style={styles.content}>
         <Text style={styles.name}>{name}</Text>
         <View style={styles.ratingContainer}>
-          <Star size={16} color="#FFD60A" fill="#FFD60A" />
+          <Star size={16} color={colors.status.warning} fill={colors.status.warning} />
           <Text style={styles.rating}>{rating}</Text>
         </View>
         <Text style={styles.distance}>{distance}</Text>

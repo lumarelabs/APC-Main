@@ -1,4 +1,6 @@
+import React from 'react';
 import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
+import { colors } from '@/app/theme/colors';
 
 type CourtTypeSelectorProps = {
   selectedType: 'all' | 'padel' | 'pickleball';
@@ -44,21 +46,21 @@ const styles = StyleSheet.create({
   },
   option: {
     flex: 1,
-    backgroundColor: '#22293A',
+    backgroundColor: colors.background.secondary,
     paddingVertical: 8,
     paddingHorizontal: 16,
     borderRadius: 20,
     alignItems: 'center',
   },
   selectedOption: {
-    backgroundColor: 'rgba(22, 255, 145, 0.15)',
+    backgroundColor: colors.primary,
   },
   optionText: {
     fontFamily: 'Inter-Medium',
     fontSize: 14,
-    color: '#8F98A8',
+    color: colors.text.secondary,
   },
   selectedOptionText: {
-    color: '#16FF91',
+    color: colors.primary,
   },
 }); 

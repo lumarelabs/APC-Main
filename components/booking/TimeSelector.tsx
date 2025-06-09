@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, ScrollView } from 'react-native';
+import { colors } from '@/app/theme/colors';
 
 type TimeSelectorProps = {
   onSelectTime: (time: string) => void;
@@ -98,7 +99,7 @@ const styles = StyleSheet.create({
   title: {
     fontFamily: 'Inter-Bold',
     fontSize: 18,
-    color: '#FFFFFF',
+    color: colors.charcoal,
     marginBottom: 16,
   },
   timeSlotsContainer: {
@@ -109,7 +110,7 @@ const styles = StyleSheet.create({
   },
   timeSlot: {
     flexDirection: 'row',
-    backgroundColor: '#22293A',
+    backgroundColor: colors.background.secondary,
     borderRadius: 12,
     padding: 16,
     marginBottom: 12,
@@ -120,20 +121,20 @@ const styles = StyleSheet.create({
     opacity: 0.5,
   },
   selectedTimeSlot: {
-    backgroundColor: 'rgba(22, 255, 145, 0.15)',
+    backgroundColor: colors.primary,
     borderWidth: 1,
-    borderColor: '#16FF91',
+    borderColor: colors.primary,
   },
   timeText: {
     fontFamily: 'Inter-Medium',
     fontSize: 16,
-    color: '#FFFFFF',
+    color: colors.charcoal,
   },
   unavailableTimeText: {
-    color: '#8F98A8',
+    color: colors.text.disabled,
   },
   selectedTimeText: {
-    color: '#16FF91',
+    color: colors.white,
   },
   statusIndicator: {
     paddingHorizontal: 12,
@@ -141,38 +142,38 @@ const styles = StyleSheet.create({
     borderRadius: 8,
   },
   availableIndicator: {
-    backgroundColor: 'rgba(22, 255, 145, 0.15)',
+    backgroundColor: colors.primary,
   },
   unavailableIndicator: {
-    backgroundColor: 'rgba(255, 90, 90, 0.15)',
+    backgroundColor: colors.status.error,
   },
   selectedIndicator: {
-    backgroundColor: 'rgba(22, 255, 145, 0.3)',
+    backgroundColor: colors.primary,
   },
   statusText: {
     fontFamily: 'Inter-Medium',
     fontSize: 12,
-    color: '#16FF91',
+    color: colors.primary,
   },
   selectedStatusText: {
-    color: '#16FF91',
+    color: colors.primary,
   },
   buttonContainer: {
     marginTop: 16,
   },
   continueButton: {
-    backgroundColor: '#16FF91',
+    backgroundColor: colors.primary,
     borderRadius: 12,
     height: 56,
     alignItems: 'center',
     justifyContent: 'center',
   },
   disabledButton: {
-    backgroundColor: '#22293A',
+    backgroundColor: colors.background.secondary,
   },
   continueButtonText: {
     fontFamily: 'Inter-Bold',
     fontSize: 16,
-    color: '#000000',
+    color: colors.white,
   },
 });

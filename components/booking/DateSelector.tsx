@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, Modal } from 'react-native';
 import { CalendarList } from 'react-native-calendars';
+import { colors } from '@/app/theme/colors';
 
 type DateSelectorProps = {
   onSelectDate: (date: string) => void;
@@ -85,11 +86,11 @@ const styles = StyleSheet.create({
   title: {
     fontFamily: 'Inter-Bold',
     fontSize: 18,
-    color: '#FFFFFF',
+    color: colors.charcoal,
     marginBottom: 16,
   },
   openCalendarButton: {
-    backgroundColor: '#16FF91',
+    backgroundColor: colors.primary,
     borderRadius: 12,
     height: 56,
     alignItems: 'center',
@@ -98,7 +99,7 @@ const styles = StyleSheet.create({
   openCalendarButtonText: {
     fontFamily: 'Inter-Bold',
     fontSize: 16,
-    color: '#000000',
+    color: colors.white,
   },
   modalOverlay: {
     flex: 1,
@@ -107,7 +108,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   modalContent: {
-    backgroundColor: '#22293A',
+    backgroundColor: colors.background.secondary,
     borderRadius: 12,
     padding: 16,
     width: '80%',
@@ -119,27 +120,27 @@ const styles = StyleSheet.create({
     marginBottom: 16,
   },
   toggleButton: {
-    backgroundColor: '#22293A',
+    backgroundColor: colors.background.secondary,
     borderRadius: 12,
     height: 40,
     alignItems: 'center',
     justifyContent: 'center',
   },
   activeToggleButton: {
-    backgroundColor: '#16FF91',
+    backgroundColor: colors.primary,
   },
   toggleText: {
     fontFamily: 'Inter-Medium',
     fontSize: 14,
-    color: '#8F98A8',
+    color: colors.text.disabled,
   },
   activeToggleText: {
     fontFamily: 'Inter-Bold',
     fontSize: 16,
-    color: '#000000',
+    color: colors.white,
   },
   closeButton: {
-    backgroundColor: '#16FF91',
+    backgroundColor: colors.primary,
     borderRadius: 12,
     height: 56,
     alignItems: 'center',
@@ -149,24 +150,24 @@ const styles = StyleSheet.create({
   closeButtonText: {
     fontFamily: 'Inter-Bold',
     fontSize: 16,
-    color: '#000000',
+    color: colors.white,
   },
   buttonContainer: {
     marginTop: 32,
   },
   continueButton: {
-    backgroundColor: '#16FF91',
+    backgroundColor: colors.primary,
     borderRadius: 12,
     height: 56,
     alignItems: 'center',
     justifyContent: 'center',
   },
   disabledButton: {
-    backgroundColor: '#22293A',
+    backgroundColor: colors.background.secondary,
   },
   continueButtonText: {
     fontFamily: 'Inter-Bold',
     fontSize: 16,
-    color: '#000000',
+    color: colors.white,
   },
 });

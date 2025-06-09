@@ -1,7 +1,7 @@
 import React from 'react';
 import { View, Text, StyleSheet } from 'react-native';
 import { Calendar } from 'react-native-calendars';
-import { format } from 'date-fns';
+import { colors } from '@/app/theme/colors';
 
 export type Booking = {
   id: string;
@@ -25,8 +25,8 @@ export function BookingCalendar({ bookings }: BookingCalendarProps) {
     acc[date] = {
       marked: true,
       selected: true,
-      selectedColor: 'rgba(22, 255, 145, 0.15)',
-      dotColor: '#16FF91',
+      selectedColor: colors.primary,
+      dotColor: colors.primary,
     };
     return acc;
   }, {} as Record<string, any>);
@@ -37,23 +37,23 @@ export function BookingCalendar({ bookings }: BookingCalendarProps) {
       <Calendar
         style={styles.calendar}
         theme={{
-          backgroundColor: '#111827',
-          calendarBackground: '#111827',
-          textSectionTitleColor: '#8F98A8',
-          selectedDayBackgroundColor: '#16FF91',
-          selectedDayTextColor: '#16FF91',
-          todayTextColor: '#16FF91',
-          dayTextColor: '#FFFFFF',
-          textDisabledColor: '#464D59',
-          dotColor: '#16FF91',
-          monthTextColor: '#FFFFFF',
+          backgroundColor: colors.background.primary,
+          calendarBackground: colors.background.primary,
+          textSectionTitleColor: colors.text.secondary,
+          selectedDayBackgroundColor: colors.primary,
+          selectedDayTextColor: colors.primary,
+          todayTextColor: colors.primary,
+          dayTextColor: colors.text.primary,
+          textDisabledColor: colors.text.disabled,
+          dotColor: colors.primary,
+          monthTextColor: colors.text.primary,
           textDayFontFamily: 'Inter-Medium',
           textMonthFontFamily: 'Inter-Bold',
           textDayHeaderFontFamily: 'Inter-Medium',
           textDayFontSize: 14,
           textMonthFontSize: 16,
           textDayHeaderFontSize: 14,
-          arrowColor: '#16FF91',
+          arrowColor: colors.primary,
         }}
         markedDates={markedDates}
         enableSwipeMonths={true}
@@ -64,18 +64,18 @@ export function BookingCalendar({ bookings }: BookingCalendarProps) {
 
 const styles = StyleSheet.create({
   container: {
-    backgroundColor: '#111827',
+    backgroundColor: colors.background.primary,
     padding: 16,
   },
   title: {
     fontFamily: 'Inter-Bold',
     fontSize: 18,
-    color: '#FFFFFF',
+    color: colors.text.primary,
     marginBottom: 16,
   },
   calendar: {
     borderRadius: 12,
-    backgroundColor: '#22293A',
+    backgroundColor: colors.background.secondary,
     padding: 8,
   },
 }); 

@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, Modal, ScrollView } from 'react-native';
 import type { Booking } from './BookingCalendar';
 import { format } from 'date-fns';
+import { colors } from '@/app/theme/colors';
 
 type BookingListViewProps = {
   bookings: Record<string, Booking[]>;
@@ -119,33 +120,33 @@ export function BookingListView({ bookings }: BookingListViewProps) {
 function getSkillBadgeStyle(skillLevel: string) {
   switch (skillLevel) {
     case 'Beginner':
-      return { backgroundColor: 'rgba(50, 209, 255, 0.2)', borderColor: '#32D1FF' };
+      return { backgroundColor: colors.secondary, borderColor: colors.secondary };
     case 'Intermediate':
-      return { backgroundColor: 'rgba(255, 214, 10, 0.2)', borderColor: '#FFD60A' };
+      return { backgroundColor: colors.status.warning, borderColor: colors.status.warning };
     case 'Advanced':
-      return { backgroundColor: 'rgba(255, 90, 90, 0.2)', borderColor: '#FF5A5A' };
+      return { backgroundColor: colors.status.error, borderColor: colors.status.error };
     default:
-      return { backgroundColor: 'rgba(22, 255, 145, 0.15)', borderColor: '#16FF91' };
+      return { backgroundColor: colors.primary, borderColor: colors.primary };
   }
 }
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#111827',
+    backgroundColor: colors.background.primary,
     padding: 16,
   },
   title: {
     fontFamily: 'Inter-Bold',
     fontSize: 18,
-    color: '#FFFFFF',
+    color: colors.charcoal,
     marginBottom: 16,
   },
   bookingsList: {
     flex: 1,
   },
   bookingBar: {
-    backgroundColor: '#22293A',
+    backgroundColor: colors.background.secondary,
     borderRadius: 12,
     padding: 16,
     marginBottom: 8,
@@ -159,13 +160,13 @@ const styles = StyleSheet.create({
   courtName: {
     fontFamily: 'Inter-Bold',
     fontSize: 16,
-    color: '#FFFFFF',
+    color: colors.charcoal,
     marginBottom: 4,
   },
   dateTime: {
     fontFamily: 'Inter-Medium',
     fontSize: 14,
-    color: '#8F98A8',
+    color: colors.text.disabled,
   },
   playerCount: {
     paddingHorizontal: 12,
@@ -176,6 +177,7 @@ const styles = StyleSheet.create({
   playerCountText: {
     fontFamily: 'Inter-Bold',
     fontSize: 14,
+    color: colors.charcoal,
   },
   modalOverlay: {
     flex: 1,
@@ -184,7 +186,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   modalContent: {
-    backgroundColor: '#22293A',
+    backgroundColor: colors.background.secondary,
     borderRadius: 12,
     padding: 20,
     width: '90%',
@@ -193,7 +195,7 @@ const styles = StyleSheet.create({
   modalTitle: {
     fontFamily: 'Inter-Bold',
     fontSize: 20,
-    color: '#FFFFFF',
+    color: colors.charcoal,
     marginBottom: 16,
   },
   bookingHeader: {
@@ -202,13 +204,13 @@ const styles = StyleSheet.create({
   modalCourtName: {
     fontFamily: 'Inter-Bold',
     fontSize: 18,
-    color: '#FFFFFF',
+    color: colors.charcoal,
     marginBottom: 4,
   },
   modalDateTime: {
     fontFamily: 'Inter-Medium',
     fontSize: 16,
-    color: '#8F98A8',
+    color: colors.text.disabled,
   },
   playersList: {
     marginBottom: 20,
@@ -216,7 +218,7 @@ const styles = StyleSheet.create({
   playersTitle: {
     fontFamily: 'Inter-Bold',
     fontSize: 16,
-    color: '#FFFFFF',
+    color: colors.charcoal,
     marginBottom: 12,
   },
   playerItem: {
@@ -228,7 +230,7 @@ const styles = StyleSheet.create({
   playerName: {
     fontFamily: 'Inter-Medium',
     fontSize: 14,
-    color: '#FFFFFF',
+    color: colors.charcoal,
   },
   skillBadge: {
     paddingHorizontal: 8,
@@ -239,10 +241,10 @@ const styles = StyleSheet.create({
   skillText: {
     fontFamily: 'Inter-Medium',
     fontSize: 12,
-    color: '#FFFFFF',
+    color: colors.charcoal,
   },
   closeButton: {
-    backgroundColor: '#16FF91',
+    backgroundColor: colors.primary,
     borderRadius: 8,
     padding: 12,
     alignItems: 'center',
@@ -250,6 +252,6 @@ const styles = StyleSheet.create({
   closeButtonText: {
     fontFamily: 'Inter-Bold',
     fontSize: 16,
-    color: '#000000',
+    color: colors.white,
   },
 }); 

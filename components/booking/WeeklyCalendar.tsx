@@ -3,6 +3,7 @@ import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
 import { format, startOfWeek, addDays, addWeeks, subWeeks } from 'date-fns';
 import { ChevronLeft, ChevronRight } from 'lucide-react-native';
 import type { Booking } from './BookingCalendar';
+import { colors } from '@/app/theme/colors';
 
 type WeeklyCalendarProps = {
   bookings: Record<string, Booking[]>;
@@ -71,7 +72,7 @@ export function WeeklyCalendar({ bookings }: WeeklyCalendarProps) {
 
 const styles = StyleSheet.create({
   container: {
-    backgroundColor: '#111827',
+    backgroundColor: colors.background.primary,
     padding: 16,
   },
   header: {
@@ -80,7 +81,7 @@ const styles = StyleSheet.create({
   title: {
     fontFamily: 'Inter-Bold',
     fontSize: 18,
-    color: '#FFFFFF',
+    color: colors.charcoal,
     marginBottom: 8,
   },
   navigation: {
@@ -94,13 +95,13 @@ const styles = StyleSheet.create({
   monthText: {
     fontFamily: 'Inter-Bold',
     fontSize: 16,
-    color: '#16FF91',
+    color: colors.primary,
     marginHorizontal: 16,
   },
   weekContainer: {
     flexDirection: 'row',
     justifyContent: 'space-between',
-    backgroundColor: '#22293A',
+    backgroundColor: colors.background.secondary,
     borderRadius: 12,
     padding: 16,
   },
@@ -110,20 +111,20 @@ const styles = StyleSheet.create({
     borderRadius: 8,
   },
   bookedDay: {
-    backgroundColor: 'rgba(22, 255, 145, 0.15)',
+    backgroundColor: colors.primary,
   },
   dayName: {
     fontFamily: 'Inter-Medium',
     fontSize: 12,
-    color: '#8F98A8',
+    color: colors.text.disabled,
     marginBottom: 4,
   },
   dayNumber: {
     fontFamily: 'Inter-Bold',
     fontSize: 16,
-    color: '#FFFFFF',
+    color: colors.charcoal,
   },
   bookedDayText: {
-    color: '#16FF91',
+    color: colors.primary,
   },
 }); 

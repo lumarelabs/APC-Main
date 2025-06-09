@@ -1,6 +1,7 @@
 import React from 'react';
 import { View, Text, StyleSheet, Modal, TouchableOpacity, ScrollView } from 'react-native';
 import { X } from 'lucide-react-native';
+import { colors } from '@/app/theme/colors';
 
 type ServiceDetailsModalProps = {
   isVisible: boolean;
@@ -85,12 +86,12 @@ export const ServiceDetailsModal = ({ isVisible, onClose, serviceType }: Service
 const styles = StyleSheet.create({
   modalOverlay: {
     flex: 1,
-    backgroundColor: 'rgba(0, 0, 0, 0.7)',
+    backgroundColor: 'rgba(34, 40, 47, 0.7)',
     justifyContent: 'center',
     alignItems: 'center',
   },
   modalContent: {
-    backgroundColor: '#22293A',
+    backgroundColor: colors.background.secondary,
     borderRadius: 16,
     padding: 24,
     width: '90%',
@@ -105,7 +106,7 @@ const styles = StyleSheet.create({
   title: {
     fontFamily: 'Inter-Bold',
     fontSize: 24,
-    color: '#FFFFFF',
+    color: colors.white,
     marginBottom: 16,
   },
   priceContainer: {
@@ -117,22 +118,22 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     paddingVertical: 12,
     borderBottomWidth: 1,
-    borderBottomColor: 'rgba(255, 255, 255, 0.1)',
+    borderBottomColor: colors.text.disabled,
   },
   courtType: {
     fontFamily: 'Inter-Medium',
     fontSize: 16,
-    color: '#FFFFFF',
+    color: colors.white,
   },
   price: {
     fontFamily: 'Inter-Bold',
     fontSize: 16,
-    color: '#16FF91',
+    color: colors.primary,
   },
   description: {
     fontFamily: 'Inter-Regular',
     fontSize: 14,
-    color: '#8F98A8',
+    color: colors.text.disabled,
     lineHeight: 20,
   },
 }); 

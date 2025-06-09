@@ -6,14 +6,24 @@ import { UpcomingBooking } from '@/components/home/UpcomingBooking';
 import { ImageSlider } from '@/components/home/ImageSlider';
 import { ServiceDetailsModal } from '@/components/home/ServiceDetailsModal';
 import { BookingDetailsModal } from '@/components/home/BookingDetailsModal';
+import { colors } from '@/app/theme/colors';
 import Logo2 from '../../assets/images/logo2.png';
+
+type Booking = {
+  courtName: string;
+  courtType: "padel" | "pickleball";
+  date: string;
+  time: string;
+  image: string;
+  players: Array<{ name: string; skillLevel: string }>;
+};
 
 export default function HomeScreen() {
   const [activeTab, setActiveTab] = useState('all');
   const [selectedService, setSelectedService] = useState<'court' | 'lessons' | 'tournaments' | null>(null);
-  const [selectedBooking, setSelectedBooking] = useState<any>(null);
+  const [selectedBooking, setSelectedBooking] = useState<Booking | null>(null);
 
-  const bookings = [
+  const bookings: Booking[] = [
     {
       courtName: "Padel Court 2",
       courtType: "padel",
@@ -189,11 +199,11 @@ export default function HomeScreen() {
 const styles = StyleSheet.create({
   safeArea: {
     flex: 1,
-    backgroundColor: '#111827',
+    backgroundColor: colors.background.primary,
   },
   container: {
     flex: 1,
-    backgroundColor: '#111827',
+    backgroundColor: colors.background.primary,
   },
   contentContainer: {
     paddingBottom: 100,
@@ -209,13 +219,13 @@ const styles = StyleSheet.create({
   greeting: {
     fontFamily: 'Inter-Bold',
     fontSize: 24,
-    color: '#FFFFFF',
+    color: colors.charcoal,
     marginBottom: 4,
   },
   subtitle: {
     fontFamily: 'Inter-Regular',
     fontSize: 16,
-    color: '#8F98A8',
+    color: colors.text.disabled,
   },
   headerActions: {
     flexDirection: 'row',
@@ -224,7 +234,7 @@ const styles = StyleSheet.create({
     width: 44,
     height: 44,
     borderRadius: 22,
-    backgroundColor: '#22293A',
+    backgroundColor: colors.background.secondary,
     justifyContent: 'center',
     alignItems: 'center',
     marginLeft: 8,
@@ -234,7 +244,7 @@ const styles = StyleSheet.create({
     padding: 16,
     alignItems: 'center',
     borderBottomWidth: 1,
-    borderBottomColor: '#22293A',
+    borderBottomColor: colors.background.secondary,
   },
   headerLogo: {
     width: 100,
@@ -247,13 +257,13 @@ const styles = StyleSheet.create({
   aboutTitle: {
     fontFamily: 'Inter-Bold',
     fontSize: 18,
-    color: '#FFFFFF',
+    color: colors.charcoal,
     marginBottom: 8,
   },
   aboutText: {
     fontFamily: 'Inter-Regular',
     fontSize: 14,
-    color: '#8F98A8',
+    color: colors.text.disabled,
     lineHeight: 20,
   },
   section: {
@@ -269,12 +279,12 @@ const styles = StyleSheet.create({
   sectionTitle: {
     fontFamily: 'Inter-Bold',
     fontSize: 18,
-    color: '#FFFFFF',
+    color: colors.charcoal,
   },
   seeAll: {
     fontFamily: 'Inter-Medium',
     fontSize: 14,
-    color: '#32D1FF',
+    color: colors.primary,
   },
   bookingsScroll: {
     marginLeft: -8,
@@ -287,7 +297,7 @@ const styles = StyleSheet.create({
   },
   serviceCard: {
     width: '31%',
-    backgroundColor: '#22293A',
+    backgroundColor: colors.background.secondary,
     borderRadius: 16,
     padding: 16,
     alignItems: 'center',
@@ -304,18 +314,18 @@ const styles = StyleSheet.create({
   serviceTitle: {
     fontFamily: 'Inter-Bold',
     fontSize: 14,
-    color: '#FFFFFF',
+    color: colors.charcoal,
     marginBottom: 4,
     textAlign: 'center',
   },
   serviceDescription: {
     fontFamily: 'Inter-Regular',
     fontSize: 12,
-    color: '#8F98A8',
+    color: colors.text.disabled,
     textAlign: 'center',
   },
   tournamentCard: {
-    backgroundColor: '#22293A',
+    backgroundColor: colors.background.secondary,
     borderRadius: 16,
     overflow: 'hidden',
   },
@@ -329,17 +339,17 @@ const styles = StyleSheet.create({
   tournamentTitle: {
     fontFamily: 'Inter-Bold',
     fontSize: 18,
-    color: '#FFFFFF',
+    color: colors.charcoal,
     marginBottom: 4,
   },
   tournamentDate: {
     fontFamily: 'Inter-Regular',
     fontSize: 14,
-    color: '#8F98A8',
+    color: colors.text.disabled,
     marginBottom: 12,
   },
   registerButton: {
-    backgroundColor: '#16FF91',
+    backgroundColor: colors.primary,
     borderRadius: 8,
     paddingVertical: 8,
     alignItems: 'center',
@@ -347,38 +357,38 @@ const styles = StyleSheet.create({
   registerButtonText: {
     fontFamily: 'Inter-Bold',
     fontSize: 14,
-    color: '#000000',
+    color: colors.white,
   },
   contactSection: {
     marginTop: 32,
     paddingHorizontal: 16,
     paddingVertical: 24,
-    backgroundColor: '#22293A',
+    backgroundColor: colors.background.secondary,
     borderRadius: 16,
     alignItems: 'center',
   },
   contactTitle: {
     fontFamily: 'Inter-Bold',
     fontSize: 20,
-    color: '#FFFFFF',
+    color: colors.charcoal,
     marginBottom: 16,
   },
   contactText: {
     fontFamily: 'Inter-Regular',
     fontSize: 14,
-    color: '#8F98A8',
+    color: colors.text.disabled,
     marginBottom: 4,
   },
   contactEmail: {
     fontFamily: 'Inter-Medium',
     fontSize: 14,
-    color: '#32D1FF',
+    color: colors.primary,
     marginTop: 8,
     marginBottom: 4,
   },
   contactPhone: {
     fontFamily: 'Inter-Medium',
     fontSize: 14,
-    color: '#16FF91',
+    color: colors.primary,
   },
 });

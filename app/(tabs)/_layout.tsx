@@ -2,6 +2,7 @@ import { Tabs } from 'expo-router';
 import { useColorScheme, StyleSheet } from 'react-native';
 import { BlurView } from 'expo-blur';
 import { Home, CalendarClock, Users, User } from 'lucide-react-native';
+import { colors } from '@/app/theme/colors';
 
 export default function TabLayout() {
   const colorScheme = useColorScheme();
@@ -11,8 +12,8 @@ export default function TabLayout() {
       screenOptions={{
         headerShown: false,
         tabBarStyle: styles.tabBar,
-        tabBarActiveTintColor: '#16FF91',
-        tabBarInactiveTintColor: '#8F98A8',
+        tabBarActiveTintColor: colors.primary,
+        tabBarInactiveTintColor: colors.text.secondary,
         tabBarBackground: () => (
           <BlurView intensity={80} style={styles.blurView} tint="dark" />
         ),

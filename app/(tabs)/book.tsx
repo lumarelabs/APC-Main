@@ -9,8 +9,9 @@ import { WeeklyCalendar } from '@/components/booking/WeeklyCalendar';
 import { CourtList } from '@/components/booking/CourtList';
 import { RacketRental } from '@/components/booking/RacketRental';
 import { PaymentSummary } from '@/components/booking/PaymentSummary';
-import { ChevronLeft } from 'lucide-react-native';
+import { ChevronLeft, X, Users, Search } from 'lucide-react-native';
 import type { Booking } from '@/components/booking/BookingCalendar';
+import { colors } from '@/app/theme/colors';
 
 type BookingStep = 'court-selection' | 'date-time' | 'racket-rental' | 'payment';
 type CalendarViewMode = 'weekly' | 'monthly';
@@ -171,7 +172,7 @@ export default function BookScreen() {
                 style={styles.backButton} 
                 onPress={handleBack}
               >
-                <ChevronLeft size={24} color="#fff" />
+                <ChevronLeft size={24} color={colors.white} />
               </TouchableOpacity>
             )}
             <Text style={styles.headerTitle}>Book a Court</Text>
@@ -233,11 +234,11 @@ export default function BookScreen() {
 const styles = StyleSheet.create({
   safeArea: {
     flex: 1,
-    backgroundColor: '#111827',
+    backgroundColor: colors.background.primary,
   },
   container: {
     flex: 1,
-    backgroundColor: '#111827',
+    backgroundColor: colors.background.primary,
   },
   header: {
     flexDirection: 'row',
@@ -249,7 +250,7 @@ const styles = StyleSheet.create({
     width: 40,
     height: 40,
     borderRadius: 20,
-    backgroundColor: '#22293A',
+    backgroundColor: colors.background.secondary,
     justifyContent: 'center',
     alignItems: 'center',
     marginRight: 12,
@@ -257,7 +258,7 @@ const styles = StyleSheet.create({
   headerTitle: {
     fontFamily: 'Inter-Bold',
     fontSize: 24,
-    color: '#FFFFFF',
+    color: colors.text.primary,
     flex: 1,
   },
   topSection: {
@@ -272,7 +273,7 @@ const styles = StyleSheet.create({
   },
   bottomSection: {
     borderTopWidth: 1,
-    borderTopColor: '#22293A',
+    borderTopColor: colors.background.secondary,
     paddingBottom: 100,
   },
   viewSelector: {
@@ -285,22 +286,22 @@ const styles = StyleSheet.create({
     paddingVertical: 8,
     paddingHorizontal: 16,
     borderRadius: 20,
-    backgroundColor: '#22293A',
+    backgroundColor: colors.background.secondary,
     alignItems: 'center',
   },
   viewOptionActive: {
-    backgroundColor: 'rgba(22, 255, 145, 0.15)',
+    backgroundColor: colors.primary,
   },
   viewOptionText: {
     fontFamily: 'Inter-Medium',
     fontSize: 14,
-    color: '#8F98A8',
+    color: colors.text.secondary,
   },
   viewOptionTextActive: {
-    color: '#16FF91',
+    color: colors.primary,
   },
   confirmButton: {
-    backgroundColor: '#16FF91',
+    backgroundColor: colors.primary,
     padding: 16,
     borderRadius: 12,
     alignItems: 'center',

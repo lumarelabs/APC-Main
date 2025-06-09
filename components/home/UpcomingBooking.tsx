@@ -1,6 +1,7 @@
 import React from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, Image } from 'react-native';
 import { Calendar, Clock } from 'lucide-react-native';
+import { colors } from '@/app/theme/colors';
 
 type UpcomingBookingProps = {
   courtName: string;
@@ -19,14 +20,14 @@ export const UpcomingBooking = ({
   image,
   onPress,
 }: UpcomingBookingProps) => {
-  const typeColor = courtType === 'padel' ? '#16FF91' : '#32D1FF';
+  const typeColor = colors.primary;
 
   return (
     <View style={styles.container}>
       <Image source={{ uri: image }} style={styles.image} />
       <View style={styles.content}>
-        <View style={[styles.typeBadge, { backgroundColor: `${typeColor}20` }]}>
-          <Text style={[styles.typeText, { color: typeColor }]}>
+        <View style={[styles.typeBadge, { backgroundColor: colors.primary }]}>
+          <Text style={[styles.typeText, { color: colors.white }]}>
             {courtType === 'padel' ? 'Padel' : 'Pickleball'}
           </Text>
         </View>
@@ -35,21 +36,21 @@ export const UpcomingBooking = ({
 
         <View style={styles.infoContainer}>
           <View style={styles.infoRow}>
-            <Calendar size={14} color="#8F98A8" />
+            <Calendar size={14} color={colors.text.disabled} />
             <Text style={styles.infoText}>{date}</Text>
           </View>
 
           <View style={styles.infoRow}>
-            <Clock size={14} color="#8F98A8" />
+            <Clock size={14} color={colors.text.disabled} />
             <Text style={styles.infoText}>{time}</Text>
           </View>
         </View>
 
         <TouchableOpacity 
-          style={[styles.detailsButton, { borderColor: typeColor }]}
+          style={[styles.detailsButton, { borderColor: colors.primary }]}
           onPress={onPress}
         >
-          <Text style={[styles.detailsButtonText, { color: typeColor }]}>View Details</Text>
+          <Text style={[styles.detailsButtonText, { color: colors.primary }]}>View Details</Text>
         </TouchableOpacity>
       </View>
     </View>
@@ -61,7 +62,7 @@ const styles = StyleSheet.create({
     width: 300,
     height: 180,
     borderRadius: 16,
-    backgroundColor: '#22293A',
+    backgroundColor: colors.background.secondary,
     marginLeft: 8,
     marginRight: 8,
     overflow: 'hidden',
@@ -89,7 +90,7 @@ const styles = StyleSheet.create({
   courtName: {
     fontFamily: 'Inter-Bold',
     fontSize: 16,
-    color: '#FFFFFF',
+    color: colors.charcoal,
     marginBottom: 12,
   },
   infoContainer: {
@@ -103,7 +104,7 @@ const styles = StyleSheet.create({
   infoText: {
     fontFamily: 'Inter-Regular',
     fontSize: 14,
-    color: '#8F98A8',
+    color: colors.text.disabled,
     marginLeft: 8,
   },
   detailsButton: {
@@ -117,5 +118,6 @@ const styles = StyleSheet.create({
   detailsButtonText: {
     fontFamily: 'Inter-Medium',
     fontSize: 12,
+    color: colors.primary,
   },
 });

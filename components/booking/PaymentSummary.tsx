@@ -1,4 +1,6 @@
+import React from 'react';
 import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
+import { colors } from '@/app/theme/colors';
 
 type PaymentSummaryProps = {
   courtName: string;
@@ -76,16 +78,16 @@ export function PaymentSummary({
 const styles = StyleSheet.create({
   container: {
     padding: 16,
-    backgroundColor: '#111827',
+    backgroundColor: colors.background.primary,
   },
   title: {
     fontFamily: 'Inter-Bold',
     fontSize: 24,
-    color: '#FFFFFF',
+    color: colors.charcoal,
     marginBottom: 24,
   },
   section: {
-    backgroundColor: '#22293A',
+    backgroundColor: colors.background.secondary,
     borderRadius: 12,
     padding: 16,
     marginBottom: 16,
@@ -93,7 +95,7 @@ const styles = StyleSheet.create({
   sectionTitle: {
     fontFamily: 'Inter-Bold',
     fontSize: 18,
-    color: '#FFFFFF',
+    color: colors.charcoal,
     marginBottom: 16,
   },
   detailRow: {
@@ -104,12 +106,12 @@ const styles = StyleSheet.create({
   label: {
     fontFamily: 'Inter-Medium',
     fontSize: 14,
-    color: '#8F98A8',
+    color: colors.text.disabled,
   },
   value: {
     fontFamily: 'Inter-Medium',
     fontSize: 14,
-    color: '#FFFFFF',
+    color: colors.charcoal,
   },
   totalRow: {
     flexDirection: 'row',
@@ -117,20 +119,20 @@ const styles = StyleSheet.create({
     marginTop: 16,
     paddingTop: 16,
     borderTopWidth: 1,
-    borderTopColor: '#464D59',
+    borderTopColor: colors.text.disabled,
   },
   totalLabel: {
     fontFamily: 'Inter-Bold',
     fontSize: 16,
-    color: '#FFFFFF',
+    color: colors.charcoal,
   },
   totalValue: {
     fontFamily: 'Inter-Bold',
     fontSize: 16,
-    color: '#16FF91',
+    color: colors.primary,
   },
   confirmButton: {
-    backgroundColor: '#16FF91',
+    backgroundColor: colors.primary,
     padding: 16,
     borderRadius: 12,
     alignItems: 'center',
@@ -139,6 +141,6 @@ const styles = StyleSheet.create({
   confirmButtonText: {
     fontFamily: 'Inter-Bold',
     fontSize: 16,
-    color: '#000000',
+    color: colors.white,
   },
 }); 

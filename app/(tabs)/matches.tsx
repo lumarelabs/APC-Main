@@ -3,6 +3,7 @@ import { useState } from 'react';
 import { View, Text, StyleSheet, ScrollView, TouchableOpacity } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { MatchCard } from '@/components/matches/MatchCard';
+import { colors } from '@/app/theme/colors';
 
 export default function MatchesScreen() {
   const [activeTab, setActiveTab] = useState('upcoming');
@@ -106,11 +107,11 @@ export default function MatchesScreen() {
 const styles = StyleSheet.create({
   safeArea: {
     flex: 1,
-    backgroundColor: '#111827',
+    backgroundColor: colors.background.primary,
   },
   container: {
     flex: 1,
-    backgroundColor: '#111827',
+    backgroundColor: colors.background.primary,
   },
   header: {
     padding: 16,
@@ -118,7 +119,7 @@ const styles = StyleSheet.create({
   headerTitle: {
     fontFamily: 'Inter-Bold',
     fontSize: 24,
-    color: '#FFFFFF',
+    color: colors.charcoal,
   },
   tabsContainer: {
     flexDirection: 'row',
@@ -130,18 +131,18 @@ const styles = StyleSheet.create({
     paddingHorizontal: 24,
     borderRadius: 20,
     marginRight: 12,
-    backgroundColor: '#22293A',
+    backgroundColor: colors.background.secondary,
   },
   activeTab: {
-    backgroundColor: 'rgba(22, 255, 145, 0.15)',
+    backgroundColor: colors.primary,
   },
   tabText: {
     fontFamily: 'Inter-Medium',
     fontSize: 14,
-    color: '#8F98A8',
+    color: colors.text.disabled,
   },
   activeTabText: {
-    color: '#16FF91',
+    color: colors.primary,
   },
   content: {
     flex: 1,

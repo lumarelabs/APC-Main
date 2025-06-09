@@ -6,6 +6,7 @@ import {
 } from 'lucide-react-native';
 import { useApp } from '@/context/AppContext';
 import Logo2 from '../../assets/images/logo2.png';
+import { colors } from '@/app/theme/colors';
 
 export default function ProfileScreen() {
   const { user } = useApp();
@@ -102,24 +103,24 @@ export default function ProfileScreen() {
 function skillLevelBarStyle(skillLevel: 'Beginner' | 'Intermediate' | 'Advanced' | undefined) {
   switch (skillLevel) {
     case 'Beginner':
-      return { backgroundColor: 'rgba(50, 209, 255, 0.2)', borderColor: '#32D1FF' };
+      return { backgroundColor: colors.secondary, borderColor: colors.secondary };
     case 'Intermediate':
-      return { backgroundColor: 'rgba(255, 214, 10, 0.2)', borderColor: '#FFD60A' };
+      return { backgroundColor: colors.status.warning, borderColor: colors.status.warning };
     case 'Advanced':
-      return { backgroundColor: 'rgba(255, 90, 90, 0.2)', borderColor: '#FF5A5A' };
+      return { backgroundColor: colors.status.error, borderColor: colors.status.error };
     default:
-      return { backgroundColor: 'rgba(22, 255, 145, 0.15)', borderColor: '#16FF91' };
+      return { backgroundColor: colors.primary, borderColor: colors.primary };
   }
 }
 
 const styles = StyleSheet.create({
   safeArea: {
     flex: 1,
-    backgroundColor: '#111827',
+    backgroundColor: colors.background.primary,
   },
   container: {
     flex: 1,
-    backgroundColor: '#111827',
+    backgroundColor: colors.background.primary,
   },
   contentContainer: {
     paddingBottom: 100,
@@ -133,20 +134,20 @@ const styles = StyleSheet.create({
   headerTitle: {
     fontFamily: 'Inter-Bold',
     fontSize: 24,
-    color: '#FFFFFF',
+    color: colors.charcoal,
   },
   settingsButton: {
     width: 44,
     height: 44,
     borderRadius: 22,
-    backgroundColor: '#22293A',
+    backgroundColor: colors.background.secondary,
     justifyContent: 'center',
     alignItems: 'center',
   },
   profileCard: {
     margin: 16,
     padding: 16,
-    backgroundColor: '#22293A',
+    backgroundColor: colors.background.secondary,
     borderRadius: 16,
     flexDirection: 'row',
     alignItems: 'center',
@@ -156,7 +157,7 @@ const styles = StyleSheet.create({
     height: 80,
     borderRadius: 40,
     borderWidth: 2,
-    borderColor: '#16FF91',
+    borderColor: colors.primary,
   },
   profileInfo: {
     marginLeft: 16,
@@ -170,16 +171,16 @@ const styles = StyleSheet.create({
   profileName: {
     fontFamily: 'Inter-Bold',
     fontSize: 20,
-    color: '#FFFFFF',
+    color: colors.charcoal,
   },
   profileEmail: {
     fontFamily: 'Inter-Regular',
     fontSize: 14,
-    color: '#8F98A8',
+    color: colors.text.disabled,
     marginBottom: 8,
   },
   levelBadge: {
-    backgroundColor: 'rgba(22, 255, 145, 0.15)',
+    backgroundColor: colors.primary,
     paddingHorizontal: 12,
     paddingVertical: 4,
     borderRadius: 12,
@@ -188,7 +189,7 @@ const styles = StyleSheet.create({
   levelText: {
     fontFamily: 'Inter-Medium',
     fontSize: 12,
-    color: '#16FF91',
+    color: colors.white,
   },
   statsContainer: {
     flexDirection: 'row',
@@ -198,7 +199,7 @@ const styles = StyleSheet.create({
   },
   statCard: {
     flex: 1,
-    backgroundColor: '#22293A',
+    backgroundColor: colors.background.secondary,
     borderRadius: 16,
     padding: 16,
     alignItems: 'center',
@@ -207,17 +208,17 @@ const styles = StyleSheet.create({
   statValue: {
     fontFamily: 'Inter-Bold',
     fontSize: 24,
-    color: '#FFFFFF',
+    color: colors.primary,
     marginTop: 8,
   },
   statLabel: {
     fontFamily: 'Inter-Regular',
     fontSize: 14,
-    color: '#8F98A8',
+    color: colors.text.disabled,
     marginTop: 4,
   },
   menuContainer: {
-    backgroundColor: '#22293A',
+    backgroundColor: colors.background.secondary,
     borderRadius: 16,
     marginHorizontal: 16,
   },
@@ -227,13 +228,13 @@ const styles = StyleSheet.create({
     paddingVertical: 16,
     paddingHorizontal: 16,
     borderBottomWidth: 1,
-    borderBottomColor: '#212A37',
+    borderBottomColor: colors.charcoal,
   },
   menuIconContainer: {
     width: 40,
     height: 40,
     borderRadius: 20,
-    backgroundColor: '#111827',
+    backgroundColor: colors.background.primary,
     justifyContent: 'center',
     alignItems: 'center',
     marginRight: 16,
@@ -241,7 +242,7 @@ const styles = StyleSheet.create({
   menuText: {
     fontFamily: 'Inter-Medium',
     fontSize: 16,
-    color: '#FFFFFF',
+    color: colors.charcoal,
   },
   skillLevelBar: {
     paddingHorizontal: 12,
@@ -253,7 +254,7 @@ const styles = StyleSheet.create({
   skillLevelText: {
     fontFamily: 'Inter-Medium',
     fontSize: 12,
-    color: '#FFFFFF',
+    color: colors.charcoal,
   },
   logo2Container: {
     position: 'absolute',

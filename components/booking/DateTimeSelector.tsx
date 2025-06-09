@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, Modal, ScrollView } from 'react-native';
 import { Calendar } from 'react-native-calendars';
+import { colors } from '@/app/theme/colors';
 
 type DateTimeSelectorProps = {
   onSelectDateTime: (date: string, time: string) => void;
@@ -104,7 +105,7 @@ export function DateTimeSelector({ onSelectDateTime }: DateTimeSelectorProps) {
 
 const styles = StyleSheet.create({
   container: {
-    backgroundColor: '#22293A',
+    backgroundColor: colors.background.secondary,
     borderRadius: 12,
     padding: 16,
     marginBottom: 16,
@@ -112,14 +113,14 @@ const styles = StyleSheet.create({
   sectionTitle: {
     fontFamily: 'Inter-Bold',
     fontSize: 18,
-    color: '#FFFFFF',
+    color: colors.text.primary,
     marginBottom: 12,
   },
   dateSection: {
     marginBottom: 16,
   },
   dateButton: {
-    backgroundColor: '#16FF91',
+    backgroundColor: colors.primary,
     borderRadius: 8,
     padding: 12,
     alignItems: 'center',
@@ -133,7 +134,7 @@ const styles = StyleSheet.create({
     flexGrow: 0,
   },
   timeSlot: {
-    backgroundColor: '#111827',
+    backgroundColor: colors.background.primary,
     borderRadius: 8,
     padding: 12,
     marginRight: 8,
@@ -141,12 +142,12 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   selectedTimeSlot: {
-    backgroundColor: '#16FF91',
+    backgroundColor: colors.primary,
   },
   timeText: {
     fontFamily: 'Inter-Medium',
     fontSize: 14,
-    color: '#FFFFFF',
+    color: colors.text.primary,
   },
   selectedTimeText: {
     color: '#000000',
@@ -159,13 +160,13 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   modalContent: {
-    backgroundColor: '#22293A',
+    backgroundColor: colors.background.secondary,
     borderRadius: 12,
     padding: 16,
     width: '90%',
   },
   closeButton: {
-    backgroundColor: '#16FF91',
+    backgroundColor: colors.primary,
     borderRadius: 8,
     padding: 12,
     alignItems: 'center',

@@ -1,5 +1,6 @@
 import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
 import { Calendar, Clock, Users } from 'lucide-react-native';
+import { colors } from '@/app/theme/colors';
 
 type MatchCardProps = {
   courtName: string;
@@ -24,18 +25,18 @@ export function MatchCard({
   result,
   onPress,
 }: MatchCardProps) {
-  const typeColor = courtType === 'padel' ? '#16FF91' : '#32D1FF';
+  const typeColor = colors.primary;
   
   const getStatusColor = () => {
     switch (status) {
       case 'pending':
-        return '#FFC107';
+        return colors.status.warning;
       case 'confirmed':
-        return '#16FF91';
+        return colors.primary;
       case 'completed':
-        return result === 'win' ? '#16FF91' : '#FF5A5A';
+        return result === 'win' ? colors.primary : colors.status.error;
       default:
-        return '#8F98A8';
+        return colors.text.disabled;
     }
   };
   
@@ -72,12 +73,12 @@ export function MatchCard({
       
       <View style={styles.infoContainer}>
         <View style={styles.infoRow}>
-          <Calendar size={16} color="#8F98A8" />
+          <Calendar size={16} color={colors.text.disabled} />
           <Text style={styles.infoText}>{date}</Text>
         </View>
         
         <View style={styles.infoRow}>
-          <Clock size={16} color="#8F98A8" />
+          <Clock size={16} color={colors.text.disabled} />
           <Text style={styles.infoText}>{time}</Text>
         </View>
       </View>
@@ -113,7 +114,7 @@ export function MatchCard({
 
 const styles = StyleSheet.create({
   container: {
-    backgroundColor: '#22293A',
+    backgroundColor: colors.background.secondary,
     borderRadius: 16,
     padding: 16,
     marginBottom: 16,
@@ -144,7 +145,7 @@ const styles = StyleSheet.create({
   courtName: {
     fontFamily: 'Inter-Bold',
     fontSize: 18,
-    color: '#FFFFFF',
+    color: colors.charcoal,
     marginBottom: 12,
   },
   infoContainer: {
@@ -159,12 +160,12 @@ const styles = StyleSheet.create({
   infoText: {
     fontFamily: 'Inter-Regular',
     fontSize: 14,
-    color: '#8F98A8',
+    color: colors.text.disabled,
     marginLeft: 8,
   },
   teamsContainer: {
     flexDirection: 'row',
-    backgroundColor: '#181A20',
+    backgroundColor: colors.background.primary,
     borderRadius: 12,
     padding: 12,
     marginBottom: 16,
@@ -175,13 +176,13 @@ const styles = StyleSheet.create({
   teamLabel: {
     fontFamily: 'Inter-Medium',
     fontSize: 14,
-    color: '#8F98A8',
+    color: colors.text.disabled,
     marginBottom: 8,
   },
   playerName: {
     fontFamily: 'Inter-Regular',
     fontSize: 14,
-    color: '#FFFFFF',
+    color: colors.charcoal,
     marginBottom: 4,
   },
   vsContainer: {
@@ -192,10 +193,10 @@ const styles = StyleSheet.create({
   vsText: {
     fontFamily: 'Inter-Bold',
     fontSize: 16,
-    color: '#8F98A8',
+    color: colors.text.disabled,
   },
   detailsButton: {
-    backgroundColor: '#32D1FF',
+    backgroundColor: colors.primary,
     borderRadius: 12,
     paddingVertical: 12,
     alignItems: 'center',
@@ -203,6 +204,6 @@ const styles = StyleSheet.create({
   detailsButtonText: {
     fontFamily: 'Inter-Bold',
     fontSize: 14,
-    color: '#000000',
+    color: colors.white,
   },
 });

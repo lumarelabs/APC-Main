@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
 import { MinusCircle, PlusCircle } from 'lucide-react-native';
+import { colors } from '@/app/theme/colors';
 
 type RacketRentalProps = {
   onComplete: (racketCount: number) => void;
@@ -28,7 +29,7 @@ export function RacketRental({ onComplete }: RacketRentalProps) {
           style={[styles.counterButton, racketCount === 0 && styles.counterButtonDisabled]}
           disabled={racketCount === 0}
         >
-          <MinusCircle size={24} color={racketCount === 0 ? '#464D59' : '#16FF91'} />
+          <MinusCircle size={24} color={racketCount === 0 ? colors.text.disabled : colors.primary} />
         </TouchableOpacity>
         
         <View style={styles.countDisplay}>
@@ -41,7 +42,7 @@ export function RacketRental({ onComplete }: RacketRentalProps) {
           style={[styles.counterButton, racketCount === 4 && styles.counterButtonDisabled]}
           disabled={racketCount === 4}
         >
-          <PlusCircle size={24} color={racketCount === 4 ? '#464D59' : '#16FF91'} />
+          <PlusCircle size={24} color={racketCount === 4 ? colors.text.disabled : colors.primary} />
         </TouchableOpacity>
       </View>
 
@@ -75,18 +76,18 @@ export function RacketRental({ onComplete }: RacketRentalProps) {
 const styles = StyleSheet.create({
   container: {
     padding: 16,
-    backgroundColor: '#111827',
+    backgroundColor: colors.background.primary,
   },
   title: {
     fontFamily: 'Inter-Bold',
     fontSize: 24,
-    color: '#FFFFFF',
+    color: colors.charcoal,
     marginBottom: 8,
   },
   subtitle: {
     fontFamily: 'Inter-Medium',
     fontSize: 16,
-    color: '#8F98A8',
+    color: colors.text.disabled,
     marginBottom: 24,
   },
   counterContainer: {
@@ -108,15 +109,15 @@ const styles = StyleSheet.create({
   countText: {
     fontFamily: 'Inter-Bold',
     fontSize: 32,
-    color: '#FFFFFF',
+    color: colors.charcoal,
   },
   countLabel: {
     fontFamily: 'Inter-Medium',
     fontSize: 14,
-    color: '#8F98A8',
+    color: colors.text.disabled,
   },
   priceContainer: {
-    backgroundColor: '#22293A',
+    backgroundColor: colors.background.secondary,
     padding: 16,
     borderRadius: 12,
     marginBottom: 24,
@@ -124,25 +125,25 @@ const styles = StyleSheet.create({
   priceLabel: {
     fontFamily: 'Inter-Medium',
     fontSize: 14,
-    color: '#8F98A8',
+    color: colors.text.disabled,
     marginBottom: 4,
   },
   priceValue: {
     fontFamily: 'Inter-Bold',
     fontSize: 18,
-    color: '#FFFFFF',
+    color: colors.charcoal,
     marginBottom: 12,
   },
   totalLabel: {
     fontFamily: 'Inter-Medium',
     fontSize: 14,
-    color: '#8F98A8',
+    color: colors.text.disabled,
     marginBottom: 4,
   },
   totalValue: {
     fontFamily: 'Inter-Bold',
     fontSize: 24,
-    color: '#16FF91',
+    color: colors.primary,
   },
   buttonContainer: {
     flexDirection: 'row',
@@ -150,7 +151,7 @@ const styles = StyleSheet.create({
   },
   skipButton: {
     flex: 1,
-    backgroundColor: '#22293A',
+    backgroundColor: colors.background.secondary,
     padding: 16,
     borderRadius: 12,
     alignItems: 'center',
@@ -158,11 +159,11 @@ const styles = StyleSheet.create({
   skipButtonText: {
     fontFamily: 'Inter-Bold',
     fontSize: 16,
-    color: '#8F98A8',
+    color: colors.text.disabled,
   },
   continueButton: {
     flex: 1,
-    backgroundColor: '#16FF91',
+    backgroundColor: colors.primary,
     padding: 16,
     borderRadius: 12,
     alignItems: 'center',
@@ -170,7 +171,7 @@ const styles = StyleSheet.create({
   continueButtonText: {
     fontFamily: 'Inter-Bold',
     fontSize: 16,
-    color: '#000000',
+    color: colors.white,
   },
   disabledButton: {
     opacity: 0.5,

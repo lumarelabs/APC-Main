@@ -1,6 +1,7 @@
 import React from 'react';
 import { View, Text, StyleSheet, Modal, TouchableOpacity, Image } from 'react-native';
 import { X, Users } from 'lucide-react-native';
+import { colors } from '@/app/theme/colors';
 
 type BookingDetailsModalProps = {
   isVisible: boolean;
@@ -35,7 +36,7 @@ export const BookingDetailsModal = ({ isVisible, onClose, booking }: BookingDeta
       <View style={styles.modalOverlay}>
         <View style={styles.modalContent}>
           <TouchableOpacity style={styles.closeButton} onPress={onClose}>
-            <X size={24} color="#fff" />
+            <X size={24} color={colors.white} />
           </TouchableOpacity>
 
           <Image source={{ uri: booking.image }} style={styles.image} />
@@ -46,7 +47,7 @@ export const BookingDetailsModal = ({ isVisible, onClose, booking }: BookingDeta
 
             <View style={styles.playersSection}>
               <View style={styles.playersHeader}>
-                <Users size={20} color="#8F98A8" />
+                <Users size={20} color={colors.text.disabled} />
                 <Text style={styles.playersTitle}>Players</Text>
                 <View style={[styles.playerCount, { backgroundColor: getStatusColor() + '26' }]}>
                   <Text style={[styles.playerCountText, { color: getStatusColor() }]}>
@@ -72,12 +73,12 @@ export const BookingDetailsModal = ({ isVisible, onClose, booking }: BookingDeta
 const styles = StyleSheet.create({
   modalOverlay: {
     flex: 1,
-    backgroundColor: 'rgba(0, 0, 0, 0.7)',
+    backgroundColor: 'rgba(34, 40, 47, 0.7)',
     justifyContent: 'center',
     alignItems: 'center',
   },
   modalContent: {
-    backgroundColor: '#22293A',
+    backgroundColor: colors.background.secondary,
     borderRadius: 16,
     width: '90%',
     maxHeight: '80%',
@@ -88,7 +89,7 @@ const styles = StyleSheet.create({
     right: 16,
     top: 16,
     zIndex: 1,
-    backgroundColor: 'rgba(0, 0, 0, 0.5)',
+    backgroundColor: 'rgba(34, 40, 47, 0.5)',
     borderRadius: 20,
     padding: 8,
   },
@@ -102,17 +103,17 @@ const styles = StyleSheet.create({
   courtName: {
     fontFamily: 'Inter-Bold',
     fontSize: 20,
-    color: '#FFFFFF',
+    color: colors.white,
     marginBottom: 8,
   },
   dateTime: {
     fontFamily: 'Inter-Medium',
     fontSize: 16,
-    color: '#8F98A8',
+    color: colors.text.disabled,
     marginBottom: 24,
   },
   playersSection: {
-    backgroundColor: '#1A1F2E',
+    backgroundColor: colors.background.primary,
     borderRadius: 12,
     padding: 16,
   },
@@ -124,7 +125,7 @@ const styles = StyleSheet.create({
   playersTitle: {
     fontFamily: 'Inter-Medium',
     fontSize: 16,
-    color: '#FFFFFF',
+    color: colors.white,
     marginLeft: 8,
     flex: 1,
   },
@@ -136,6 +137,7 @@ const styles = StyleSheet.create({
   playerCountText: {
     fontFamily: 'Inter-Bold',
     fontSize: 12,
+    color: colors.primary,
   },
   playerItem: {
     flexDirection: 'row',
@@ -143,16 +145,16 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     paddingVertical: 8,
     borderBottomWidth: 1,
-    borderBottomColor: 'rgba(255, 255, 255, 0.1)',
+    borderBottomColor: colors.text.disabled,
   },
   playerName: {
     fontFamily: 'Inter-Medium',
     fontSize: 14,
-    color: '#FFFFFF',
+    color: colors.white,
   },
   skillLevel: {
     fontFamily: 'Inter-Regular',
     fontSize: 12,
-    color: '#8F98A8',
+    color: colors.text.disabled,
   },
 }); 
