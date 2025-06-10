@@ -134,7 +134,7 @@ export default function BookScreen() {
                 style={styles.confirmButton}
                 onPress={handleDateTimeConfirm}
               >
-                <Text style={styles.confirmButtonText}>Confirm Date & Time</Text>
+                <Text style={styles.confirmButtonText}>Tarih & Saat Onayla</Text>
               </TouchableOpacity>
             )}
           </>
@@ -175,7 +175,7 @@ export default function BookScreen() {
                 <ChevronLeft size={24} color={colors.white} />
               </TouchableOpacity>
             )}
-            <Text style={styles.headerTitle}>Book a Court</Text>
+            <Text style={styles.headerTitle}>Kort Rezervasyonu</Text>
           </View>
           
           {currentStep === 'court-selection' && (
@@ -200,7 +200,7 @@ export default function BookScreen() {
                 onPress={() => setCalendarViewMode('weekly')}
               >
                 <Text style={[styles.viewOptionText, calendarViewMode === 'weekly' && styles.viewOptionTextActive]}>
-                  Weekly View
+                  Haftalık Görünüm
                 </Text>
               </TouchableOpacity>
               <TouchableOpacity
@@ -208,7 +208,7 @@ export default function BookScreen() {
                 onPress={() => setCalendarViewMode('monthly')}
               >
                 <Text style={[styles.viewOptionText, calendarViewMode === 'monthly' && styles.viewOptionTextActive]}>
-                  Monthly View
+                  Aylık Görünüm
                 </Text>
               </TouchableOpacity>
             </View>
@@ -260,6 +260,8 @@ const styles = StyleSheet.create({
     fontSize: 24,
     color: colors.text.primary,
     flex: 1,
+    textAlign: 'center',
+    marginRight: 40, // To balance back button space
   },
   topSection: {
     paddingTop: 16,
@@ -306,11 +308,16 @@ const styles = StyleSheet.create({
     borderRadius: 12,
     alignItems: 'center',
     marginTop: 16,
+    shadowColor: colors.primary,
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.3,
+    shadowRadius: 4,
+    elevation: 5,
   },
   confirmButtonText: {
     fontFamily: 'Inter-Bold',
     fontSize: 16,
-    color: '#000000',
+    color: colors.white,
   },
   bookingsListContainer: {
     marginTop: 8,

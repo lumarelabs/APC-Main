@@ -38,7 +38,7 @@ export function CourtCard({
         <Text style={styles.distance}>{distance}</Text>
         <View style={styles.priceContainer}>
           <Text style={styles.price}>${price}</Text>
-          <Text style={styles.perHour}>/hour</Text>
+          <Text style={styles.perHour}>/saat</Text>
         </View>
         <TouchableOpacity 
           style={[
@@ -52,7 +52,7 @@ export function CourtCard({
             styles.bookButtonText,
             availableSlots === 0 && styles.disabledButtonText,
           ]}>
-            {availableSlots > 0 ? 'Book Now' : 'Fully Booked'}
+            {availableSlots > 0 ? 'Rezervasyon Yap' : 'Dolu'}
           </Text>
         </TouchableOpacity>
       </View>
@@ -63,7 +63,7 @@ export function CourtCard({
 const styles = StyleSheet.create({
   container: {
     width: '48%',
-    backgroundColor: '#22293A',
+    backgroundColor: colors.background.secondary,
     borderRadius: 12,
     overflow: 'hidden',
     marginBottom: 16,
@@ -79,7 +79,7 @@ const styles = StyleSheet.create({
   name: {
     fontFamily: 'Inter-Bold',
     fontSize: 14,
-    color: '#FFFFFF',
+    color: '#00000',
     marginBottom: 4,
   },
   ratingContainer: {
@@ -121,16 +121,19 @@ const styles = StyleSheet.create({
     paddingHorizontal: 12,
     borderRadius: 8,
     alignItems: 'center',
+    borderWidth: 1,
+    borderColor: colors.primary,
   },
   bookButtonText: {
     fontFamily: 'Inter-Bold',
     fontSize: 12,
-    color: '#16FF91',
+    color: colors.primary,
   },
   disabledButton: {
     backgroundColor: 'rgba(143, 152, 168, 0.15)',
+    borderColor: colors.text.disabled,
   },
   disabledButtonText: {
-    color: '#8F98A8',
+    color: colors.text.disabled,
   },
 });

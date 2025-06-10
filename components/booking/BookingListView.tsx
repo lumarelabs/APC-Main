@@ -35,7 +35,7 @@ export function BookingListView({ bookings }: BookingListViewProps) {
 
   return (
     <View style={styles.container}>
-      <Text style={styles.title}>Current Bookings</Text>
+      <Text style={styles.title}>Mevcut Rezervasyonlar</Text>
       <ScrollView style={styles.bookingsList}>
         {Object.entries(bookings).map(([date, dateBookings]) =>
           dateBookings.map((booking) => (

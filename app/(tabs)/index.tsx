@@ -55,16 +55,8 @@ export default function HomeScreen() {
         {/* Welcome Header */}
         <View style={styles.welcomeHeader}>
           <View>
-            <Text style={styles.greeting}>Hey, Alex!</Text>
-            <Text style={styles.subtitle}>Ready to hit the courts?</Text>
-          </View>
-          <View style={styles.headerActions}>
-            <TouchableOpacity style={styles.iconButton}>
-              <Search size={24} color="#fff" />
-            </TouchableOpacity>
-            <TouchableOpacity style={styles.iconButton}>
-              <Bell size={24} color="#fff" />
-            </TouchableOpacity>
+            <Text style={styles.greeting}>Hoş geldin, Ece!</Text>
+            <Text style={styles.subtitle}>Oynamaya hazır mısın?</Text>
           </View>
         </View>
 
@@ -72,9 +64,9 @@ export default function HomeScreen() {
         <View style={styles.headerContainer}>
           <Image source={Logo2} style={styles.headerLogo} resizeMode="contain" />
           <View style={styles.aboutContainer}>
-            <Text style={styles.aboutTitle}>Alacati Padel Club</Text>
+            <Text style={styles.aboutTitle}>Alaçatı Padel Club</Text>
             <Text style={styles.aboutText}>
-              Alaçatı Padel Club is a racket sports club located in Alaçatı, a popular holiday resort in Izmir. The club offers padel and pickleball court rentals, private lessons, group matches and social events...
+              Alaçatı Padel Club, İzmir'in popüler tatil beldesi Alaçatı'da bulunan bir raket sporları kulübüdür. Kulüp, padel ve pickleball kortu kiralama, özel dersler, grup maçları ve sosyal etkinlikler sunmaktadır.
             </Text>
           </View>
         </View>
@@ -85,9 +77,9 @@ export default function HomeScreen() {
         {/* Upcoming bookings */}
         <View style={styles.section}>
           <View style={styles.sectionHeader}>
-            <Text style={styles.sectionTitle}>Upcoming Bookings</Text>
+            <Text style={styles.sectionTitle}>Yaklaşan Rezervasyonlar</Text>
             <TouchableOpacity>
-              <Text style={styles.seeAll}>See All</Text>
+              <Text style={styles.seeAll}>Hepsini Gör</Text>
             </TouchableOpacity>
           </View>
 
@@ -226,18 +218,6 @@ const styles = StyleSheet.create({
     fontFamily: 'Inter-Regular',
     fontSize: 16,
     color: colors.text.disabled,
-  },
-  headerActions: {
-    flexDirection: 'row',
-  },
-  iconButton: {
-    width: 44,
-    height: 44,
-    borderRadius: 22,
-    backgroundColor: colors.background.secondary,
-    justifyContent: 'center',
-    alignItems: 'center',
-    marginLeft: 8,
   },
   headerContainer: {
     flexDirection: 'row',

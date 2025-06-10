@@ -14,6 +14,7 @@ export default function TabLayout() {
         tabBarStyle: styles.tabBar,
         tabBarActiveTintColor: colors.primary,
         tabBarInactiveTintColor: colors.text.secondary,
+        tabBarLabelPosition: 'below-icon',
         tabBarBackground: () => (
           <BlurView intensity={80} style={styles.blurView} tint="dark" />
         ),
@@ -21,7 +22,7 @@ export default function TabLayout() {
       <Tabs.Screen
         name="index"
         options={{
-          title: 'Home',
+          title: 'Anasayfa',
           tabBarIcon: ({ color, size }) => (
             <Home size={size} color={color} />
           ),
@@ -30,7 +31,7 @@ export default function TabLayout() {
       <Tabs.Screen
         name="book"
         options={{
-          title: 'Book',
+          title: 'Rezervasyon',
           tabBarIcon: ({ color, size }) => (
             <CalendarClock size={size} color={color} />
           ),
@@ -39,7 +40,7 @@ export default function TabLayout() {
       <Tabs.Screen
         name="matches"
         options={{
-          title: 'Matches',
+          title: 'Maçlar',
           tabBarIcon: ({ color, size }) => (
             <Users size={size} color={color} />
           ),
@@ -48,7 +49,7 @@ export default function TabLayout() {
       <Tabs.Screen
         name="profile"
         options={{
-          title: 'Profile',
+          title: 'Profil',
           tabBarIcon: ({ color, size }) => (
             <User size={size} color={color} />
           ),

@@ -14,25 +14,19 @@ export function CourtTypeSelector({ selectedType, onSelectType }: CourtTypeSelec
         style={[styles.option, selectedType === 'all' && styles.selectedOption]}
         onPress={() => onSelectType('all')}
       >
-        <Text style={[styles.optionText, selectedType === 'all' && styles.selectedOptionText]}>
-          All Courts
-        </Text>
+        <Text style={[styles.optionText, selectedType === 'all' && styles.selectedOptionText]}>Tümü</Text>
       </TouchableOpacity>
       <TouchableOpacity
         style={[styles.option, selectedType === 'padel' && styles.selectedOption]}
         onPress={() => onSelectType('padel')}
       >
-        <Text style={[styles.optionText, selectedType === 'padel' && styles.selectedOptionText]}>
-          Padel
-        </Text>
+        <Text style={[styles.optionText, selectedType === 'padel' && styles.selectedOptionText]}>Padel</Text>
       </TouchableOpacity>
       <TouchableOpacity
         style={[styles.option, selectedType === 'pickleball' && styles.selectedOption]}
         onPress={() => onSelectType('pickleball')}
       >
-        <Text style={[styles.optionText, selectedType === 'pickleball' && styles.selectedOptionText]}>
-          Pickleball
-        </Text>
+        <Text style={[styles.optionText, selectedType === 'pickleball' && styles.selectedOptionText]}>Pickleball</Text>
       </TouchableOpacity>
     </View>
   );
@@ -61,6 +55,6 @@ const styles = StyleSheet.create({
     color: colors.text.secondary,
   },
   selectedOptionText: {
-    color: colors.primary,
+    color: colors.charcoal,
   },
 }); 

@@ -10,7 +10,7 @@ export function CourtList({ courtType, onSelectCourt }: CourtListProps) {
   const courts = [
     {
       id: '1',
-      name: 'Padel Court 1',
+      name: 'Padel Kort 1',
       type: 'padel',
       price: 35,
       rating: 4.8,
@@ -20,7 +20,7 @@ export function CourtList({ courtType, onSelectCourt }: CourtListProps) {
     },
     {
       id: '2',
-      name: 'Padel Court 2',
+      name: 'Padel Kort 2',
       type: 'padel',
       price: 35,
       rating: 4.7,
@@ -30,7 +30,7 @@ export function CourtList({ courtType, onSelectCourt }: CourtListProps) {
     },
     {
       id: '3',
-      name: 'Padel Court 3',
+      name: 'Padel Kort 3',
       type: 'padel',
       price: 35,
       rating: 4.9,
@@ -40,7 +40,7 @@ export function CourtList({ courtType, onSelectCourt }: CourtListProps) {
     },
     {
       id: '4',
-      name: 'Padel Court 4',
+      name: 'Padel Kort 4',
       type: 'padel',
       price: 35,
       rating: 4.6,
@@ -50,7 +50,7 @@ export function CourtList({ courtType, onSelectCourt }: CourtListProps) {
     },
     {
       id: '5',
-      name: 'Pickleball Court 1',
+      name: 'Pickleball Kort 1',
       type: 'pickleball',
       price: 25,
       rating: 4.5,
@@ -60,7 +60,7 @@ export function CourtList({ courtType, onSelectCourt }: CourtListProps) {
     },
     {
       id: '6',
-      name: 'Pickleball Court 2',
+      name: 'Pickleball Kort 2',
       type: 'pickleball',
       price: 25,
       rating: 4.3,
@@ -74,7 +74,7 @@ export function CourtList({ courtType, onSelectCourt }: CourtListProps) {
 
   return (
     <View style={styles.container}>
-      <Text style={styles.title}>Select a Court</Text>
+      <Text style={styles.title}>Kort Seçiniz</Text>
       
       <FlatList
         data={filteredCourts}
@@ -107,7 +107,7 @@ const styles = StyleSheet.create({
   title: {
     fontFamily: 'Inter-Bold',
     fontSize: 18,
-    color: '#FFFFFF',
+    color: '#000000',
     marginBottom: 16,
   },
   listContent: {
