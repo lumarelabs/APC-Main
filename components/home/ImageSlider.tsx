@@ -3,12 +3,13 @@ import { View, Image, StyleSheet, Dimensions } from 'react-native';
 import Logo1 from '../../assets/images/logo1.png';
 import Logo2 from '../../assets/images/logo2.png';
 import Logo3 from '../../assets/images/logo3.png';
+import Logo4 from '../../assets/images/logo4.png';
 
 const { width } = Dimensions.get('window');
 
 export const ImageSlider = () => {
   const [currentIndex, setCurrentIndex] = useState(0);
-  const images = [Logo1, Logo2, Logo3];
+  const images = [Logo4, Logo3];
 
   useEffect(() => {
     const timer = setInterval(() => {

@@ -28,13 +28,13 @@ export function WeeklyCalendar({ bookings }: WeeklyCalendarProps) {
   return (
     <View style={styles.container}>
       <View style={styles.header}>
-        <Text style={styles.title}>Weekly View</Text>
+        <Text style={styles.title}>Haftalık Görünüm</Text>
         <View style={styles.navigation}>
           <TouchableOpacity 
             style={styles.navButton} 
             onPress={() => navigateWeek('prev')}
           >
-            <ChevronLeft size={24} color="#16FF91" />
+            <ChevronLeft size={24} color="#e97d2b" />
           </TouchableOpacity>
           <Text style={styles.monthText}>
             {format(weekStart, 'MMMM yyyy')}
@@ -43,7 +43,7 @@ export function WeeklyCalendar({ bookings }: WeeklyCalendarProps) {
             style={styles.navButton} 
             onPress={() => navigateWeek('next')}
           >
-            <ChevronRight size={24} color="#16FF91" />
+            <ChevronRight size={24} color="#e97d2b" />
           </TouchableOpacity>
         </View>
       </View>
@@ -125,6 +125,6 @@ const styles = StyleSheet.create({
     color: colors.charcoal,
   },
   bookedDayText: {
-    color: colors.primary,
+    color: colors.charcoal,
   },
 }); 

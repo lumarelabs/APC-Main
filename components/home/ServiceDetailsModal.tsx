@@ -15,38 +15,38 @@ export const ServiceDetailsModal = ({ isVisible, onClose, serviceType }: Service
       case 'court':
         return (
           <>
-            <Text style={styles.title}>Court Booking</Text>
+            <Text style={styles.title}>Kort Rezervasyonu</Text>
             <View style={styles.priceContainer}>
               <View style={styles.priceItem}>
-                <Text style={styles.courtType}>Padel Courts</Text>
-                <Text style={styles.price}>$35/hour</Text>
+                <Text style={styles.courtType}>Padel Kortları</Text>
+                <Text style={styles.price}>₺350/saat</Text>
               </View>
               <View style={styles.priceItem}>
-                <Text style={styles.courtType}>Pickleball Courts</Text>
-                <Text style={styles.price}>$25/hour</Text>
+                <Text style={styles.courtType}>Pickleball Kortları</Text>
+                <Text style={styles.price}>₺250/saat</Text>
               </View>
             </View>
             <Text style={styles.description}>
-              Book your preferred court type and time slot. All courts are equipped with professional-grade facilities and maintained to the highest standards.
+              Tercih ettiğiniz kort tipini ve zaman dilimini seçin. Tüm kortlarımız profesyonel standartlarda donatılmış ve en yüksek kalitede bakımı yapılmaktadır.
             </Text>
           </>
         );
       case 'lessons':
         return (
           <>
-            <Text style={styles.title}>Padel Lessons</Text>
+            <Text style={styles.title}>Padel Dersleri</Text>
             <View style={styles.priceContainer}>
               <View style={styles.priceItem}>
-                <Text style={styles.courtType}>Private Lesson</Text>
-                <Text style={styles.price}>$60/hour</Text>
+                <Text style={styles.courtType}>Özel Ders</Text>
+                <Text style={styles.price}>₺600/saat</Text>
               </View>
               <View style={styles.priceItem}>
-                <Text style={styles.courtType}>Group Lesson (4 people)</Text>
-                <Text style={styles.price}>$30/person/hour</Text>
+                <Text style={styles.courtType}>Grup Dersi (4 kişi)</Text>
+                <Text style={styles.price}>₺300/kişi/saat</Text>
               </View>
             </View>
             <Text style={styles.description}>
-              Learn from our experienced coaches. Lessons are available for all skill levels, from beginners to advanced players.
+              Deneyimli eğitmenlerimizden ders alın. Başlangıç seviyesinden ileri seviyeye kadar tüm seviyelerde dersler mevcuttur.
             </Text>
           </>
         );

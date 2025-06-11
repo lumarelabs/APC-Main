@@ -48,7 +48,7 @@ export const BookingDetailsModal = ({ isVisible, onClose, booking }: BookingDeta
             <View style={styles.playersSection}>
               <View style={styles.playersHeader}>
                 <Users size={20} color={colors.text.disabled} />
-                <Text style={styles.playersTitle}>Players</Text>
+                <Text style={styles.playersTitle}>Oyuncular</Text>
                 <View style={[styles.playerCount, { backgroundColor: getStatusColor() + '26' }]}>
                   <Text style={[styles.playerCountText, { color: getStatusColor() }]}>
                     {currentPlayers}/{maxPlayers}

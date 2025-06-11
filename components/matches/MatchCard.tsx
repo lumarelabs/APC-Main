@@ -43,11 +43,11 @@ export function MatchCard({
   const getStatusText = () => {
     switch (status) {
       case 'pending':
-        return 'Pending';
+        return 'Beklemede';
       case 'confirmed':
-        return 'Confirmed';
+        return 'Onaylandı';
       case 'completed':
-        return result === 'win' ? 'Won' : 'Lost';
+        return result === 'win' ? 'Kazandınız' : 'Kaybettiniz';
       default:
         return '';
     }
@@ -85,7 +85,7 @@ export function MatchCard({
       
       <View style={styles.teamsContainer}>
         <View style={styles.teamColumn}>
-          <Text style={styles.teamLabel}>Your Team</Text>
+          <Text style={styles.teamLabel}>Takımınız</Text>
           {partners.map((partner, index) => (
             <Text key={`partner-${index}`} style={styles.playerName}>{partner}</Text>
           ))}
@@ -96,7 +96,7 @@ export function MatchCard({
         </View>
         
         <View style={styles.teamColumn}>
-          <Text style={styles.teamLabel}>Opponents</Text>
+          <Text style={styles.teamLabel}>Rakipler</Text>
           {opponents.map((opponent, index) => (
             <Text key={`opponent-${index}`} style={styles.playerName}>{opponent}</Text>
           ))}
@@ -105,7 +105,12 @@ export function MatchCard({
       
       {status === 'confirmed' && (
         <TouchableOpacity style={styles.detailsButton} onPress={onPress}>
-          <Text style={styles.detailsButtonText}>View Details</Text>
+          <Text style={styles.detailsButtonText}>Detayları Gör</Text>
+        </TouchableOpacity>
+      )}
+      {status === 'completed' && (
+        <TouchableOpacity style={styles.detailsButton} onPress={onPress}>
+          <Text style={styles.detailsButtonText}>Detayları Gör</Text>
         </TouchableOpacity>
       )}
     </TouchableOpacity>

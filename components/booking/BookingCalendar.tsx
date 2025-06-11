@@ -11,7 +11,7 @@ export type Booking = {
   date: string;
   players: Array<{
     name: string;
-    skillLevel: 'Beginner' | 'Intermediate' | 'Advanced';
+    skillLevel: 'Başlangıç' | 'Orta' | 'İleri';
   }>;
   maxPlayers?: number;
 };
@@ -33,15 +33,15 @@ export function BookingCalendar({ bookings }: BookingCalendarProps) {
 
   return (
     <View style={styles.container}>
-      <Text style={styles.title}>Monthly View</Text>
+      <Text style={styles.title}>Aylık Görünüm</Text>
       <Calendar
         style={styles.calendar}
         theme={{
           backgroundColor: colors.background.primary,
           calendarBackground: colors.background.primary,
-          textSectionTitleColor: colors.text.secondary,
+          textSectionTitleColor: colors.text.primary,
           selectedDayBackgroundColor: colors.primary,
-          selectedDayTextColor: colors.primary,
+          selectedDayTextColor: colors.text.primary,
           todayTextColor: colors.primary,
           dayTextColor: colors.text.primary,
           textDisabledColor: colors.text.disabled,

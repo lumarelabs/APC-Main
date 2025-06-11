@@ -1,13 +1,14 @@
 import React, { useState } from 'react';
-import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Image } from 'react-native';
+import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Image, Linking } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { Search, Bell, Trophy, GraduationCap, BookOpen } from 'lucide-react-native';
+import { Search, Bell, Trophy, GraduationCap, BookOpen, Instagram, MapPin } from 'lucide-react-native';
 import { UpcomingBooking } from '@/components/home/UpcomingBooking';
 import { ImageSlider } from '@/components/home/ImageSlider';
 import { ServiceDetailsModal } from '@/components/home/ServiceDetailsModal';
 import { BookingDetailsModal } from '@/components/home/BookingDetailsModal';
 import { colors } from '@/app/theme/colors';
 import Logo2 from '../../assets/images/logo2.png';
+import RacketImage from '../../assets/images/racket.png';
 
 type Booking = {
   courtName: string;
@@ -27,7 +28,7 @@ export default function HomeScreen() {
     {
       courtName: "Padel Court 2",
       courtType: "padel",
-      date: "Today",
+      date: "Bugün",
       time: "18:00 - 19:30",
       image: "https://images.pexels.com/photos/2277981/pexels-photo-2277981.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=2",
       players: [
@@ -39,7 +40,7 @@ export default function HomeScreen() {
     {
       courtName: "Pickleball Court 1",
       courtType: "pickleball",
-      date: "Tomorrow",
+      date: "Yarın",
       time: "10:00 - 11:30",
       image: "https://images.pexels.com/photos/6765942/pexels-photo-6765942.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=2",
       players: [
@@ -58,11 +59,12 @@ export default function HomeScreen() {
             <Text style={styles.greeting}>Hoş geldin, Ece!</Text>
             <Text style={styles.subtitle}>Oynamaya hazır mısın?</Text>
           </View>
+          <Image source={Logo2} style={styles.topRightLogo} resizeMode="contain" />
         </View>
 
-        {/* Header with Logo and About */}
+        {/* Header with About */}
         <View style={styles.headerContainer}>
-          <Image source={Logo2} style={styles.headerLogo} resizeMode="contain" />
+          <Image source={RacketImage} style={styles.headerLogo} resizeMode="contain" />
           <View style={styles.aboutContainer}>
             <Text style={styles.aboutTitle}>Alaçatı Padel Club</Text>
             <Text style={styles.aboutText}>
@@ -100,7 +102,7 @@ export default function HomeScreen() {
 
         {/* Services */}
         <View style={styles.section}>
-          <Text style={styles.sectionTitle}>Services</Text>
+          <Text style={styles.sectionTitle}>Hizmetler</Text>
           <View style={styles.servicesGrid}>
             <TouchableOpacity 
               style={styles.serviceCard}
@@ -109,8 +111,8 @@ export default function HomeScreen() {
               <View style={[styles.serviceIcon, { backgroundColor: 'rgba(22, 255, 145, 0.15)' }]}>
                 <BookOpen size={24} color="#16FF91" />
               </View>
-              <Text style={styles.serviceTitle}>Court Booking</Text>
-              <Text style={styles.serviceDescription}>Book your court</Text>
+              <Text style={styles.serviceTitle}>Kort Rezervasyonu</Text>
+              <Text style={styles.serviceDescription}>Kort rezervasyonu yapın</Text>
             </TouchableOpacity>
             <TouchableOpacity 
               style={styles.serviceCard}
@@ -119,8 +121,8 @@ export default function HomeScreen() {
               <View style={[styles.serviceIcon, { backgroundColor: 'rgba(50, 209, 255, 0.15)' }]}>
                 <GraduationCap size={24} color="#32D1FF" />
               </View>
-              <Text style={styles.serviceTitle}>Lessons</Text>
-              <Text style={styles.serviceDescription}>Learn from pros</Text>
+              <Text style={styles.serviceTitle}>Dersler</Text>
+              <Text style={styles.serviceDescription}>Profesyonellerden öğrenin</Text>
             </TouchableOpacity>
             <TouchableOpacity 
               style={styles.serviceCard}
@@ -129,8 +131,8 @@ export default function HomeScreen() {
               <View style={[styles.serviceIcon, { backgroundColor: 'rgba(255, 86, 86, 0.15)' }]}>
                 <Trophy size={24} color="#FF5656" />
               </View>
-              <Text style={styles.serviceTitle}>Tournaments</Text>
-              <Text style={styles.serviceDescription}>Join competitions</Text>
+              <Text style={styles.serviceTitle}>Turnuvalar</Text>
+              <Text style={styles.serviceDescription}>Turnuvalara katılın</Text>
             </TouchableOpacity>
           </View>
         </View>
@@ -138,9 +140,9 @@ export default function HomeScreen() {
         {/* Upcoming Tournaments */}
         <View style={styles.section}>
           <View style={styles.sectionHeader}>
-            <Text style={styles.sectionTitle}>Upcoming Tournaments</Text>
+            <Text style={styles.sectionTitle}>Yaklaşan Turnuvalar</Text>
             <TouchableOpacity>
-              <Text style={styles.seeAll}>See All</Text>
+              <Text style={styles.seeAll}>Tümünü Gör</Text>
             </TouchableOpacity>
           </View>
           <View style={styles.tournamentCard}>
@@ -149,10 +151,10 @@ export default function HomeScreen() {
               style={styles.tournamentImage}
             />
             <View style={styles.tournamentInfo}>
-              <Text style={styles.tournamentTitle}>Spring Padel Championship</Text>
-              <Text style={styles.tournamentDate}>March 15-17, 2024</Text>
+              <Text style={styles.tournamentTitle}>Bahar Padel Şampiyonası</Text>
+              <Text style={styles.tournamentDate}>15-17 Mart 2024</Text>
               <TouchableOpacity style={styles.registerButton}>
-                <Text style={styles.registerButtonText}>Register Now</Text>
+                <Text style={styles.registerButtonText}>Şimdi Kayıt Ol</Text>
               </TouchableOpacity>
             </View>
           </View>
@@ -160,12 +162,27 @@ export default function HomeScreen() {
 
         {/* Contact Information */}
         <View style={styles.contactSection}>
-          <Text style={styles.contactTitle}>Contact Us</Text>
-          <Text style={styles.contactText}>Alaçatı Padel Club</Text>
-          <Text style={styles.contactText}>12065. Sokak No: 3</Text>
-          <Text style={styles.contactText}>Alaçatı, İzmir</Text>
-          <Text style={styles.contactEmail}>alacatipadelclub@gmail.com</Text>
-          <Text style={styles.contactPhone}>Tel: +90 535 306 2892</Text>
+          <Text style={styles.contactTitle}>İletişim</Text>
+          <View style={styles.contactContent}>
+            <TouchableOpacity 
+              style={styles.contactLink}
+              onPress={() => Linking.openURL('https://www.instagram.com/alacatipadelclub')}
+            >
+              <Instagram size={24} color={colors.primary} />
+              <Text style={styles.contactLinkText}>@alacatipadelclub</Text>
+            </TouchableOpacity>
+            
+            <TouchableOpacity 
+              style={styles.contactLink}
+              onPress={() => Linking.openURL('https://goo.gl/maps/yourGoogleMapsLink')}
+            >
+              <MapPin size={24} color={colors.primary} />
+              <Text style={styles.contactLinkText}>Haritada Göster</Text>
+            </TouchableOpacity>
+
+            <Text style={styles.contactEmail}>alacatipadelclub@gmail.com</Text>
+            <Text style={styles.contactPhone}>Tel: +90 535 306 2892</Text>
+          </View>
         </View>
 
         {/* Service Details Modal */}
@@ -227,8 +244,8 @@ const styles = StyleSheet.create({
     borderBottomColor: colors.background.secondary,
   },
   headerLogo: {
-    width: 100,
-    height: 60,
+    width: 140,
+    height: 140,
     marginRight: 16,
   },
   aboutContainer: {
@@ -353,11 +370,19 @@ const styles = StyleSheet.create({
     color: colors.charcoal,
     marginBottom: 16,
   },
-  contactText: {
+  contactContent: {
+    alignItems: 'center',
+  },
+  contactLink: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginBottom: 8,
+  },
+  contactLinkText: {
     fontFamily: 'Inter-Regular',
     fontSize: 14,
-    color: colors.text.disabled,
-    marginBottom: 4,
+    color: colors.primary,
+    marginLeft: 8,
   },
   contactEmail: {
     fontFamily: 'Inter-Medium',
@@ -370,5 +395,9 @@ const styles = StyleSheet.create({
     fontFamily: 'Inter-Medium',
     fontSize: 14,
     color: colors.primary,
+  },
+  topRightLogo: {
+    width: 130,
+    height: 50,
   },
 });

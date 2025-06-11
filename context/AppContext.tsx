@@ -6,7 +6,7 @@ type User = {
   email: string;
   level: string;
   profileImage: string;
-  skillLevel: 'Beginner' | 'Intermediate' | 'Advanced';
+  skillLevel: 'Başlangıç' | 'Orta' | 'İleri';
 };
 
 type Booking = {
@@ -54,7 +54,7 @@ export function AppProvider({ children }: AppProviderProps) {
     email: 'alex.johnson@example.com',
     level: '3.5',
     profileImage: 'https://images.pexels.com/photos/1681010/pexels-photo-1681010.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=2',
-    skillLevel: 'Intermediate',
+    skillLevel: 'Orta',
   });
   
   const [bookings, setBookings] = useState<Booking[]>([
@@ -133,7 +133,7 @@ export function AppProvider({ children }: AppProviderProps) {
         email: email,
         level: '3.5',
         profileImage: 'https://images.pexels.com/photos/1681010/pexels-photo-1681010.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=2',
-        skillLevel: 'Intermediate',
+        skillLevel: 'Orta',
       });
     } catch (error) {
       console.error('Login failed:', error);

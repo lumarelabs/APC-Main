@@ -15,10 +15,7 @@ export default function ProfileScreen() {
       <ScrollView style={styles.container} contentContainerStyle={styles.contentContainer}>
         {/* Header */}
         <View style={styles.header}>
-          <Text style={styles.headerTitle}>Profile</Text>
-          <TouchableOpacity style={styles.settingsButton}>
-            <Settings size={24} color="#fff" />
-          </TouchableOpacity>
+          <Text style={styles.headerTitle}>Profil</Text>
         </View>
 
         {/* User Profile */}
@@ -44,19 +41,16 @@ export default function ProfileScreen() {
         {/* Stats */}
         <View style={styles.statsContainer}>
           <View style={styles.statCard}>
-            <Trophy size={24} color="#16FF91" />
+            <Text style={styles.statValue}>24</Text>
+            <Text style={styles.statLabel}>Toplam Maç</Text>
+          </View>
+          <View style={styles.statCard}>
             <Text style={styles.statValue}>18</Text>
-            <Text style={styles.statLabel}>Wins</Text>
+            <Text style={styles.statLabel}>Kazanılan</Text>
           </View>
           <View style={styles.statCard}>
-            <Clock size={24} color="#32D1FF" />
-            <Text style={styles.statValue}>52</Text>
-            <Text style={styles.statLabel}>Hours</Text>
-          </View>
-          <View style={styles.statCard}>
-            <Calendar size={24} color="#FF5A5A" />
-            <Text style={styles.statValue}>31</Text>
-            <Text style={styles.statLabel}>Matches</Text>
+            <Text style={styles.statValue}>75%</Text>
+            <Text style={styles.statLabel}>Kazanma Oranı</Text>
           </View>
         </View>
 
@@ -66,28 +60,28 @@ export default function ProfileScreen() {
             <View style={styles.menuIconContainer}>
               <CreditCard size={24} color="#32D1FF" />
             </View>
-            <Text style={styles.menuText}>Payment Methods</Text>
-          </TouchableOpacity>
-          
-          <TouchableOpacity style={styles.menuItem}>
-            <View style={styles.menuIconContainer}>
-              <Bell size={24} color="#16FF91" />
-            </View>
-            <Text style={styles.menuText}>Notifications</Text>
+            <Text style={styles.menuText}>Ödeme Yöntemleri</Text>
           </TouchableOpacity>
           
           <TouchableOpacity style={styles.menuItem}>
             <View style={styles.menuIconContainer}>
               <Shield size={24} color="#FF5A5A" />
             </View>
-            <Text style={styles.menuText}>Privacy & Security</Text>
+            <Text style={styles.menuText}>Gizlilik ve Güvenlik</Text>
+          </TouchableOpacity>
+          
+          <TouchableOpacity style={styles.menuItem}>
+            <View style={styles.menuIconContainer}>
+              <Settings size={24} color="#16FF91" />
+            </View>
+            <Text style={styles.menuText}>Ayarlar</Text>
           </TouchableOpacity>
           
           <TouchableOpacity style={styles.menuItem}>
             <View style={styles.menuIconContainer}>
               <LogOut size={24} color="#8F98A8" />
             </View>
-            <Text style={styles.menuText}>Log Out</Text>
+            <Text style={styles.menuText}>Çıkış Yap</Text>
           </TouchableOpacity>
         </View>
 
@@ -100,13 +94,13 @@ export default function ProfileScreen() {
   );
 }
 
-function skillLevelBarStyle(skillLevel: 'Beginner' | 'Intermediate' | 'Advanced' | undefined) {
+function skillLevelBarStyle(skillLevel: 'Başlangıç' | 'Orta' | 'İleri' | undefined) {
   switch (skillLevel) {
-    case 'Beginner':
+    case 'Başlangıç':
       return { backgroundColor: colors.secondary, borderColor: colors.secondary };
-    case 'Intermediate':
+    case 'Orta':
       return { backgroundColor: colors.status.warning, borderColor: colors.status.warning };
-    case 'Advanced':
+    case 'İleri':
       return { backgroundColor: colors.status.error, borderColor: colors.status.error };
     default:
       return { backgroundColor: colors.primary, borderColor: colors.primary };
@@ -127,7 +121,7 @@ const styles = StyleSheet.create({
   },
   header: {
     flexDirection: 'row',
-    justifyContent: 'space-between',
+    justifyContent: 'center',
     alignItems: 'center',
     padding: 16,
   },
@@ -135,14 +129,7 @@ const styles = StyleSheet.create({
     fontFamily: 'Inter-Bold',
     fontSize: 24,
     color: colors.charcoal,
-  },
-  settingsButton: {
-    width: 44,
-    height: 44,
-    borderRadius: 22,
-    backgroundColor: colors.background.secondary,
-    justifyContent: 'center',
-    alignItems: 'center',
+    textAlign: 'center',
   },
   profileCard: {
     margin: 16,
@@ -221,20 +208,29 @@ const styles = StyleSheet.create({
     backgroundColor: colors.background.secondary,
     borderRadius: 16,
     marginHorizontal: 16,
+    padding: 8,
   },
   menuItem: {
     flexDirection: 'row',
     alignItems: 'center',
-    paddingVertical: 16,
-    paddingHorizontal: 16,
-    borderBottomWidth: 1,
-    borderBottomColor: colors.charcoal,
+    padding: 16,
+    marginVertical: 4,
+    backgroundColor: colors.background.primary,
+    borderRadius: 12,
+    shadowColor: '#000',
+    shadowOffset: {
+      width: 0,
+      height: 2,
+    },
+    shadowOpacity: 0.1,
+    shadowRadius: 4,
+    elevation: 2,
   },
   menuIconContainer: {
     width: 40,
     height: 40,
     borderRadius: 20,
-    backgroundColor: colors.background.primary,
+    backgroundColor: colors.background.tertiary,
     justifyContent: 'center',
     alignItems: 'center',
     marginRight: 16,

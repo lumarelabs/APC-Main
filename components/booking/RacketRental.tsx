@@ -20,8 +20,8 @@ export function RacketRental({ onComplete }: RacketRentalProps) {
 
   return (
     <View style={styles.container}>
-      <Text style={styles.title}>Racket Rental</Text>
-      <Text style={styles.subtitle}>Would you like to rent rackets?</Text>
+      <Text style={styles.title}>Raket Kiralama</Text>
+      <Text style={styles.subtitle}>Raket kiralamak ister misiniz?</Text>
       
       <View style={styles.counterContainer}>
         <TouchableOpacity 
@@ -34,7 +34,7 @@ export function RacketRental({ onComplete }: RacketRentalProps) {
         
         <View style={styles.countDisplay}>
           <Text style={styles.countText}>{racketCount}</Text>
-          <Text style={styles.countLabel}>Rackets</Text>
+          <Text style={styles.countLabel}>Raket</Text>
         </View>
         
         <TouchableOpacity 
@@ -47,10 +47,10 @@ export function RacketRental({ onComplete }: RacketRentalProps) {
       </View>
 
       <View style={styles.priceContainer}>
-        <Text style={styles.priceLabel}>Price per racket:</Text>
-        <Text style={styles.priceValue}>$5</Text>
-        <Text style={styles.totalLabel}>Total:</Text>
-        <Text style={styles.totalValue}>${racketCount * 5}</Text>
+        <Text style={styles.priceLabel}>Raket başına ücret:</Text>
+        <Text style={styles.priceValue}>₺100</Text>
+        <Text style={styles.totalLabel}>Toplam:</Text>
+        <Text style={styles.totalValue}>₺{racketCount * 100}</Text>
       </View>
 
       <View style={styles.buttonContainer}>
@@ -58,7 +58,7 @@ export function RacketRental({ onComplete }: RacketRentalProps) {
           style={styles.skipButton} 
           onPress={() => onComplete(0)}
         >
-          <Text style={styles.skipButtonText}>Skip Rental</Text>
+          <Text style={styles.skipButtonText}>Kiralamayı Geç</Text>
         </TouchableOpacity>
         
         <TouchableOpacity
@@ -66,7 +66,7 @@ export function RacketRental({ onComplete }: RacketRentalProps) {
           onPress={() => racketCount > 0 && onComplete(racketCount)}
           disabled={racketCount === 0}
         >
-          <Text style={styles.continueButtonText}>Continue</Text>
+          <Text style={styles.continueButtonText}>Devam Et</Text>
         </TouchableOpacity>
       </View>
     </View>

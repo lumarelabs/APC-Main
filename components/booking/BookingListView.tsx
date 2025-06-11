@@ -79,7 +79,7 @@ export function BookingListView({ bookings }: BookingListViewProps) {
       >
         <View style={styles.modalOverlay}>
           <View style={styles.modalContent}>
-            <Text style={styles.modalTitle}>Booking Details</Text>
+            <Text style={styles.modalTitle}>Rezervasyon Detayları</Text>
             {selectedBooking && selectedDate && (
               <>
                 <View style={styles.bookingHeader}>
@@ -89,7 +89,7 @@ export function BookingListView({ bookings }: BookingListViewProps) {
                   </Text>
                 </View>
                 <View style={styles.playersList}>
-                  <Text style={styles.playersTitle}>Players</Text>
+                  <Text style={styles.playersTitle}>Oyuncular</Text>
                   {selectedBooking.players.map((player, index) => (
                     <View key={index} style={styles.playerItem}>
                       <Text style={styles.playerName}>{player.name}</Text>
@@ -108,7 +108,7 @@ export function BookingListView({ bookings }: BookingListViewProps) {
                 setSelectedDate(null);
               }}
             >
-              <Text style={styles.closeButtonText}>Close</Text>
+              <Text style={styles.closeButtonText}>Kapat</Text>
             </TouchableOpacity>
           </View>
         </View>

@@ -78,8 +78,8 @@ export default function BookScreen() {
       date: 'March 19 - Tuesday - 5:00 PM - 2024',
       maxPlayers: 4,
       players: [
-        { name: 'Alex Johnson', skillLevel: 'Advanced' },
-        { name: 'Sarah Smith', skillLevel: 'Intermediate' }
+        { name: 'Alex Johnson', skillLevel: 'İleri' },
+        { name: 'Sarah Smith', skillLevel: 'Orta' }
       ]
     }],
     '2024-03-21': [{
@@ -90,10 +90,10 @@ export default function BookScreen() {
       date: 'March 21 - Thursday - 3:30 PM - 2024',
       maxPlayers: 4,
       players: [
-        { name: 'Mike Brown', skillLevel: 'Beginner' },
-        { name: 'Emma Davis', skillLevel: 'Intermediate' },
-        { name: 'John Smith', skillLevel: 'Advanced' },
-        { name: 'Lisa Wilson', skillLevel: 'Intermediate' }
+        { name: 'Mike Brown', skillLevel: 'Başlangıç' },
+        { name: 'Emma Davis', skillLevel: 'Orta' },
+        { name: 'John Smith', skillLevel: 'İleri' },
+        { name: 'Lisa Wilson', skillLevel: 'Orta' }
       ]
     }],
     '2024-03-25': [{
@@ -104,7 +104,7 @@ export default function BookScreen() {
       date: 'March 25 - Monday - 10:00 AM - 2024',
       maxPlayers: 4,
       players: [
-        { name: 'Tom Wilson', skillLevel: 'Advanced' }
+        { name: 'Tom Wilson', skillLevel: 'İleri' }
       ]
     }]
   };
@@ -244,24 +244,21 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     paddingHorizontal: 16,
-    marginBottom: 16,
+    paddingVertical: 12,
+    backgroundColor: colors.secondary,
+    position: 'relative',
   },
   backButton: {
-    width: 40,
-    height: 40,
-    borderRadius: 20,
-    backgroundColor: colors.background.secondary,
-    justifyContent: 'center',
-    alignItems: 'center',
-    marginRight: 12,
+    position: 'absolute',
+    left: 16,
+    zIndex: 1,
   },
   headerTitle: {
-    fontFamily: 'Inter-Bold',
-    fontSize: 24,
-    color: colors.text.primary,
     flex: 1,
     textAlign: 'center',
-    marginRight: 40, // To balance back button space
+    fontFamily: 'Inter-Bold',
+    fontSize: 20,
+    color: colors.charcoal,
   },
   topSection: {
     paddingTop: 16,
@@ -292,7 +289,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   viewOptionActive: {
-    backgroundColor: colors.primary,
+    backgroundColor: colors.secondary,
   },
   viewOptionText: {
     fontFamily: 'Inter-Medium',

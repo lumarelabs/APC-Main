@@ -50,7 +50,7 @@ export const UpcomingBooking = ({
           style={[styles.detailsButton, { borderColor: colors.primary }]}
           onPress={onPress}
         >
-          <Text style={[styles.detailsButtonText, { color: colors.primary }]}>View Details</Text>
+          <Text style={[styles.detailsButtonText, { color: colors.primary }]}>Detayları Gör</Text>
         </TouchableOpacity>
       </View>
     </View>

@@ -68,7 +68,7 @@ export function TimeSelector({ onSelectTime }: TimeSelectorProps) {
                   selectedTime === slot.time && slot.available && styles.selectedStatusText,
                 ]}
               >
-                {slot.available ? 'Available' : 'Booked'}
+                {slot.available ? 'Müsait' : 'Dolu'}
               </Text>
             </View>
           </TouchableOpacity>
@@ -84,7 +84,7 @@ export function TimeSelector({ onSelectTime }: TimeSelectorProps) {
           onPress={() => selectedTime && onSelectTime(selectedTime)}
           disabled={!selectedTime}
         >
-          <Text style={styles.continueButtonText}>Book Now</Text>
+          <Text style={styles.continueButtonText}>Rezervasyon Yap</Text>
         </TouchableOpacity>
       </View>
     </View>

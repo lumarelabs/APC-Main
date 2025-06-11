@@ -16,15 +16,32 @@ export default function TabLayout() {
         tabBarInactiveTintColor: colors.text.secondary,
         tabBarLabelPosition: 'below-icon',
         tabBarBackground: () => (
-          <BlurView intensity={80} style={styles.blurView} tint="dark" />
+          <BlurView intensity={100} style={styles.blurView} tint="light" />
         ),
+        tabBarIconStyle: {
+          marginTop: 7,
+          marginBottom: 0,
+        },
+        tabBarLabelStyle: {
+          paddingBottom: 4,
+          fontSize: 12,
+          fontFamily: 'Inter-Medium',
+          lineHeight: 16,
+        },
+        tabBarItemStyle: {
+          flex: 1,
+          alignItems: 'center',
+          justifyContent: 'center',
+          margin: 0,
+          padding: 0,
+        },
       }}>
       <Tabs.Screen
         name="index"
         options={{
           title: 'Anasayfa',
-          tabBarIcon: ({ color, size }) => (
-            <Home size={size} color={color} />
+          tabBarIcon: ({ color }) => (
+            <Home size={24} color={color} strokeWidth={2} />
           ),
         }}
       />
@@ -32,8 +49,8 @@ export default function TabLayout() {
         name="book"
         options={{
           title: 'Rezervasyon',
-          tabBarIcon: ({ color, size }) => (
-            <CalendarClock size={size} color={color} />
+          tabBarIcon: ({ color }) => (
+            <CalendarClock size={24} color={color} strokeWidth={2} />
           ),
         }}
       />
@@ -41,8 +58,8 @@ export default function TabLayout() {
         name="matches"
         options={{
           title: 'Maçlar',
-          tabBarIcon: ({ color, size }) => (
-            <Users size={size} color={color} />
+          tabBarIcon: ({ color }) => (
+            <Users size={24} color={color} strokeWidth={2} />
           ),
         }}
       />
@@ -50,8 +67,8 @@ export default function TabLayout() {
         name="profile"
         options={{
           title: 'Profil',
-          tabBarIcon: ({ color, size }) => (
-            <User size={size} color={color} />
+          tabBarIcon: ({ color }) => (
+            <User size={24} color={color} strokeWidth={2} />
           ),
         }}
       />
@@ -67,7 +84,7 @@ const styles = StyleSheet.create({
     right: 16,
     elevation: 0,
     borderRadius: 16,
-    height: 64,
+    height: 70,
     borderTopWidth: 0,
     backgroundColor: 'transparent',
     shadowColor: '#000',
@@ -77,6 +94,10 @@ const styles = StyleSheet.create({
     },
     shadowOpacity: 0.3,
     shadowRadius: 8,
+    paddingVertical: 8,
+    flexDirection: 'row',
+    justifyContent: 'space-evenly',
+    alignItems: 'center',
   },
   blurView: {
     position: 'absolute',
