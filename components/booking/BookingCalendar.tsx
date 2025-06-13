@@ -21,12 +21,36 @@ type BookingCalendarProps = {
 };
 
 export function BookingCalendar({ bookings }: BookingCalendarProps) {
+  const getAvailabilityStatus = (date: string) => {
+    const dayBookings = bookings[date] || [];
+    
+    // Count total players for the day
+    const totalPlayers = dayBookings.reduce((sum, booking) => {
+      return sum + (booking.players?.length || 0);
+    }, 0);
+    
+    // Assuming max capacity is 16 players per day (4 courts * 4 players)
+    const maxCapacity = 16;
+    
+    if (totalPlayers >= maxCapacity) {
+      return 'full';
+    } else if (totalPlayers > 0) {
+      return 'partial';
+    }
+    return 'available';
+  };
+
   const markedDates = Object.keys(bookings).reduce((acc, date) => {
+    const availability = getAvailabilityStatus(date);
     acc[date] = {
       marked: true,
       selected: true,
-      selectedColor: colors.primary,
-      dotColor: colors.primary,
+      selectedColor: availability === 'full' ? colors.error : 
+                    availability === 'partial' ? colors.warning : 
+                    colors.status.success,
+      dotColor: availability === 'full' ? colors.error : 
+                availability === 'partial' ? colors.warning : 
+                colors.status.success,
     };
     return acc;
   }, {} as Record<string, any>);

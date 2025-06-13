@@ -72,7 +72,7 @@ export const ServiceDetailsModal = ({ isVisible, onClose, serviceType }: Service
       <View style={styles.modalOverlay}>
         <View style={styles.modalContent}>
           <TouchableOpacity style={styles.closeButton} onPress={onClose}>
-            <X size={24} color="#fff" />
+            <X size={24} color={colors.charcoal} />
           </TouchableOpacity>
           <ScrollView showsVerticalScrollIndicator={false}>
             {renderContent()}
@@ -102,6 +102,17 @@ const styles = StyleSheet.create({
     right: 16,
     top: 16,
     zIndex: 1,
+    width: 32,
+    height: 32,
+    borderRadius: 16,
+    backgroundColor: colors.background.secondary,
+    justifyContent: 'center',
+    alignItems: 'center',
+    shadowColor: colors.charcoal,
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 4,
+    elevation: 2,
   },
   title: {
     fontFamily: 'Inter-Bold',

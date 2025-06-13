@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Image, Linking } from 'react-native';
+import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Image, Linking, Dimensions, Platform } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Search, Bell, Trophy, GraduationCap, BookOpen, Instagram, MapPin } from 'lucide-react-native';
 import { UpcomingBooking } from '@/components/home/UpcomingBooking';
@@ -9,6 +9,7 @@ import { BookingDetailsModal } from '@/components/home/BookingDetailsModal';
 import { colors } from '@/app/theme/colors';
 import Logo2 from '../../assets/images/logo2.png';
 import RacketImage from '../../assets/images/racket.png';
+import LocationMap from '../../components/home/LocationMap';
 
 type Booking = {
   courtName: string;
@@ -112,7 +113,7 @@ export default function HomeScreen() {
                 <BookOpen size={24} color="#16FF91" />
               </View>
               <Text style={styles.serviceTitle}>Kort Rezervasyonu</Text>
-              <Text style={styles.serviceDescription}>Kort rezervasyonu yapın</Text>
+              <Text style={styles.serviceDescription}>Kort rezervasyonu yapın ve oyununuzu planlayın</Text>
             </TouchableOpacity>
             <TouchableOpacity 
               style={styles.serviceCard}
@@ -122,7 +123,7 @@ export default function HomeScreen() {
                 <GraduationCap size={24} color="#32D1FF" />
               </View>
               <Text style={styles.serviceTitle}>Dersler</Text>
-              <Text style={styles.serviceDescription}>Profesyonellerden öğrenin</Text>
+              <Text style={styles.serviceDescription}>Profesyonel eğitmenlerden özel ders alın</Text>
             </TouchableOpacity>
             <TouchableOpacity 
               style={styles.serviceCard}
@@ -132,7 +133,7 @@ export default function HomeScreen() {
                 <Trophy size={24} color="#FF5656" />
               </View>
               <Text style={styles.serviceTitle}>Turnuvalar</Text>
-              <Text style={styles.serviceDescription}>Turnuvalara katılın</Text>
+              <Text style={styles.serviceDescription}>Turnuvalara katılın ve ödüller kazanın</Text>
             </TouchableOpacity>
           </View>
         </View>
@@ -163,6 +164,12 @@ export default function HomeScreen() {
         {/* Contact Information */}
         <View style={styles.contactSection}>
           <Text style={styles.contactTitle}>İletişim</Text>
+          
+          {/* Map */}
+          <View style={styles.mapContainer}>
+            <LocationMap />
+          </View>
+
           <View style={styles.contactContent}>
             <TouchableOpacity 
               style={styles.contactLink}
@@ -399,5 +406,27 @@ const styles = StyleSheet.create({
   topRightLogo: {
     width: 130,
     height: 50,
+  },
+  mapContainer: {
+    width: Dimensions.get('window').width - 32,
+    height: 200,
+    borderRadius: 16,
+    overflow: 'hidden',
+    marginBottom: 16,
+  },
+  webMapFallback: {
+    width: '100%',
+    height: '100%',
+    backgroundColor: colors.background.secondary,
+    justifyContent: 'center',
+    alignItems: 'center',
+    borderRadius: 16,
+  },
+  webMapText: {
+    fontFamily: 'Inter-Medium',
+    fontSize: 14,
+    color: colors.text.disabled,
+    marginTop: 8,
+    textAlign: 'center',
   },
 });

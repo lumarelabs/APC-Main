@@ -222,7 +222,13 @@ export default function BookScreen() {
 
             {/* Bookings List */}
             <View style={styles.bookingsListContainer}>
-              <BookingListView bookings={existingBookings} />
+              {Object.keys(existingBookings).length === 0 ? (
+                <View style={styles.noBookingsContainer}>
+                  <Text style={styles.noBookingsText}>Henüz rezervasyonunuz yok</Text>
+                </View>
+              ) : (
+                <BookingListView bookings={existingBookings} />
+              )}
             </View>
           </View>
         )}
@@ -318,5 +324,16 @@ const styles = StyleSheet.create({
   },
   bookingsListContainer: {
     marginTop: 8,
+  },
+  noBookingsContainer: {
+    padding: 20,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  noBookingsText: {
+    fontFamily: 'Inter-Medium',
+    fontSize: 16,
+    color: colors.text.disabled,
+    textAlign: 'center',
   },
 });

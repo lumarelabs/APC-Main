@@ -14,9 +14,24 @@ export function WeeklyCalendar({ bookings }: WeeklyCalendarProps) {
   const weekStart = startOfWeek(currentDate, { weekStartsOn: 1 }); // Start from Monday
   const weekDays = Array.from({ length: 7 }, (_, i) => addDays(weekStart, i));
 
-  const hasBooking = (date: Date) => {
+  const getAvailabilityStatus = (date: Date) => {
     const dateString = format(date, 'yyyy-MM-dd');
-    return bookings[dateString] !== undefined;
+    const dayBookings = bookings[dateString] || [];
+    
+    // Count total players for the day
+    const totalPlayers = dayBookings.reduce((sum, booking) => {
+      return sum + (booking.players?.length || 0);
+    }, 0);
+    
+    // Assuming max capacity is 16 players per day (4 courts * 4 players)
+    const maxCapacity = 16;
+    
+    if (totalPlayers >= maxCapacity) {
+      return 'full';
+    } else if (totalPlayers > 0) {
+      return 'partial';
+    }
+    return 'available';
   };
 
   const navigateWeek = (direction: 'prev' | 'next') => {
@@ -34,7 +49,7 @@ export function WeeklyCalendar({ bookings }: WeeklyCalendarProps) {
             style={styles.navButton} 
             onPress={() => navigateWeek('prev')}
           >
-            <ChevronLeft size={24} color="#e97d2b" />
+            <ChevronLeft size={24} color={colors.primary} />
           </TouchableOpacity>
           <Text style={styles.monthText}>
             {format(weekStart, 'MMMM yyyy')}
@@ -43,28 +58,35 @@ export function WeeklyCalendar({ bookings }: WeeklyCalendarProps) {
             style={styles.navButton} 
             onPress={() => navigateWeek('next')}
           >
-            <ChevronRight size={24} color="#e97d2b" />
+            <ChevronRight size={24} color={colors.primary} />
           </TouchableOpacity>
         </View>
       </View>
       <View style={styles.weekContainer}>
-        {weekDays.map((date) => (
-          <View 
-            key={date.toString()} 
-            style={[
-              styles.dayContainer,
-              hasBooking(date) && styles.bookedDay
-            ]}
-          >
-            <Text style={styles.dayName}>{format(date, 'EEE')}</Text>
-            <Text style={[
-              styles.dayNumber,
-              hasBooking(date) && styles.bookedDayText
-            ]}>
-              {format(date, 'd')}
-            </Text>
-          </View>
-        ))}
+        {weekDays.map((date) => {
+          const availability = getAvailabilityStatus(date);
+          return (
+            <View 
+              key={date.toString()} 
+              style={[
+                styles.dayContainer,
+                availability === 'full' && styles.fullDay,
+                availability === 'partial' && styles.partialDay,
+                availability === 'available' && styles.availableDay
+              ]}
+            >
+              <Text style={styles.dayName}>{format(date, 'EEE')}</Text>
+              <Text style={[
+                styles.dayNumber,
+                availability === 'full' && styles.fullDayText,
+                availability === 'partial' && styles.partialDayText,
+                availability === 'available' && styles.availableDayText
+              ]}>
+                {format(date, 'd')}
+              </Text>
+            </View>
+          );
+        })}
       </View>
     </View>
   );
@@ -110,8 +132,14 @@ const styles = StyleSheet.create({
     padding: 8,
     borderRadius: 8,
   },
-  bookedDay: {
-    backgroundColor: colors.primary,
+  fullDay: {
+    backgroundColor: colors.error,
+  },
+  partialDay: {
+    backgroundColor: colors.warning,
+  },
+  availableDay: {
+    backgroundColor: colors.status.success,
   },
   dayName: {
     fontFamily: 'Inter-Medium',
@@ -124,7 +152,13 @@ const styles = StyleSheet.create({
     fontSize: 16,
     color: colors.charcoal,
   },
-  bookedDayText: {
+  fullDayText: {
+    color: colors.white,
+  },
+  partialDayText: {
     color: colors.charcoal,
+  },
+  availableDayText: {
+    color: colors.white,
   },
 }); 

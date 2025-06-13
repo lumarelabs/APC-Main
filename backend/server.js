@@ -44,6 +44,19 @@ app.get('/health', (req, res) => {
   });
 });
 
+// Test environment variables
+app.get('/test-env', (req, res) => {
+  res.json({
+    supabaseUrl: process.env.SUPABASE_URL ? 'Set' : 'Not set',
+    supabaseAnonKey: process.env.SUPABASE_ANON_KEY ? 'Set' : 'Not set',
+    supabaseServiceKey: process.env.SUPABASE_SERVICE_ROLE_KEY ? 'Set' : 'Not set',
+    port: process.env.PORT,
+    nodeEnv: process.env.NODE_ENV,
+    frontendUrl: process.env.FRONTEND_URL,
+    jwtSecret: process.env.JWT_SECRET ? 'Set' : 'Not set'
+  });
+});
+
 // API routes
 app.use('/api/users', authMiddleware, userRoutes);
 app.use('/api/courts', authMiddleware, courtRoutes);
