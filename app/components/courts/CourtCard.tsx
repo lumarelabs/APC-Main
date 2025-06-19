@@ -37,7 +37,7 @@ export function CourtCard({
         </View>
         <Text style={styles.distance}>{distance}</Text>
         <View style={styles.priceContainer}>
-          <Text style={styles.price}>₺{price}</Text>
+          <Text style={styles.price}>${price}</Text>
           <Text style={styles.perHour}>/saat</Text>
         </View>
         <TouchableOpacity 
@@ -79,7 +79,7 @@ const styles = StyleSheet.create({
   name: {
     fontFamily: 'Inter-Bold',
     fontSize: 14,
-    color: colors.charcoal,
+    color: '#00000',
     marginBottom: 4,
   },
   ratingContainer: {

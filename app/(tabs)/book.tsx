@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Alert } from 'react-native';
+import { View, Text, StyleSheet, ScrollView, TouchableOpacity } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { CourtTypeSelector } from '@/app/components/booking/CourtTypeSelector';
 import { DateTimeSelector } from '@/app/components/booking/DateTimeSelector';
@@ -9,9 +9,7 @@ import { WeeklyCalendar } from '@/app/components/booking/WeeklyCalendar';
 import { CourtList } from '@/app/components/booking/CourtList';
 import { RacketRental } from '@/app/components/booking/RacketRental';
 import { PaymentSummary } from '@/app/components/booking/PaymentSummary';
-import { ChevronLeft } from 'lucide-react-native';
-import { useCourts, useUserBookings } from '@/app/hooks/useSupabaseData';
-import { useApp } from '@/app/context/AppContext';
+import { ChevronLeft, X, Users, Search } from 'lucide-react-native';
 import type { Booking } from '@/app/components/booking/BookingCalendar';
 import { colors } from '@/app/theme/colors';
 
@@ -19,10 +17,6 @@ type BookingStep = 'court-selection' | 'date-time' | 'racket-rental' | 'payment'
 type CalendarViewMode = 'weekly' | 'monthly';
 
 export default function BookScreen() {
-  const { createBooking } = useApp();
-  const { courts, loading: courtsLoading } = useCourts();
-  const { bookings, loading: bookingsLoading } = useUserBookings();
-  
   const [courtType, setCourtType] = useState<'all' | 'padel' | 'pickleball'>('all');
   const [selectedCourt, setSelectedCourt] = useState<any>(null);
   const [selectedDate, setSelectedDate] = useState<string | null>(null);
@@ -30,7 +24,6 @@ export default function BookScreen() {
   const [racketCount, setRacketCount] = useState(0);
   const [currentStep, setCurrentStep] = useState<BookingStep>('court-selection');
   const [calendarViewMode, setCalendarViewMode] = useState<CalendarViewMode>('weekly');
-  const [isBooking, setIsBooking] = useState(false);
 
   const handleBack = () => {
     switch (currentStep) {
@@ -70,90 +63,58 @@ export default function BookScreen() {
     setCurrentStep('payment');
   };
 
-  const handlePaymentConfirm = async () => {
-    if (!selectedCourt || !selectedDate || !selectedTime) {
-      Alert.alert('Error', 'Missing booking information');
-      return;
-    }
-
-    try {
-      setIsBooking(true);
-      
-      // Parse time to get start and end times
-      const [startTime, endTime] = selectedTime.split(' - ');
-      
-      const bookingData = {
-        court_id: selectedCourt.id,
-        date: selectedDate,
-        start_time: startTime + ':00',
-        end_time: endTime + ':00',
-        status: 'confirmed' as const
-      };
-
-      await createBooking(bookingData);
-      
-      Alert.alert(
-        'Success!', 
-        'Your booking has been confirmed!',
-        [
-          {
-            text: 'OK',
-            onPress: () => {
-              // Reset form
-              setSelectedCourt(null);
-              setSelectedDate(null);
-              setSelectedTime(null);
-              setRacketCount(0);
-              setCurrentStep('court-selection');
-            }
-          }
-        ]
-      );
-    } catch (error: any) {
-      Alert.alert('Error', error.message || 'Failed to create booking');
-    } finally {
-      setIsBooking(false);
-    }
+  const handlePaymentConfirm = () => {
+    // Payment processing would go here
+    console.log('Processing payment...');
   };
 
-  // Transform bookings for calendar components
-  const existingBookings: Record<string, Booking[]> = {};
-  
-  bookings.forEach(booking => {
-    const date = booking.date;
-    if (!existingBookings[date]) {
-      existingBookings[date] = [];
-    }
-    
-    existingBookings[date].push({
-      id: booking.id,
-      courtName: booking.court?.name || 'Court',
-      courtType: booking.court?.type || 'padel',
-      time: booking.start_time.slice(0, 5),
-      date: `${new Date(date).toLocaleDateString('tr-TR', { 
-        month: 'long', 
-        day: 'numeric', 
-        weekday: 'long' 
-      })} - ${booking.start_time.slice(0, 5)} - ${new Date(date).getFullYear()}`,
+  // Sample data for existing bookings
+  const existingBookings: Record<string, Booking[]> = {
+    '2024-03-19': [{
+      id: '1',
+      courtName: 'Padel Court 2',
+      courtType: 'padel',
+      time: '17:00',
+      date: 'March 19 - Tuesday - 5:00 PM - 2024',
       maxPlayers: 4,
-      players: [] // We'll implement this when we add match players
-    });
-  });
+      players: [
+        { name: 'Alex Johnson', skillLevel: 'İleri' },
+        { name: 'Sarah Smith', skillLevel: 'Orta' }
+      ]
+    }],
+    '2024-03-21': [{
+      id: '2',
+      courtName: 'Pickleball Court 1',
+      courtType: 'pickleball',
+      time: '15:30',
+      date: 'March 21 - Thursday - 3:30 PM - 2024',
+      maxPlayers: 4,
+      players: [
+        { name: 'Mike Brown', skillLevel: 'Başlangıç' },
+        { name: 'Emma Davis', skillLevel: 'Orta' },
+        { name: 'John Smith', skillLevel: 'İleri' },
+        { name: 'Lisa Wilson', skillLevel: 'Orta' }
+      ]
+    }],
+    '2024-03-25': [{
+      id: '3',
+      courtName: 'Padel Court 1',
+      courtType: 'padel',
+      time: '10:00',
+      date: 'March 25 - Monday - 10:00 AM - 2024',
+      maxPlayers: 4,
+      players: [
+        { name: 'Tom Wilson', skillLevel: 'İleri' }
+      ]
+    }]
+  };
 
   const renderBookingStep = () => {
     switch (currentStep) {
       case 'court-selection':
-        if (courtsLoading) {
-          return (
-            <View style={styles.loadingContainer}>
-              <Text style={styles.loadingText}>Kortlar yükleniyor...</Text>
-            </View>
-          );
-        }
         return (
           <View style={styles.courtList}>
             <CourtList
-              courts={courts}
               courtType={courtType}
               onSelectCourt={(court) => {
                 setSelectedCourt(court);
@@ -191,11 +152,10 @@ export default function BookScreen() {
             courtType={selectedCourt.type}
             date={selectedDate!}
             time={selectedTime!}
-            courtPrice={selectedCourt.price_per_hour / 100} // Convert from cents
+            courtPrice={selectedCourt.price}
             racketCount={racketCount}
-            racketPrice={100} // ₺100 per racket
+            racketPrice={5}
             onConfirm={handlePaymentConfirm}
-            isLoading={isBooking}
           />
         );
     }
@@ -212,7 +172,7 @@ export default function BookScreen() {
                 style={styles.backButton} 
                 onPress={handleBack}
               >
-                <ChevronLeft size={24} color={colors.charcoal} />
+                <ChevronLeft size={24} color={colors.white} />
               </TouchableOpacity>
             )}
             <Text style={styles.headerTitle}>Kort Rezervasyonu</Text>
@@ -254,30 +214,22 @@ export default function BookScreen() {
             </View>
 
             {/* Calendar */}
-            {bookingsLoading ? (
-              <View style={styles.loadingContainer}>
-                <Text style={styles.loadingText}>Rezervasyonlar yükleniyor...</Text>
-              </View>
+            {calendarViewMode === 'weekly' ? (
+              <WeeklyCalendar bookings={existingBookings} />
             ) : (
-              <>
-                {calendarViewMode === 'weekly' ? (
-                  <WeeklyCalendar bookings={existingBookings} />
-                ) : (
-                  <BookingCalendar bookings={existingBookings} />
-                )}
-
-                {/* Bookings List */}
-                <View style={styles.bookingsListContainer}>
-                  {Object.keys(existingBookings).length === 0 ? (
-                    <View style={styles.noBookingsContainer}>
-                      <Text style={styles.noBookingsText}>Henüz rezervasyonunuz yok</Text>
-                    </View>
-                  ) : (
-                    <BookingListView bookings={existingBookings} />
-                  )}
-                </View>
-              </>
+              <BookingCalendar bookings={existingBookings} />
             )}
+
+            {/* Bookings List */}
+            <View style={styles.bookingsListContainer}>
+              {Object.keys(existingBookings).length === 0 ? (
+                <View style={styles.noBookingsContainer}>
+                  <Text style={styles.noBookingsText}>Henüz rezervasyonunuz yok</Text>
+                </View>
+              ) : (
+                <BookingListView bookings={existingBookings} />
+              )}
+            </View>
           </View>
         )}
       </ScrollView>
@@ -323,15 +275,6 @@ const styles = StyleSheet.create({
   },
   courtList: {
     marginBottom: 8,
-  },
-  loadingContainer: {
-    padding: 20,
-    alignItems: 'center',
-  },
-  loadingText: {
-    fontFamily: 'Inter-Medium',
-    fontSize: 16,
-    color: colors.text.disabled,
   },
   bottomSection: {
     borderTopWidth: 1,
