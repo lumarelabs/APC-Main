@@ -1,4 +1,5 @@
 import React, { createContext, useContext, useState, ReactNode } from 'react';
+import { createClient } from '@supabase/supabase-js';
 
 type User = {
   id: string;
