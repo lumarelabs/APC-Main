@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { View, Text, StyleSheet, ScrollView, TouchableOpacity } from 'react-native';
+import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Alert } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { CourtTypeSelector } from '@/app/components/booking/CourtTypeSelector';
 import { DateTimeSelector } from '@/app/components/booking/DateTimeSelector';
@@ -9,8 +9,9 @@ import { WeeklyCalendar } from '@/app/components/booking/WeeklyCalendar';
 import { CourtList } from '@/app/components/booking/CourtList';
 import { RacketRental } from '@/app/components/booking/RacketRental';
 import { PaymentSummary } from '@/app/components/booking/PaymentSummary';
-import { ChevronLeft, X, Users, Search } from 'lucide-react-native';
-import type { Booking } from '@/app/components/booking/BookingCalendar';
+import { ChevronLeft } from 'lucide-react-native';
+import { useUserBookings } from '@/app/hooks/useSupabaseData';
+import { useApp } from '@/app/context/AppContext';
 import { colors } from '@/app/theme/colors';
 
 type BookingStep = 'court-selection' | 'date-time' | 'racket-rental' | 'payment';
@@ -24,6 +25,9 @@ export default function BookScreen() {
   const [racketCount, setRacketCount] = useState(0);
   const [currentStep, setCurrentStep] = useState<BookingStep>('court-selection');
   const [calendarViewMode, setCalendarViewMode] = useState<CalendarViewMode>('weekly');
+
+  const { createBooking } = useApp();
+  const { bookings } = useUserBookings();
 
   const handleBack = () => {
     switch (currentStep) {
@@ -63,51 +67,74 @@ export default function BookScreen() {
     setCurrentStep('payment');
   };
 
-  const handlePaymentConfirm = () => {
-    // Payment processing would go here
-    console.log('Processing payment...');
+  const handlePaymentConfirm = async () => {
+    try {
+      if (!selectedCourt || !selectedDate || !selectedTime) {
+        Alert.alert('Error', 'Missing booking information');
+        return;
+      }
+
+      // Parse time to get start and end times
+      const [startTime] = selectedTime.split(' - ');
+      const startHour = parseInt(startTime.split(':')[0]);
+      const endTime = `${(startHour + 1).toString().padStart(2, '0')}:00`;
+
+      const bookingData = {
+        court_id: selectedCourt.id,
+        date: selectedDate,
+        start_time: `${startTime}:00`,
+        end_time: endTime,
+        status: 'confirmed' as const
+      };
+
+      await createBooking(bookingData);
+      
+      Alert.alert(
+        'Success!', 
+        'Your booking has been confirmed.',
+        [
+          {
+            text: 'OK',
+            onPress: () => {
+              // Reset form
+              setSelectedCourt(null);
+              setSelectedDate(null);
+              setSelectedTime(null);
+              setRacketCount(0);
+              setCurrentStep('court-selection');
+            }
+          }
+        ]
+      );
+    } catch (error: any) {
+      Alert.alert('Error', error.message || 'Failed to create booking');
+    }
   };
 
-  // Sample data for existing bookings
-  const existingBookings: Record<string, Booking[]> = {
-    '2024-03-19': [{
-      id: '1',
-      courtName: 'Padel Court 2',
-      courtType: 'padel',
-      time: '17:00',
-      date: 'March 19 - Tuesday - 5:00 PM - 2024',
+  // Transform bookings for calendar display
+  const existingBookings: Record<string, any[]> = {};
+  bookings.forEach(booking => {
+    const dateKey = booking.date;
+    if (!existingBookings[dateKey]) {
+      existingBookings[dateKey] = [];
+    }
+    existingBookings[dateKey].push({
+      id: booking.id,
+      courtName: booking.court?.name || 'Unknown Court',
+      courtType: booking.court?.type || 'padel',
+      time: booking.start_time.slice(0, 5),
+      date: new Date(booking.date).toLocaleDateString('en-US', {
+        month: 'long',
+        day: 'numeric',
+        weekday: 'long',
+        hour: 'numeric',
+        minute: '2-digit',
+        year: 'numeric'
+      }),
       maxPlayers: 4,
-      players: [
-        { name: 'Alex Johnson', skillLevel: 'İleri' },
-        { name: 'Sarah Smith', skillLevel: 'Orta' }
-      ]
-    }],
-    '2024-03-21': [{
-      id: '2',
-      courtName: 'Pickleball Court 1',
-      courtType: 'pickleball',
-      time: '15:30',
-      date: 'March 21 - Thursday - 3:30 PM - 2024',
-      maxPlayers: 4,
-      players: [
-        { name: 'Mike Brown', skillLevel: 'Başlangıç' },
-        { name: 'Emma Davis', skillLevel: 'Orta' },
-        { name: 'John Smith', skillLevel: 'İleri' },
-        { name: 'Lisa Wilson', skillLevel: 'Orta' }
-      ]
-    }],
-    '2024-03-25': [{
-      id: '3',
-      courtName: 'Padel Court 1',
-      courtType: 'padel',
-      time: '10:00',
-      date: 'March 25 - Monday - 10:00 AM - 2024',
-      maxPlayers: 4,
-      players: [
-        { name: 'Tom Wilson', skillLevel: 'İleri' }
-      ]
-    }]
-  };
+      players: [] // Will be populated from matches data later
+    });
+  });
 
   const renderBookingStep = () => {
     switch (currentStep) {
@@ -152,9 +179,9 @@ export default function BookScreen() {
             courtType={selectedCourt.type}
             date={selectedDate!}
             time={selectedTime!}
-            courtPrice={selectedCourt.price}
+            courtPrice={selectedCourt.price_per_hour / 100}
             racketCount={racketCount}
-            racketPrice={5}
+            racketPrice={100}
             onConfirm={handlePaymentConfirm}
           />
         );
@@ -172,7 +199,7 @@ export default function BookScreen() {
                 style={styles.backButton} 
                 onPress={handleBack}
               >
-                <ChevronLeft size={24} color={colors.white} />
+                <ChevronLeft size={24} color={colors.charcoal} />
               </TouchableOpacity>
             )}
             <Text style={styles.headerTitle}>Kort Rezervasyonu</Text>

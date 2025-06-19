@@ -1,5 +1,7 @@
-import { View, Text, StyleSheet, FlatList } from 'react-native';
+import { View, Text, StyleSheet, FlatList, ActivityIndicator } from 'react-native';
 import { CourtCard } from '@/app/components/courts/CourtCard';
+import { useCourts } from '@/app/hooks/useSupabaseData';
+import { colors } from '@/app/theme/colors';
 
 type CourtListProps = {
   courtType: 'all' | 'padel' | 'pickleball';
@@ -7,77 +9,39 @@ type CourtListProps = {
 };
 
 export function CourtList({ courtType, onSelectCourt }: CourtListProps) {
-  const courts = [
-    {
-      id: '1',
-      name: 'Padel Kort 1',
-      type: 'padel',
-      price: 35,
-      rating: 4.8,
-      distance: '1.2 km',
-      image: 'https://images.pexels.com/photos/2277981/pexels-photo-2277981.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=2',
-      availableSlots: 3,
-    },
-    {
-      id: '2',
-      name: 'Padel Kort 2',
-      type: 'padel',
-      price: 35,
-      rating: 4.7,
-      distance: '1.2 km',
-      image: 'https://images.pexels.com/photos/8224728/pexels-photo-8224728.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=2',
-      availableSlots: 2,
-    },
-    {
-      id: '3',
-      name: 'Padel Kort 3',
-      type: 'padel',
-      price: 35,
-      rating: 4.9,
-      distance: '1.2 km',
-      image: 'https://images.pexels.com/photos/13635523/pexels-photo-13635523.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=2',
-      availableSlots: 4,
-    },
-    {
-      id: '4',
-      name: 'Padel Kort 4',
-      type: 'padel',
-      price: 35,
-      rating: 4.6,
-      distance: '1.2 km',
-      image: 'https://images.pexels.com/photos/2277981/pexels-photo-2277981.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=2',
-      availableSlots: 3,
-    },
-    {
-      id: '5',
-      name: 'Pickleball Kort 1',
-      type: 'pickleball',
-      price: 25,
-      rating: 4.5,
-      distance: '1.2 km',
-      image: 'https://images.pexels.com/photos/6765942/pexels-photo-6765942.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=2',
-      availableSlots: 5,
-    },
-    {
-      id: '6',
-      name: 'Pickleball Kort 2',
-      type: 'pickleball',
-      price: 25,
-      rating: 4.3,
-      distance: '1.2 km',
-      image: 'https://images.pexels.com/photos/6765986/pexels-photo-6765986.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=2',
-      availableSlots: 6,
-    },
-  ];
+  const { courts, loading, error } = useCourts(courtType === 'all' ? undefined : courtType);
 
-  const filteredCourts = courtType === 'all' ? courts : courts.filter(court => court.type === courtType);
+  if (loading) {
+    return (
+      <View style={styles.loadingContainer}>
+        <ActivityIndicator size="large" color={colors.primary} />
+        <Text style={styles.loadingText}>Loading courts...</Text>
+      </View>
+    );
+  }
+
+  if (error) {
+    return (
+      <View style={styles.errorContainer}>
+        <Text style={styles.errorText}>Error loading courts: {error}</Text>
+      </View>
+    );
+  }
+
+  if (courts.length === 0) {
+    return (
+      <View style={styles.emptyContainer}>
+        <Text style={styles.emptyText}>No courts available</Text>
+      </View>
+    );
+  }
 
   return (
     <View style={styles.container}>
       <Text style={styles.title}>Kort Seçiniz</Text>
       
       <FlatList
-        data={filteredCourts}
+        data={courts}
         keyExtractor={(item) => item.id}
         numColumns={2}
         contentContainerStyle={styles.listContent}
@@ -85,12 +49,12 @@ export function CourtList({ courtType, onSelectCourt }: CourtListProps) {
         renderItem={({ item }) => (
           <CourtCard
             name={item.name}
-            type={item.type as 'padel' | 'pickleball'}
-            price={item.price}
-            rating={item.rating}
-            distance={item.distance}
-            image={item.image}
-            availableSlots={item.availableSlots}
+            type={item.type}
+            price={item.price_per_hour / 100} // Convert from cents
+            rating={item.rating || 4.5}
+            distance="1.2 km" // Static for now
+            image={item.image_url || 'https://images.pexels.com/photos/2277981/pexels-photo-2277981.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=2'}
+            availableSlots={Math.floor(Math.random() * 5) + 1} // Random for now
             onPress={() => onSelectCourt(item)}
           />
         )}
@@ -107,7 +71,7 @@ const styles = StyleSheet.create({
   title: {
     fontFamily: 'Inter-Bold',
     fontSize: 18,
-    color: '#000000',
+    color: colors.charcoal,
     marginBottom: 16,
   },
   listContent: {
@@ -115,5 +79,41 @@ const styles = StyleSheet.create({
   },
   columnWrapper: {
     justifyContent: 'space-between',
+  },
+  loadingContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    padding: 40,
+  },
+  loadingText: {
+    fontFamily: 'Inter-Medium',
+    fontSize: 16,
+    color: colors.text.disabled,
+    marginTop: 12,
+  },
+  errorContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    padding: 40,
+  },
+  errorText: {
+    fontFamily: 'Inter-Medium',
+    fontSize: 16,
+    color: colors.status.error,
+    textAlign: 'center',
+  },
+  emptyContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    padding: 40,
+  },
+  emptyText: {
+    fontFamily: 'Inter-Medium',
+    fontSize: 16,
+    color: colors.text.disabled,
+    textAlign: 'center',
   },
 });
