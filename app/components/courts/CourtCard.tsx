@@ -6,10 +6,8 @@ type CourtCardProps = {
   name: string;
   type: 'padel' | 'pickleball';
   price: number;
-  rating: number;
-  distance: string;
   image: string;
-  availableSlots: number;
+  location?: string;
   onPress: () => void;
 };
 
@@ -17,10 +15,8 @@ export function CourtCard({
   name,
   type,
   price,
-  rating,
-  distance,
   image,
-  availableSlots,
+  location,
   onPress,
 }: CourtCardProps) {
   const typeColor = type === 'padel' ? '#16FF91' : '#32D1FF';
@@ -31,29 +27,28 @@ export function CourtCard({
       <Image source={{ uri: image }} style={styles.image} />
       <View style={styles.content}>
         <Text style={styles.name}>{name}</Text>
-        <View style={styles.ratingContainer}>
-          <Star size={16} color={colors.status.warning} fill={colors.status.warning} />
-          <Text style={styles.rating}>{rating}</Text>
+        
+        <View style={[styles.typeBadge, { backgroundColor: `${typeColor}20` }]}>
+          <Text style={[styles.typeText, { color: typeColor }]}>{typeText}</Text>
         </View>
-        <Text style={styles.distance}>{distance}</Text>
+        
+        {location && (
+          <View style={styles.locationContainer}>
+            <MapPin size={12} color={colors.text.disabled} />
+            <Text style={styles.location}>{location}</Text>
+          </View>
+        )}
+        
         <View style={styles.priceContainer}>
           <Text style={styles.price}>₺{price}</Text>
           <Text style={styles.perHour}>/saat</Text>
         </View>
+        
         <TouchableOpacity 
-          style={[
-            styles.bookButton,
-            availableSlots === 0 && styles.disabledButton,
-          ]}
+          style={styles.bookButton}
           onPress={onPress}
-          disabled={availableSlots === 0}
         >
-          <Text style={[
-            styles.bookButtonText,
-            availableSlots === 0 && styles.disabledButtonText,
-          ]}>
-            {availableSlots > 0 ? 'Rezervasyon Yap' : 'Dolu'}
-          </Text>
+          <Text style={styles.bookButtonText}>Rezervasyon Yap</Text>
         </TouchableOpacity>
       </View>
     </View>
@@ -80,43 +75,48 @@ const styles = StyleSheet.create({
     fontFamily: 'Inter-Bold',
     fontSize: 14,
     color: colors.charcoal,
-    marginBottom: 4,
+    marginBottom: 8,
   },
-  ratingContainer: {
+  typeBadge: {
+    paddingHorizontal: 8,
+    paddingVertical: 4,
+    borderRadius: 8,
+    alignSelf: 'flex-start',
+    marginBottom: 8,
+  },
+  typeText: {
+    fontFamily: 'Inter-Medium',
+    fontSize: 12,
+  },
+  locationContainer: {
     flexDirection: 'row',
     alignItems: 'center',
-    marginBottom: 4,
-  },
-  rating: {
-    fontFamily: 'Inter-Medium',
-    fontSize: 12,
-    color: '#FFD60A',
-    marginLeft: 4,
-  },
-  distance: {
-    fontFamily: 'Inter-Medium',
-    fontSize: 12,
-    color: '#8F98A8',
     marginBottom: 8,
+  },
+  location: {
+    fontFamily: 'Inter-Medium',
+    fontSize: 12,
+    color: colors.text.disabled,
+    marginLeft: 4,
   },
   priceContainer: {
     flexDirection: 'row',
     alignItems: 'baseline',
-    marginBottom: 8,
+    marginBottom: 12,
   },
   price: {
     fontFamily: 'Inter-Bold',
     fontSize: 16,
-    color: '#16FF91',
+    color: colors.primary,
   },
   perHour: {
     fontFamily: 'Inter-Medium',
     fontSize: 12,
-    color: '#8F98A8',
+    color: colors.text.disabled,
     marginLeft: 4,
   },
   bookButton: {
-    backgroundColor: 'rgba(22, 255, 145, 0.15)',
+    backgroundColor: 'rgba(233, 125, 43, 0.15)',
     paddingVertical: 8,
     paddingHorizontal: 12,
     borderRadius: 8,
@@ -128,12 +128,5 @@ const styles = StyleSheet.create({
     fontFamily: 'Inter-Bold',
     fontSize: 12,
     color: colors.primary,
-  },
-  disabledButton: {
-    backgroundColor: 'rgba(143, 152, 168, 0.15)',
-    borderColor: colors.text.disabled,
-  },
-  disabledButtonText: {
-    color: colors.text.disabled,
   },
 });

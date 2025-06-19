@@ -12,7 +12,9 @@ export interface Database {
       users: {
         Row: {
           id: string
+          role: string | null
           full_name: string | null
+          email: string | null
           level: string | null
           profile_image_url: string | null
           created_at: string
@@ -20,7 +22,9 @@ export interface Database {
         }
         Insert: {
           id: string
+          role?: string | null
           full_name?: string | null
+          email?: string | null
           level?: string | null
           profile_image_url?: string | null
           created_at?: string
@@ -28,7 +32,9 @@ export interface Database {
         }
         Update: {
           id?: string
+          role?: string | null
           full_name?: string | null
+          email?: string | null
           level?: string | null
           profile_image_url?: string | null
           created_at?: string
@@ -51,7 +57,6 @@ export interface Database {
           type: 'padel' | 'pickleball'
           price_per_hour: number
           image_url: string | null
-          rating: number | null
           location: string | null
           created_at: string
           updated_at: string
@@ -62,7 +67,6 @@ export interface Database {
           type: 'padel' | 'pickleball'
           price_per_hour: number
           image_url?: string | null
-          rating?: number | null
           location?: string | null
           created_at?: string
           updated_at?: string
@@ -73,7 +77,6 @@ export interface Database {
           type?: 'padel' | 'pickleball'
           price_per_hour?: number
           image_url?: string | null
-          rating?: number | null
           location?: string | null
           created_at?: string
           updated_at?: string
@@ -89,6 +92,9 @@ export interface Database {
           start_time: string
           end_time: string
           status: 'pending' | 'confirmed' | 'canceled'
+          type: string | null
+          lesson_id: string | null
+          includes_racket: boolean | null
           created_at: string
           updated_at: string
         }
@@ -100,6 +106,9 @@ export interface Database {
           start_time: string
           end_time: string
           status?: 'pending' | 'confirmed' | 'canceled'
+          type?: string | null
+          lesson_id?: string | null
+          includes_racket?: boolean | null
           created_at?: string
           updated_at?: string
         }
@@ -111,6 +120,9 @@ export interface Database {
           start_time?: string
           end_time?: string
           status?: 'pending' | 'confirmed' | 'canceled'
+          type?: string | null
+          lesson_id?: string | null
+          includes_racket?: boolean | null
           created_at?: string
           updated_at?: string
         }
@@ -201,6 +213,41 @@ export interface Database {
             columns: ["user_id"]
             isOneToOne: false
             referencedRelation: "users"
+            referencedColumns: ["id"]
+          }
+        ]
+      }
+      payments: {
+        Row: {
+          id: string
+          booking_id: string
+          amount: number
+          status: string
+          payment_method: string
+          created_at: string
+        }
+        Insert: {
+          id?: string
+          booking_id: string
+          amount: number
+          status: string
+          payment_method: string
+          created_at?: string
+        }
+        Update: {
+          id?: string
+          booking_id?: string
+          amount?: number
+          status?: string
+          payment_method?: string
+          created_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "payments_booking_id_fkey"
+            columns: ["booking_id"]
+            isOneToOne: false
+            referencedRelation: "bookings"
             referencedColumns: ["id"]
           }
         ]

@@ -87,7 +87,9 @@ export class AuthService {
           .insert({
             id: user.id,
             full_name: user.user_metadata?.full_name || user.email?.split('@')[0] || 'User',
+            email: user.email,
             level: 'Başlangıç',
+            role: 'user',
             profile_image_url: user.user_metadata?.avatar_url || 'https://images.pexels.com/photos/1681010/pexels-photo-1681010.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=2'
           });
 

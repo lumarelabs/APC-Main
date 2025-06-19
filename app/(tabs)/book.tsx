@@ -70,7 +70,7 @@ export default function BookScreen() {
   const handlePaymentConfirm = async () => {
     try {
       if (!selectedCourt || !selectedDate || !selectedTime) {
-        Alert.alert('Error', 'Missing booking information');
+        Alert.alert('Hata', 'Eksik rezervasyon bilgisi');
         return;
       }
 
@@ -84,17 +84,19 @@ export default function BookScreen() {
         date: selectedDate,
         start_time: `${startTime}:00`,
         end_time: endTime,
-        status: 'confirmed' as const
+        status: 'confirmed' as const,
+        type: 'court_booking',
+        includes_racket: racketCount > 0
       };
 
       await createBooking(bookingData);
       
       Alert.alert(
-        'Success!', 
-        'Your booking has been confirmed.',
+        'Başarılı!', 
+        'Rezervasyonunuz onaylandı.',
         [
           {
-            text: 'OK',
+            text: 'Tamam',
             onPress: () => {
               // Reset form
               setSelectedCourt(null);
@@ -107,7 +109,7 @@ export default function BookScreen() {
         ]
       );
     } catch (error: any) {
-      Alert.alert('Error', error.message || 'Failed to create booking');
+      Alert.alert('Hata', error.message || 'Rezervasyon oluşturulamadı');
     }
   };
 
@@ -120,10 +122,10 @@ export default function BookScreen() {
     }
     existingBookings[dateKey].push({
       id: booking.id,
-      courtName: booking.court?.name || 'Unknown Court',
+      courtName: booking.court?.name || 'Bilinmeyen Kort',
       courtType: booking.court?.type || 'padel',
       time: booking.start_time.slice(0, 5),
-      date: new Date(booking.date).toLocaleDateString('en-US', {
+      date: new Date(booking.date).toLocaleDateString('tr-TR', {
         month: 'long',
         day: 'numeric',
         weekday: 'long',

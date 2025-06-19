@@ -31,21 +31,28 @@ export default function HomeScreen() {
   const { bookings, loading: bookingsLoading } = useUserBookings();
 
   // Transform Supabase bookings to component format
-  const transformedBookings: Booking[] = bookings.map(booking => ({
-    id: booking.id,
-    courtName: booking.court?.name || 'Unknown Court',
-    courtType: booking.court?.type || 'padel',
-    date: new Date(booking.date).toLocaleDateString('tr-TR', { 
-      weekday: 'long',
-      day: 'numeric',
-      month: 'long'
-    }),
-    time: `${booking.start_time.slice(0, 5)} - ${booking.end_time.slice(0, 5)}`,
-    image: booking.court?.image_url || 'https://images.pexels.com/photos/2277981/pexels-photo-2277981.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=2',
-    players: [] // Will be populated from matches data later
-  }));
+  const transformedBookings: Booking[] = bookings
+    .filter(booking => {
+      const bookingDate = new Date(booking.date);
+      const today = new Date();
+      return bookingDate >= today; // Only show upcoming bookings
+    })
+    .slice(0, 5) // Limit to 5 upcoming bookings
+    .map(booking => ({
+      id: booking.id,
+      courtName: booking.court?.name || 'Bilinmeyen Kort',
+      courtType: booking.court?.type || 'padel',
+      date: new Date(booking.date).toLocaleDateString('tr-TR', { 
+        weekday: 'long',
+        day: 'numeric',
+        month: 'long'
+      }),
+      time: `${booking.start_time.slice(0, 5)} - ${booking.end_time.slice(0, 5)}`,
+      image: booking.court?.image_url || 'https://images.pexels.com/photos/2277981/pexels-photo-2277981.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=2',
+      players: [] // Will be populated from matches data later
+    }));
 
-  const displayName = profile?.full_name || user?.email?.split('@')[0] || 'User';
+  const displayName = profile?.full_name || user?.email?.split('@')[0] || 'Kullanıcı';
 
   return (
     <SafeAreaView style={styles.safeArea}>
@@ -85,7 +92,7 @@ export default function HomeScreen() {
           {bookingsLoading ? (
             <View style={styles.loadingContainer}>
               <ActivityIndicator size="small" color={colors.primary} />
-              <Text style={styles.loadingText}>Loading bookings...</Text>
+              <Text style={styles.loadingText}>Rezervasyonlar yükleniyor...</Text>
             </View>
           ) : transformedBookings.length > 0 ? (
             <ScrollView horizontal showsHorizontalScrollIndicator={false} style={styles.bookingsScroll}>

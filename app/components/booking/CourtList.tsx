@@ -15,7 +15,7 @@ export function CourtList({ courtType, onSelectCourt }: CourtListProps) {
     return (
       <View style={styles.loadingContainer}>
         <ActivityIndicator size="large" color={colors.primary} />
-        <Text style={styles.loadingText}>Loading courts...</Text>
+        <Text style={styles.loadingText}>Kortlar yükleniyor...</Text>
       </View>
     );
   }
@@ -23,7 +23,7 @@ export function CourtList({ courtType, onSelectCourt }: CourtListProps) {
   if (error) {
     return (
       <View style={styles.errorContainer}>
-        <Text style={styles.errorText}>Error loading courts: {error}</Text>
+        <Text style={styles.errorText}>Kortlar yüklenirken hata oluştu: {error}</Text>
       </View>
     );
   }
@@ -31,7 +31,7 @@ export function CourtList({ courtType, onSelectCourt }: CourtListProps) {
   if (courts.length === 0) {
     return (
       <View style={styles.emptyContainer}>
-        <Text style={styles.emptyText}>No courts available</Text>
+        <Text style={styles.emptyText}>Uygun kort bulunamadı</Text>
       </View>
     );
   }
@@ -50,11 +50,9 @@ export function CourtList({ courtType, onSelectCourt }: CourtListProps) {
           <CourtCard
             name={item.name}
             type={item.type}
-            price={item.price_per_hour / 100} // Convert from cents
-            rating={item.rating || 4.5}
-            distance="1.2 km" // Static for now
+            price={item.price_per_hour / 100} // Convert from cents to TL
             image={item.image_url || 'https://images.pexels.com/photos/2277981/pexels-photo-2277981.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=2'}
-            availableSlots={Math.floor(Math.random() * 5) + 1} // Random for now
+            location={item.location}
             onPress={() => onSelectCourt(item)}
           />
         )}
