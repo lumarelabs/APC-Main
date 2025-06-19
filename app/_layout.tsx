@@ -6,7 +6,8 @@ import { useFonts, Inter_400Regular, Inter_500Medium, Inter_700Bold } from '@exp
 import * as SplashScreen from 'expo-splash-screen';
 import { AppProvider } from '@/app/context/AppContext';
 import { useAuth } from '@/app/hooks/useAuth';
-import AuthScreen from '@/app/components/auth/AuthScreen';
+import AuthScreen from '@/app/components/auth/AuthScreen'
+import { useFrameworkReady } from '@/hooks/useFrameworkReady';
 
 // Prevent splash screen from auto-hiding
 SplashScreen.preventAutoHideAsync();
