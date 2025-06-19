@@ -6,50 +6,61 @@ import { UpcomingBooking } from '@/app/components/home/UpcomingBooking';
 import { ImageSlider } from '@/app/components/home/ImageSlider';
 import { ServiceDetailsModal } from '@/app/components/home/ServiceDetailsModal';
 import { BookingDetailsModal } from '@/app/components/home/BookingDetailsModal';
+import { useUserBookings, useUserProfile } from '@/app/hooks/useSupabaseData';
+import { useApp } from '@/app/context/AppContext';
 import { colors } from '@/app/theme/colors';
 import Logo2 from '../../assets/images/logo2.png';
 import RacketImage from '../../assets/images/racket.png';
 import LocationMap from '../components/home/LocationMap';
 
 type Booking = {
+  id: string;
   courtName: string;
   courtType: "padel" | "pickleball";
   date: string;
   time: string;
   image: string;
-  players: Array<{ name: string; skillLevel: string }>;
+  players?: Array<{ name: string; skillLevel: string }>;
 };
 
 export default function HomeScreen() {
-  const [activeTab, setActiveTab] = useState('all');
+  const { user } = useApp();
+  const { bookings, loading: bookingsLoading } = useUserBookings();
+  const { profile } = useUserProfile();
+  
   const [selectedService, setSelectedService] = useState<'court' | 'lessons' | 'tournaments' | null>(null);
   const [selectedBooking, setSelectedBooking] = useState<Booking | null>(null);
 
-  const bookings: Booking[] = [
-    {
-      courtName: "Padel Court 2",
-      courtType: "padel",
-      date: "Bugün",
-      time: "18:00 - 19:30",
-      image: "https://images.pexels.com/photos/2277981/pexels-photo-2277981.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=2",
-      players: [
-        { name: "Alex Johnson", skillLevel: "Advanced" },
-        { name: "Sarah Smith", skillLevel: "Intermediate" },
-        { name: "Mike Wilson", skillLevel: "Advanced" }
-      ]
-    },
-    {
-      courtName: "Pickleball Court 1",
-      courtType: "pickleball",
-      date: "Yarın",
-      time: "10:00 - 11:30",
-      image: "https://images.pexels.com/photos/6765942/pexels-photo-6765942.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=2",
-      players: [
-        { name: "Emma Davis", skillLevel: "Intermediate" },
-        { name: "John Smith", skillLevel: "Beginner" }
-      ]
+  // Transform Supabase bookings to component format
+  const transformedBookings: Booking[] = bookings.map(booking => {
+    const today = new Date();
+    const bookingDate = new Date(booking.date);
+    const tomorrow = new Date(today);
+    tomorrow.setDate(tomorrow.getDate() + 1);
+    
+    let dateText = booking.date;
+    if (bookingDate.toDateString() === today.toDateString()) {
+      dateText = 'Bugün';
+    } else if (bookingDate.toDateString() === tomorrow.toDateString()) {
+      dateText = 'Yarın';
     }
-  ];
+
+    return {
+      id: booking.id,
+      courtName: booking.court?.name || 'Court',
+      courtType: booking.court?.type || 'padel',
+      date: dateText,
+      time: `${booking.start_time.slice(0, 5)} - ${booking.end_time.slice(0, 5)}`,
+      image: booking.court?.image_url || "https://images.pexels.com/photos/2277981/pexels-photo-2277981.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=2",
+      players: [] // We'll need to implement match players if needed
+    };
+  }).filter(booking => {
+    // Only show upcoming bookings
+    const bookingDate = new Date(bookings.find(b => b.id === booking.id)?.date || '');
+    return bookingDate >= new Date() && bookings.find(b => b.id === booking.id)?.status === 'confirmed';
+  }).slice(0, 5); // Show only first 5 upcoming bookings
+
+  const displayName = profile?.full_name || user?.email?.split('@')[0] || 'User';
 
   return (
     <SafeAreaView style={styles.safeArea}>
@@ -57,7 +68,7 @@ export default function HomeScreen() {
         {/* Welcome Header */}
         <View style={styles.welcomeHeader}>
           <View>
-            <Text style={styles.greeting}>Hoş geldin, Ece!</Text>
+            <Text style={styles.greeting}>Hoş geldin, {displayName}!</Text>
             <Text style={styles.subtitle}>Oynamaya hazır mısın?</Text>
           </View>
           <Image source={Logo2} style={styles.topRightLogo} resizeMode="contain" />
@@ -86,19 +97,30 @@ export default function HomeScreen() {
             </TouchableOpacity>
           </View>
 
-          <ScrollView horizontal showsHorizontalScrollIndicator={false} style={styles.bookingsScroll}>
-            {bookings.map((booking, index) => (
-              <TouchableOpacity key={index} onPress={() => setSelectedBooking(booking)}>
-                <UpcomingBooking 
-                  courtName={booking.courtName}
-                  courtType={booking.courtType}
-                  date={booking.date}
-                  time={booking.time}
-                  image={booking.image}
-                />
-              </TouchableOpacity>
-            ))}
-          </ScrollView>
+          {bookingsLoading ? (
+            <View style={styles.loadingContainer}>
+              <Text style={styles.loadingText}>Rezervasyonlar yükleniyor...</Text>
+            </View>
+          ) : transformedBookings.length > 0 ? (
+            <ScrollView horizontal showsHorizontalScrollIndicator={false} style={styles.bookingsScroll}>
+              {transformedBookings.map((booking) => (
+                <TouchableOpacity key={booking.id} onPress={() => setSelectedBooking(booking)}>
+                  <UpcomingBooking 
+                    courtName={booking.courtName}
+                    courtType={booking.courtType}
+                    date={booking.date}
+                    time={booking.time}
+                    image={booking.image}
+                  />
+                </TouchableOpacity>
+              ))}
+            </ScrollView>
+          ) : (
+            <View style={styles.emptyContainer}>
+              <Text style={styles.emptyText}>Henüz rezervasyonunuz yok</Text>
+              <Text style={styles.emptySubtext}>Rezervasyon sekmesinden kort kiralayabilirsiniz</Text>
+            </View>
+          )}
         </View>
 
         {/* Services */}
@@ -290,6 +312,33 @@ const styles = StyleSheet.create({
     fontSize: 14,
     color: colors.primary,
   },
+  loadingContainer: {
+    padding: 20,
+    alignItems: 'center',
+  },
+  loadingText: {
+    fontFamily: 'Inter-Medium',
+    fontSize: 16,
+    color: colors.text.disabled,
+  },
+  emptyContainer: {
+    padding: 20,
+    alignItems: 'center',
+    backgroundColor: colors.background.secondary,
+    borderRadius: 16,
+  },
+  emptyText: {
+    fontFamily: 'Inter-Bold',
+    fontSize: 16,
+    color: colors.charcoal,
+    marginBottom: 4,
+  },
+  emptySubtext: {
+    fontFamily: 'Inter-Regular',
+    fontSize: 14,
+    color: colors.text.disabled,
+    textAlign: 'center',
+  },
   bookingsScroll: {
     marginLeft: -8,
   },
@@ -413,20 +462,5 @@ const styles = StyleSheet.create({
     borderRadius: 16,
     overflow: 'hidden',
     marginBottom: 16,
-  },
-  webMapFallback: {
-    width: '100%',
-    height: '100%',
-    backgroundColor: colors.background.secondary,
-    justifyContent: 'center',
-    alignItems: 'center',
-    borderRadius: 16,
-  },
-  webMapText: {
-    fontFamily: 'Inter-Medium',
-    fontSize: 14,
-    color: colors.text.disabled,
-    marginTop: 8,
-    textAlign: 'center',
   },
 });

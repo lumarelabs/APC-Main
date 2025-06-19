@@ -3,10 +3,62 @@ import { useState } from 'react';
 import { View, Text, StyleSheet, ScrollView, TouchableOpacity } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { MatchCard } from '@/app/components/matches/MatchCard';
+import { useUserMatches } from '@/app/hooks/useSupabaseData';
 import { colors } from '@/app/theme/colors';
 
 export default function MatchesScreen() {
   const [activeTab, setActiveTab] = useState('upcoming');
+  const { matches, loading } = useUserMatches();
+
+  // Transform matches for display
+  const transformedMatches = matches.map(match => {
+    const booking = match.booking;
+    const court = booking?.court;
+    
+    // Format date
+    const matchDate = new Date(booking?.date || '');
+    const today = new Date();
+    const tomorrow = new Date(today);
+    tomorrow.setDate(tomorrow.getDate() + 1);
+    
+    let dateText = matchDate.toLocaleDateString('tr-TR', { 
+      weekday: 'short', 
+      day: 'numeric', 
+      month: 'short' 
+    });
+    
+    if (matchDate.toDateString() === today.toDateString()) {
+      dateText = 'Bugün';
+    } else if (matchDate.toDateString() === tomorrow.toDateString()) {
+      dateText = 'Yarın';
+    }
+
+    // Get players by team
+    const homePlayers = match.players?.filter(p => p.team === 'home').map(p => p.user?.full_name || 'Player') || [];
+    const awayPlayers = match.players?.filter(p => p.team === 'away').map(p => p.user?.full_name || 'Player') || [];
+
+    return {
+      id: match.id,
+      courtName: court?.name || 'Court',
+      courtType: court?.type || 'padel',
+      date: dateText,
+      time: `${booking?.start_time?.slice(0, 5)} - ${booking?.end_time?.slice(0, 5)}`,
+      opponents: awayPlayers.length > 0 ? awayPlayers : ['Rakip Aranıyor'],
+      partners: homePlayers.length > 0 ? homePlayers : ['Siz'],
+      status: match.status,
+      result: match.result,
+      originalDate: matchDate
+    };
+  });
+
+  // Filter matches based on active tab
+  const filteredMatches = transformedMatches.filter(match => {
+    if (activeTab === 'upcoming') {
+      return match.status !== 'completed' && match.originalDate >= new Date();
+    } else {
+      return match.status === 'completed' || match.originalDate < new Date();
+    }
+  });
 
   return (
     <SafeAreaView style={styles.safeArea}>
@@ -34,69 +86,36 @@ export default function MatchesScreen() {
 
         {/* Content */}
         <ScrollView style={styles.content} contentContainerStyle={styles.contentContainer}>
-          {activeTab === 'upcoming' ? (
-            <>
+          {loading ? (
+            <View style={styles.loadingContainer}>
+              <Text style={styles.loadingText}>Maçlar yükleniyor...</Text>
+            </View>
+          ) : filteredMatches.length > 0 ? (
+            filteredMatches.map((match) => (
               <MatchCard 
-                courtName="Downtown Padel Club"
-                courtType="padel"
-                date="Bugün"
-                time="18:00 - 19:30"
-                opponents={["Sarah K.", "Michael T."]}
-                partners={["Siz", "James R."]}
-                status="confirmed"
+                key={match.id}
+                courtName={match.courtName}
+                courtType={match.courtType as 'padel' | 'pickleball'}
+                date={match.date}
+                time={match.time}
+                opponents={match.opponents}
+                partners={match.partners}
+                status={match.status as 'pending' | 'confirmed' | 'completed'}
+                result={match.result as 'win' | 'loss' | undefined}
               />
-              <MatchCard 
-                courtName="Riverside Pickleball"
-                courtType="pickleball"
-                date="Yarın"
-                time="10:00 - 11:30"
-                opponents={["Emma D."]}
-                partners={["Siz"]}
-                status="confirmed"
-              />
-              <MatchCard 
-                courtName="City Padel Center"
-                courtType="padel"
-                date="Cum, 24 Eki"
-                time="20:00 - 21:30"
-                opponents={["Robert L.", "Anna P."]}
-                partners={["Siz", "Thomas B."]}
-                status="pending"
-              />
-            </>
+            ))
           ) : (
-            <>
-              <MatchCard 
-                courtName="Beach Pickleball Courts"
-                courtType="pickleball"
-                date="Pzt, 14 Eki"
-                time="16:00 - 17:30"
-                opponents={["David S.", "Jennifer M."]}
-                partners={["Siz", "Lisa K."]}
-                status="completed"
-                result="win"
-              />
-              <MatchCard 
-                courtName="Downtown Padel Club"
-                courtType="padel"
-                date="Cmt, 5 Eki"
-                time="10:00 - 11:30"
-                opponents={["John D.", "Karen W."]}
-                partners={["Siz", "Mark R."]}
-                status="completed"
-                result="loss"
-              />
-              <MatchCard 
-                courtName="City Padel Center"
-                courtType="padel"
-                date="Çar, 2 Eki"
-                time="19:00 - 20:30"
-                opponents={["Richard B.", "Susan T."]}
-                partners={["Siz", "Paul G."]}
-                status="completed"
-                result="win"
-              />
-            </>
+            <View style={styles.emptyContainer}>
+              <Text style={styles.emptyText}>
+                {activeTab === 'upcoming' ? 'Yaklaşan maçınız yok' : 'Geçmiş maçınız yok'}
+              </Text>
+              <Text style={styles.emptySubtext}>
+                {activeTab === 'upcoming' 
+                  ? 'Rezervasyon yaptığınızda maçlar burada görünecek'
+                  : 'Tamamlanan maçlarınız burada görünecek'
+                }
+              </Text>
+            </View>
           )}
         </ScrollView>
       </View>
@@ -154,5 +173,33 @@ const styles = StyleSheet.create({
   contentContainer: {
     paddingHorizontal: 16,
     paddingBottom: 100,
+  },
+  loadingContainer: {
+    padding: 20,
+    alignItems: 'center',
+  },
+  loadingText: {
+    fontFamily: 'Inter-Medium',
+    fontSize: 16,
+    color: colors.text.disabled,
+  },
+  emptyContainer: {
+    padding: 20,
+    alignItems: 'center',
+    backgroundColor: colors.background.secondary,
+    borderRadius: 16,
+    marginTop: 20,
+  },
+  emptyText: {
+    fontFamily: 'Inter-Bold',
+    fontSize: 16,
+    color: colors.charcoal,
+    marginBottom: 4,
+  },
+  emptySubtext: {
+    fontFamily: 'Inter-Regular',
+    fontSize: 14,
+    color: colors.text.disabled,
+    textAlign: 'center',
   },
 });

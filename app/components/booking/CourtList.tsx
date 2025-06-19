@@ -2,74 +2,12 @@ import { View, Text, StyleSheet, FlatList } from 'react-native';
 import { CourtCard } from '@/app/components/courts/CourtCard';
 
 type CourtListProps = {
+  courts: any[];
   courtType: 'all' | 'padel' | 'pickleball';
   onSelectCourt: (court: any) => void;
 };
 
-export function CourtList({ courtType, onSelectCourt }: CourtListProps) {
-  const courts = [
-    {
-      id: '1',
-      name: 'Padel Kort 1',
-      type: 'padel',
-      price: 35,
-      rating: 4.8,
-      distance: '1.2 km',
-      image: 'https://images.pexels.com/photos/2277981/pexels-photo-2277981.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=2',
-      availableSlots: 3,
-    },
-    {
-      id: '2',
-      name: 'Padel Kort 2',
-      type: 'padel',
-      price: 35,
-      rating: 4.7,
-      distance: '1.2 km',
-      image: 'https://images.pexels.com/photos/8224728/pexels-photo-8224728.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=2',
-      availableSlots: 2,
-    },
-    {
-      id: '3',
-      name: 'Padel Kort 3',
-      type: 'padel',
-      price: 35,
-      rating: 4.9,
-      distance: '1.2 km',
-      image: 'https://images.pexels.com/photos/13635523/pexels-photo-13635523.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=2',
-      availableSlots: 4,
-    },
-    {
-      id: '4',
-      name: 'Padel Kort 4',
-      type: 'padel',
-      price: 35,
-      rating: 4.6,
-      distance: '1.2 km',
-      image: 'https://images.pexels.com/photos/2277981/pexels-photo-2277981.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=2',
-      availableSlots: 3,
-    },
-    {
-      id: '5',
-      name: 'Pickleball Kort 1',
-      type: 'pickleball',
-      price: 25,
-      rating: 4.5,
-      distance: '1.2 km',
-      image: 'https://images.pexels.com/photos/6765942/pexels-photo-6765942.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=2',
-      availableSlots: 5,
-    },
-    {
-      id: '6',
-      name: 'Pickleball Kort 2',
-      type: 'pickleball',
-      price: 25,
-      rating: 4.3,
-      distance: '1.2 km',
-      image: 'https://images.pexels.com/photos/6765986/pexels-photo-6765986.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=2',
-      availableSlots: 6,
-    },
-  ];
-
+export function CourtList({ courts, courtType, onSelectCourt }: CourtListProps) {
   const filteredCourts = courtType === 'all' ? courts : courts.filter(court => court.type === courtType);
 
   return (
@@ -86,11 +24,11 @@ export function CourtList({ courtType, onSelectCourt }: CourtListProps) {
           <CourtCard
             name={item.name}
             type={item.type as 'padel' | 'pickleball'}
-            price={item.price}
-            rating={item.rating}
-            distance={item.distance}
-            image={item.image}
-            availableSlots={item.availableSlots}
+            price={item.price_per_hour / 100} // Convert from cents to currency
+            rating={item.rating || 4.5}
+            distance="1.2 km" // This could be calculated based on user location
+            image={item.image_url || 'https://images.pexels.com/photos/2277981/pexels-photo-2277981.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=2'}
+            availableSlots={5} // This could be calculated based on bookings
             onPress={() => onSelectCourt(item)}
           />
         )}
