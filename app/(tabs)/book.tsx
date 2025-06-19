@@ -1,16 +1,16 @@
 import React, { useState } from 'react';
 import { View, Text, StyleSheet, ScrollView, TouchableOpacity } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { CourtTypeSelector } from '@/components/booking/CourtTypeSelector';
-import { DateTimeSelector } from '@/components/booking/DateTimeSelector';
-import { BookingCalendar } from '@/components/booking/BookingCalendar';
-import { BookingListView } from '@/components/booking/BookingListView';
-import { WeeklyCalendar } from '@/components/booking/WeeklyCalendar';
-import { CourtList } from '@/components/booking/CourtList';
-import { RacketRental } from '@/components/booking/RacketRental';
-import { PaymentSummary } from '@/components/booking/PaymentSummary';
+import { CourtTypeSelector } from '@/app/components/booking/CourtTypeSelector';
+import { DateTimeSelector } from '@/app/components/booking/DateTimeSelector';
+import { BookingCalendar } from '@/app/components/booking/BookingCalendar';
+import { BookingListView } from '@/app/components/booking/BookingListView';
+import { WeeklyCalendar } from '@/app/components/booking/WeeklyCalendar';
+import { CourtList } from '@/app/components/booking/CourtList';
+import { RacketRental } from '@/app/components/booking/RacketRental';
+import { PaymentSummary } from '@/app/components/booking/PaymentSummary';
 import { ChevronLeft, X, Users, Search } from 'lucide-react-native';
-import type { Booking } from '@/components/booking/BookingCalendar';
+import type { Booking } from '@/app/components/booking/BookingCalendar';
 import { colors } from '@/app/theme/colors';
 
 type BookingStep = 'court-selection' | 'date-time' | 'racket-rental' | 'payment';

@@ -1,10 +1,10 @@
 import { useEffect } from 'react';
 import { Stack } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
-import { useFrameworkReady } from '@/hooks/useFrameworkReady';
+import { useFrameworkReady } from '@/app/hooks/useFrameworkReady';
 import { useFonts, Inter_400Regular, Inter_500Medium, Inter_700Bold } from '@expo-google-fonts/inter';
 import * as SplashScreen from 'expo-splash-screen';
-import { AppProvider } from '@/context/AppContext';
+import { AppProvider } from '@/app/context/AppContext';
 
 // Prevent splash screen from auto-hiding
 SplashScreen.preventAutoHideAsync();

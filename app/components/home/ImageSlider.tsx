@@ -1,9 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import { View, Image, StyleSheet, Dimensions } from 'react-native';
-import Logo1 from '../../assets/images/logo1.png';
-import Logo2 from '../../assets/images/logo2.png';
-import Logo3 from '../../assets/images/logo3.png';
-import Logo4 from '../../assets/images/logo4.png';
+import Logo1 from '../../../assets/images/logo1.png';
+import Logo2 from '../../../assets/images/logo2.png';
+import Logo3 from '../../../assets/images/logo3.png';
+import Logo4 from '../../../assets/images/logo4.png';
 
 const { width } = Dimensions.get('window');
 

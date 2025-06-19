@@ -2,6 +2,8 @@ import React from 'react';
 import { View, Text, StyleSheet } from 'react-native';
 import { Calendar } from 'react-native-calendars';
 import { colors } from '@/app/theme/colors';
+import { useEffect } from 'react';
+import { supabase } from '@/app/services/supabase/config';
 
 export type Booking = {
   id: string;
@@ -103,3 +105,4 @@ const styles = StyleSheet.create({
     padding: 8,
   },
 }); 
+

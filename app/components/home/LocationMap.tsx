@@ -1,7 +1,7 @@
 import React from 'react';
 import { View, Text, StyleSheet, Platform } from 'react-native';
 import { MapPin } from 'lucide-react-native';
-import { colors } from '../../app/theme/colors';
+import { colors } from '../../theme/colors';
 
 const LocationMap = () => {
   if (Platform.OS === 'web') {

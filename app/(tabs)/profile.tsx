@@ -4,7 +4,7 @@ import {
   Settings, CreditCard, Bell, Shield, LogOut, 
   Trophy, Clock, Calendar
 } from 'lucide-react-native';
-import { useApp } from '@/context/AppContext';
+import { useApp } from '@/app/context/AppContext';
 import Logo2 from '../../assets/images/logo2.png';
 import { colors } from '@/app/theme/colors';
 

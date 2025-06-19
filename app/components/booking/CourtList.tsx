@@ -1,5 +1,5 @@
 import { View, Text, StyleSheet, FlatList } from 'react-native';
-import { CourtCard } from '@/components/courts/CourtCard';
+import { CourtCard } from '@/app/components/courts/CourtCard';
 
 type CourtListProps = {
   courtType: 'all' | 'padel' | 'pickleball';

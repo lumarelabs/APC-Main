@@ -2,14 +2,14 @@ import React, { useState } from 'react';
 import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Image, Linking, Dimensions, Platform } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Search, Bell, Trophy, GraduationCap, BookOpen, Instagram, MapPin } from 'lucide-react-native';
-import { UpcomingBooking } from '@/components/home/UpcomingBooking';
-import { ImageSlider } from '@/components/home/ImageSlider';
-import { ServiceDetailsModal } from '@/components/home/ServiceDetailsModal';
-import { BookingDetailsModal } from '@/components/home/BookingDetailsModal';
+import { UpcomingBooking } from '@/app/components/home/UpcomingBooking';
+import { ImageSlider } from '@/app/components/home/ImageSlider';
+import { ServiceDetailsModal } from '@/app/components/home/ServiceDetailsModal';
+import { BookingDetailsModal } from '@/app/components/home/BookingDetailsModal';
 import { colors } from '@/app/theme/colors';
 import Logo2 from '../../assets/images/logo2.png';
 import RacketImage from '../../assets/images/racket.png';
-import LocationMap from '../../components/home/LocationMap';
+import LocationMap from '../components/home/LocationMap';
 
 type Booking = {
   courtName: string;
@@ -181,7 +181,7 @@ export default function HomeScreen() {
             
             <TouchableOpacity 
               style={styles.contactLink}
-              onPress={() => Linking.openURL('https://goo.gl/maps/yourGoogleMapsLink')}
+              onPress={() => Linking.openURL('https://goo.gl/maps/https://g.co/kgs/STrxuyX')}
             >
               <MapPin size={24} color={colors.primary} />
               <Text style={styles.contactLinkText}>Haritada Göster</Text>
