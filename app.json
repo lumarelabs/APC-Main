@@ -14,6 +14,9 @@
     "scheme": "myapp",
     "userInterfaceStyle": "automatic",
     "newArchEnabled": true,
+    "router": {
+      "root": "./app"
+    },
     "ios": {
       "supportsTablet": true
     },
