@@ -1,44 +1,28 @@
-import React, { createContext, useContext, useState, ReactNode } from 'react';
-
-type User = {
-  id: string;
-  name: string;
-  email: string;
-  level: string;
-  profileImage: string;
-  skillLevel: 'Başlangıç' | 'Orta' | 'İleri';
-};
-
-type Booking = {
-  id: string;
-  courtName: string;
-  courtType: 'padel' | 'pickleball';
-  date: string;
-  time: string;
-  price: number;
-  status: 'pending' | 'confirmed' | 'canceled';
-};
-
-type Match = {
-  id: string;
-  courtName: string;
-  courtType: 'padel' | 'pickleball';
-  date: string;
-  time: string;
-  opponents: string[];
-  partners: string[];
-  status: 'pending' | 'confirmed' | 'completed';
-  result?: 'win' | 'loss';
-};
+import React, { createContext, useContext, ReactNode } from 'react';
+import { useAuth } from '@/app/hooks/useAuth';
+import { useUserBookings, useUserMatches, useUserProfile } from '@/app/hooks/useSupabaseData';
 
 type AppContextType = {
-  user: User | null;
-  bookings: Booking[];
-  matches: Match[];
-  login: (email: string, password: string) => Promise<void>;
-  logout: () => void;
-  createBooking: (booking: Omit<Booking, 'id'>) => Promise<void>;
-  cancelBooking: (bookingId: string) => Promise<void>;
+  // Auth
+  user: any;
+  loading: boolean;
+  error: string | null;
+  signIn: (email: string, password: string) => Promise<void>;
+  signUp: (email: string, password: string, fullName?: string) => Promise<void>;
+  signOut: () => Promise<void>;
+  isAuthenticated: boolean;
+  
+  // User data
+  profile: any;
+  bookings: any[];
+  matches: any[];
+  
+  // Actions
+  createBooking: (booking: any) => Promise<any>;
+  updateBookingStatus: (bookingId: string, status: 'pending' | 'confirmed' | 'canceled') => Promise<void>;
+  createMatch: (bookingId: string, players: any[]) => Promise<any>;
+  updateMatchResult: (matchId: string, result: 'win' | 'loss') => Promise<void>;
+  updateProfile: (updates: any) => Promise<void>;
 };
 
 const AppContext = createContext<AppContextType | undefined>(undefined);
@@ -48,148 +32,56 @@ type AppProviderProps = {
 };
 
 export function AppProvider({ children }: AppProviderProps) {
-  const [user, setUser] = useState<User | null>({
-    id: '1',
-    name: 'Alex Johnson',
-    email: 'alex.johnson@example.com',
-    level: '3.5',
-    profileImage: 'https://images.pexels.com/photos/1681010/pexels-photo-1681010.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=2',
-    skillLevel: 'Orta',
-  });
-  
-  const [bookings, setBookings] = useState<Booking[]>([
-    {
-      id: '1',
-      courtName: 'Downtown Padel Club',
-      courtType: 'padel',
-      date: 'Today',
-      time: '18:00 - 19:30',
-      price: 35,
-      status: 'confirmed',
-    },
-    {
-      id: '2',
-      courtName: 'Riverside Pickleball',
-      courtType: 'pickleball',
-      date: 'Tomorrow',
-      time: '10:00 - 11:30',
-      price: 25,
-      status: 'confirmed',
-    },
-  ]);
-  
-  const [matches, setMatches] = useState<Match[]>([
-    {
-      id: '1',
-      courtName: 'Downtown Padel Club',
-      courtType: 'padel',
-      date: 'Today',
-      time: '18:00 - 19:30',
-      opponents: ['Sarah K.', 'Michael T.'],
-      partners: ['You', 'James R.'],
-      status: 'confirmed',
-    },
-    {
-      id: '2',
-      courtName: 'Riverside Pickleball',
-      courtType: 'pickleball',
-      date: 'Tomorrow',
-      time: '10:00 - 11:30',
-      opponents: ['Emma D.'],
-      partners: ['You'],
-      status: 'confirmed',
-    },
-    {
-      id: '3',
-      courtName: 'Beach Pickleball Courts',
-      courtType: 'pickleball',
-      date: 'Mon, 14 Oct',
-      time: '16:00 - 17:30',
-      opponents: ['David S.', 'Jennifer M.'],
-      partners: ['You', 'Lisa K.'],
-      status: 'completed',
-      result: 'win',
-    },
-    {
-      id: '4',
-      courtName: 'Downtown Padel Club',
-      courtType: 'padel',
-      date: 'Sat, 5 Oct',
-      time: '10:00 - 11:30',
-      opponents: ['John D.', 'Karen W.'],
-      partners: ['You', 'Mark R.'],
-      status: 'completed',
-      result: 'loss',
-    },
-  ]);
+  const auth = useAuth();
+  const { profile, updateProfile: updateUserProfile } = useUserProfile();
+  const { 
+    bookings, 
+    createBooking, 
+    updateBookingStatus 
+  } = useUserBookings();
+  const { 
+    matches, 
+    createMatch, 
+    updateMatchResult 
+  } = useUserMatches();
 
-  const login = async (email: string, password: string) => {
-    // Simulate API call
+  const updateProfile = async (updates: any) => {
     try {
-      // In a real app, this would be an API call to authenticate
-      setUser({
-        id: '1',
-        name: 'Alex Johnson',
-        email: email,
-        level: '3.5',
-        profileImage: 'https://images.pexels.com/photos/1681010/pexels-photo-1681010.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=2',
-        skillLevel: 'Orta',
-      });
+      await Promise.all([
+        auth.updateProfile(updates),
+        updateUserProfile(updates)
+      ]);
     } catch (error) {
-      console.error('Login failed:', error);
+      console.error('Error updating profile:', error);
       throw error;
     }
   };
 
-  const logout = () => {
-    setUser(null);
-  };
-
-  const createBooking = async (booking: Omit<Booking, 'id'>) => {
-    // Simulate API call
-    try {
-      // In a real app, this would be an API call to create a booking
-      const newBooking: Booking = {
-        ...booking,
-        id: `booking-${Date.now()}`,
-      };
-      
-      setBookings([...bookings, newBooking]);
-    } catch (error) {
-      console.error('Create booking failed:', error);
-      throw error;
-    }
-  };
-
-  const cancelBooking = async (bookingId: string) => {
-    // Simulate API call
-    try {
-      // In a real app, this would be an API call to cancel a booking
-      setBookings(
-        bookings.map((booking) => 
-          booking.id === bookingId 
-            ? { ...booking, status: 'canceled' } 
-            : booking
-        )
-      );
-    } catch (error) {
-      console.error('Cancel booking failed:', error);
-      throw error;
-    }
+  const contextValue: AppContextType = {
+    // Auth
+    user: auth.user,
+    loading: auth.loading,
+    error: auth.error,
+    signIn: auth.signIn,
+    signUp: auth.signUp,
+    signOut: auth.signOut,
+    isAuthenticated: auth.isAuthenticated,
+    
+    // User data
+    profile,
+    bookings,
+    matches,
+    
+    // Actions
+    createBooking,
+    updateBookingStatus,
+    createMatch,
+    updateMatchResult,
+    updateProfile
   };
 
   return (
-    <AppContext.Provider
-      value={{
-        user,
-        bookings,
-        matches,
-        login,
-        logout,
-        createBooking,
-        cancelBooking,
-      }}
-    >
+    <AppContext.Provider value={contextValue}>
       {children}
     </AppContext.Provider>
   );

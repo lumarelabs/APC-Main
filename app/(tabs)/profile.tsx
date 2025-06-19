@@ -1,15 +1,55 @@
-import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Image } from 'react-native';
+import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Image, Alert } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { 
   Settings, CreditCard, Bell, Shield, LogOut, 
   Trophy, Clock, Calendar
 } from 'lucide-react-native';
 import { useApp } from '@/app/context/AppContext';
+import { useUserProfile } from '@/app/hooks/useSupabaseData';
 import Logo2 from '../../assets/images/logo2.png';
 import { colors } from '@/app/theme/colors';
 
 export default function ProfileScreen() {
-  const { user } = useApp();
+  const { user, signOut } = useApp();
+  const { profile, loading } = useUserProfile();
+
+  const handleSignOut = async () => {
+    Alert.alert(
+      'Sign Out',
+      'Are you sure you want to sign out?',
+      [
+        { text: 'Cancel', style: 'cancel' },
+        { 
+          text: 'Sign Out', 
+          style: 'destructive',
+          onPress: async () => {
+            try {
+              await signOut();
+            } catch (error) {
+              Alert.alert('Error', 'Failed to sign out. Please try again.');
+            }
+          }
+        }
+      ]
+    );
+  };
+
+  if (loading) {
+    return (
+      <SafeAreaView style={styles.safeArea}>
+        <View style={styles.loadingContainer}>
+          <Text style={styles.loadingText}>Loading profile...</Text>
+        </View>
+      </SafeAreaView>
+    );
+  }
+
+  const displayProfile = profile || {
+    full_name: user?.email?.split('@')[0] || 'User',
+    level: 'Başlangıç',
+    profile_image_url: 'https://images.pexels.com/photos/1681010/pexels-photo-1681010.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=2'
+  };
+
   return (
     <SafeAreaView style={styles.safeArea}>
       <ScrollView style={styles.container} contentContainerStyle={styles.contentContainer}>
@@ -21,19 +61,19 @@ export default function ProfileScreen() {
         {/* User Profile */}
         <View style={styles.profileCard}>
           <Image 
-            source={{ uri: user?.profileImage }} 
+            source={{ uri: displayProfile.profile_image_url }} 
             style={styles.profileImage} 
           />
           <View style={styles.profileInfo}>
             <View style={styles.nameAndSkill}>
-              <Text style={styles.profileName}>{user?.name}</Text>
-              <View style={[styles.skillLevelBar, skillLevelBarStyle(user?.skillLevel)]}>
-                <Text style={styles.skillLevelText}>{user?.skillLevel}</Text>
+              <Text style={styles.profileName}>{displayProfile.full_name}</Text>
+              <View style={[styles.skillLevelBar, skillLevelBarStyle(displayProfile.level)]}>
+                <Text style={styles.skillLevelText}>{displayProfile.level}</Text>
               </View>
             </View>
             <Text style={styles.profileEmail}>{user?.email}</Text>
             <View style={styles.levelBadge}>
-              <Text style={styles.levelText}>Level {user?.level}</Text>
+              <Text style={styles.levelText}>Level {displayProfile.level}</Text>
             </View>
           </View>
         </View>
@@ -77,7 +117,7 @@ export default function ProfileScreen() {
             <Text style={styles.menuText}>Ayarlar</Text>
           </TouchableOpacity>
           
-          <TouchableOpacity style={styles.menuItem}>
+          <TouchableOpacity style={styles.menuItem} onPress={handleSignOut}>
             <View style={styles.menuIconContainer}>
               <LogOut size={24} color="#8F98A8" />
             </View>
@@ -94,7 +134,7 @@ export default function ProfileScreen() {
   );
 }
 
-function skillLevelBarStyle(skillLevel: 'Başlangıç' | 'Orta' | 'İleri' | undefined) {
+function skillLevelBarStyle(skillLevel: string) {
   switch (skillLevel) {
     case 'Başlangıç':
       return { backgroundColor: colors.secondary, borderColor: colors.secondary };
@@ -118,6 +158,16 @@ const styles = StyleSheet.create({
   },
   contentContainer: {
     paddingBottom: 100,
+  },
+  loadingContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  loadingText: {
+    fontFamily: 'Inter-Medium',
+    fontSize: 16,
+    color: colors.text.disabled,
   },
   header: {
     flexDirection: 'row',

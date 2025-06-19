@@ -5,9 +5,30 @@ import { useFrameworkReady } from '@/app/hooks/useFrameworkReady';
 import { useFonts, Inter_400Regular, Inter_500Medium, Inter_700Bold } from '@expo-google-fonts/inter';
 import * as SplashScreen from 'expo-splash-screen';
 import { AppProvider } from '@/app/context/AppContext';
+import { useAuth } from '@/app/hooks/useAuth';
+import AuthScreen from '@/app/components/auth/AuthScreen';
 
 // Prevent splash screen from auto-hiding
 SplashScreen.preventAutoHideAsync();
+
+function AppContent() {
+  const { user, loading } = useAuth();
+
+  if (loading) {
+    return null; // Keep splash screen visible
+  }
+
+  if (!user) {
+    return <AuthScreen />;
+  }
+
+  return (
+    <Stack screenOptions={{ headerShown: false }}>
+      <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
+      <Stack.Screen name="+not-found" options={{ title: 'Oops!' }} />
+    </Stack>
+  );
+}
 
 export default function RootLayout() {
   useFrameworkReady();
@@ -32,10 +53,7 @@ export default function RootLayout() {
 
   return (
     <AppProvider>
-      <Stack screenOptions={{ headerShown: false }}>
-        <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
-        <Stack.Screen name="+not-found" options={{ title: 'Oops!' }} />
-      </Stack>
+      <AppContent />
       <StatusBar style="light" />
     </AppProvider>
   );
