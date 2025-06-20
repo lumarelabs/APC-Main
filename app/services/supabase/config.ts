@@ -16,8 +16,8 @@ const getEnvVar = (key: string): string => {
   return sources.find(value => value && typeof value === 'string') || '';
 };
 
-const supabaseUrl = getEnvVar('https://ntdjhvcdtzqiephcfdur.supabase.co');
-const supabaseAnonKey = getEnvVar('eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im50ZGpodmNkdHpxaWVwaGNmZHVyIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDkyMTQ4NTMsImV4cCI6MjA2NDc5MDg1M30.MCl30YzRuYMO2HH08j8aqZFVkbWEYphrrl37PeeN4QQ');
+const supabaseUrl = getEnvVar('EXPO_PUBLIC_SUPABASE_URL');
+const supabaseAnonKey = getEnvVar('EXPO_PUBLIC_SUPABASE_ANON_KEY');
 
 // Validate environment variables
 if (!supabaseUrl || !supabaseAnonKey) {
@@ -30,7 +30,7 @@ if (!supabaseUrl || !supabaseAnonKey) {
 
 // Create Supabase client with proper TypeScript typing
 export const supabase = createClient<Database>(
-  supabaseUrl || 'https://placeholder.supabase.co',
+  supabaseUrl || 'https://ntdjhvcdtzqiephcfdur.supabase.co',
   supabaseAnonKey || 'placeholder-key',
   {
     auth: {
