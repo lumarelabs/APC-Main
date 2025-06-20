@@ -17,7 +17,7 @@ const getEnvVar = (key: string): string => {
 };
 
 const supabaseUrl = getEnvVar('EXPO_PUBLIC_SUPABASE_URL');
-const supabaseAnonKey = getEnvVar('EXPO_PUBLIC_SUPABASE_ANON_KEY');
+const supabaseAnonKey = getEnvVar('eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im50ZGpodmNkdHpxaWVwaGNmZHVyIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDkyMTQ4NTMsImV4cCI6MjA2NDc5MDg1M30.MCl30YzRuYMO2HH08j8aqZFVkbWEYphrrl37PeeN4QQ');
 
 // Validate environment variables
 if (!supabaseUrl || !supabaseAnonKey) {
