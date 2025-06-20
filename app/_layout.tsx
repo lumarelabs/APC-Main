@@ -12,7 +12,14 @@ import AuthScreen from '@/app/components/auth/AuthScreen'
 SplashScreen.preventAutoHideAsync();
 
 function AppContent() {
-  const { user, loading } = useAuth();
+  const { user, loading, clearError } = useAuth();
+
+  // Clear any auth errors when component mounts
+  useEffect(() => {
+    if (clearError) {
+      clearError();
+    }
+  }, []);
 
   if (loading) {
     return null; // Keep splash screen visible

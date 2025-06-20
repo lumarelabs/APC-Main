@@ -45,6 +45,10 @@ export function useAuth() {
     }
   };
 
+  const clearError = () => {
+    authService.clearError();
+  };
+
   return {
     user: authState.user,
     loading: authState.loading,
@@ -53,6 +57,7 @@ export function useAuth() {
     signUp,
     signOut,
     updateProfile,
+    clearError,
     isAuthenticated: !!authState.user
   };
 }

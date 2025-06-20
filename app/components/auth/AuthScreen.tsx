@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { 
   View, 
   Text, 
@@ -20,36 +20,57 @@ export default function AuthScreen() {
   const [password, setPassword] = useState('');
   const [fullName, setFullName] = useState('');
   const [loading, setLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
+  const [localError, setLocalError] = useState<string | null>(null);
 
-  const { signIn, signUp } = useAuth();
+  const { signIn, signUp, error: authError, clearError } = useAuth();
+
+  // Clear errors when switching modes or changing inputs
+  useEffect(() => {
+    setLocalError(null);
+    if (clearError) clearError();
+  }, [isSignUp, email, password, fullName]);
 
   const handleSubmit = async () => {
     if (!email || !password) {
-      setError('Please fill in all required fields');
+      setLocalError('Lütfen tüm gerekli alanları doldurun');
       return;
     }
 
     if (isSignUp && !fullName) {
-      setError('Please enter your full name');
+      setLocalError('Lütfen adınızı ve soyadınızı girin');
+      return;
+    }
+
+    if (password.length < 6) {
+      setLocalError('Şifre en az 6 karakter olmalıdır');
       return;
     }
 
     try {
       setLoading(true);
-      setError(null);
+      setLocalError(null);
 
       if (isSignUp) {
         await signUp(email, password, fullName);
         Alert.alert(
-          'Success', 
-          'Account created successfully! Please check your email to verify your account.'
+          'Başarılı!', 
+          'Hesabınız oluşturuldu. Giriş yapabilirsiniz.',
+          [
+            {
+              text: 'Tamam',
+              onPress: () => {
+                setIsSignUp(false);
+                setPassword('');
+                setFullName('');
+              }
+            }
+          ]
         );
       } else {
         await signIn(email, password);
       }
     } catch (err: any) {
-      setError(err.message || 'Authentication failed');
+      setLocalError(err.message || 'Bir hata oluştu');
     } finally {
       setLoading(false);
     }
@@ -57,11 +78,14 @@ export default function AuthScreen() {
 
   const toggleMode = () => {
     setIsSignUp(!isSignUp);
-    setError(null);
+    setLocalError(null);
     setEmail('');
     setPassword('');
     setFullName('');
+    if (clearError) clearError();
   };
+
+  const displayError = localError || authError;
 
   return (
     <SafeAreaView style={styles.container}>
@@ -72,12 +96,12 @@ export default function AuthScreen() {
         <ScrollView contentContainerStyle={styles.scrollContent}>
           <View style={styles.header}>
             <Text style={styles.title}>
-              {isSignUp ? 'Create Account' : 'Welcome Back'}
+              {isSignUp ? 'Hesap Oluştur' : 'Hoş Geldiniz'}
             </Text>
             <Text style={styles.subtitle}>
               {isSignUp 
-                ? 'Sign up to start booking courts' 
-                : 'Sign in to your account'
+                ? 'Kort rezervasyonu yapmak için hesap oluşturun' 
+                : 'Hesabınıza giriş yapın'
               }
             </Text>
           </View>
@@ -85,12 +109,12 @@ export default function AuthScreen() {
           <View style={styles.form}>
             {isSignUp && (
               <View style={styles.inputContainer}>
-                <Text style={styles.label}>Full Name</Text>
+                <Text style={styles.label}>Ad Soyad</Text>
                 <TextInput
                   style={styles.input}
                   value={fullName}
                   onChangeText={setFullName}
-                  placeholder="Enter your full name"
+                  placeholder="Adınızı ve soyadınızı girin"
                   placeholderTextColor={colors.text.disabled}
                   autoCapitalize="words"
                 />
@@ -98,12 +122,12 @@ export default function AuthScreen() {
             )}
 
             <View style={styles.inputContainer}>
-              <Text style={styles.label}>Email</Text>
+              <Text style={styles.label}>E-posta</Text>
               <TextInput
                 style={styles.input}
                 value={email}
                 onChangeText={setEmail}
-                placeholder="Enter your email"
+                placeholder="E-posta adresinizi girin"
                 placeholderTextColor={colors.text.disabled}
                 keyboardType="email-address"
                 autoCapitalize="none"
@@ -112,21 +136,21 @@ export default function AuthScreen() {
             </View>
 
             <View style={styles.inputContainer}>
-              <Text style={styles.label}>Password</Text>
+              <Text style={styles.label}>Şifre</Text>
               <TextInput
                 style={styles.input}
                 value={password}
                 onChangeText={setPassword}
-                placeholder="Enter your password"
+                placeholder="Şifrenizi girin"
                 placeholderTextColor={colors.text.disabled}
                 secureTextEntry
                 autoCapitalize="none"
               />
             </View>
 
-            {error && (
+            {displayError && (
               <View style={styles.errorContainer}>
-                <Text style={styles.errorText}>{error}</Text>
+                <Text style={styles.errorText}>{displayError}</Text>
               </View>
             )}
 
@@ -137,10 +161,10 @@ export default function AuthScreen() {
             >
               <Text style={styles.submitButtonText}>
                 {loading 
-                  ? 'Please wait...' 
+                  ? 'Lütfen bekleyin...' 
                   : isSignUp 
-                    ? 'Create Account' 
-                    : 'Sign In'
+                    ? 'Hesap Oluştur' 
+                    : 'Giriş Yap'
                 }
               </Text>
             </TouchableOpacity>
@@ -148,8 +172,8 @@ export default function AuthScreen() {
             <TouchableOpacity style={styles.toggleButton} onPress={toggleMode}>
               <Text style={styles.toggleButtonText}>
                 {isSignUp 
-                  ? 'Already have an account? Sign In' 
-                  : "Don't have an account? Sign Up"
+                  ? 'Zaten hesabınız var mı? Giriş Yapın' 
+                  : "Hesabınız yok mu? Hesap Oluşturun"
                 }
               </Text>
             </TouchableOpacity>

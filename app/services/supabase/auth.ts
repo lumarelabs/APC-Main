@@ -29,12 +29,15 @@ export class AuthService {
 
   private async initialize() {
     try {
+      // Clear any previous errors
+      this.updateState({ error: null });
+
       // Get initial session
       const { data: { session }, error } = await supabase.auth.getSession();
       
       if (error) {
         console.error('Error getting initial session:', error.message);
-        this.updateState({ user: null, loading: false, error: error.message });
+        this.updateState({ user: null, loading: false, error: null }); // Don't show session errors to user
         return;
       }
 
@@ -62,7 +65,7 @@ export class AuthService {
 
     } catch (error) {
       console.error('Error initializing auth:', error);
-      this.updateState({ user: null, loading: false, error: 'Failed to initialize authentication' });
+      this.updateState({ user: null, loading: false, error: null }); // Don't show initialization errors
     }
   }
 
@@ -124,28 +127,97 @@ export class AuthService {
     return this.currentState;
   }
 
+  // Clear any persistent errors
+  clearError(): void {
+    this.updateState({ error: null });
+  }
+
   async signIn(email: string, password: string): Promise<void> {
     try {
       this.updateState({ loading: true, error: null });
       await signInWithEmail(email, password);
+      // Success state will be handled by onAuthStateChange
     } catch (error: any) {
+      let errorMessage = 'Giriş yapılamadı';
+      
+      // Handle specific error cases
+      if (error.message?.includes('Invalid login credentials')) {
+        errorMessage = 'E-posta veya şifre hatalı';
+      } else if (error.message?.includes('Email not confirmed')) {
+        errorMessage = 'E-posta adresinizi doğrulamanız gerekiyor';
+      } else if (error.message?.includes('Too many requests')) {
+        errorMessage = 'Çok fazla deneme. Lütfen daha sonra tekrar deneyin';
+      }
+
       this.updateState({ 
         loading: false, 
-        error: error.message || 'Failed to sign in' 
+        error: errorMessage
       });
-      throw error;
+      throw new Error(errorMessage);
     }
   }
 
   async signUp(email: string, password: string, fullName?: string): Promise<void> {
     try {
       this.updateState({ loading: true, error: null });
-      await signUpWithEmail(email, password, fullName);
-    } catch (error: any) {
+      
+      const { data, error } = await supabase.auth.signUp({
+        email,
+        password,
+        options: {
+          data: {
+            full_name: fullName
+          }
+        }
+      });
+
+      if (error) {
+        let errorMessage = 'Hesap oluşturulamadı';
+        
+        // Handle specific error cases
+        if (error.message?.includes('User already registered')) {
+          errorMessage = 'Bu e-posta adresi zaten kayıtlı. Giriş yapmayı deneyin.';
+        } else if (error.message?.includes('Password should be at least')) {
+          errorMessage = 'Şifre en az 6 karakter olmalıdır';
+        } else if (error.message?.includes('Invalid email')) {
+          errorMessage = 'Geçerli bir e-posta adresi girin';
+        } else if (error.message?.includes('Signup is disabled')) {
+          errorMessage = 'Yeni kayıt şu anda devre dışı';
+        }
+
+        this.updateState({ 
+          loading: false, 
+          error: errorMessage
+        });
+        throw new Error(errorMessage);
+      }
+
+      // If user is immediately confirmed (no email verification required)
+      if (data.user && !data.session) {
+        this.updateState({ 
+          loading: false, 
+          error: null
+        });
+        // Don't throw error, just show success message
+        return;
+      }
+
       this.updateState({ 
         loading: false, 
-        error: error.message || 'Failed to sign up' 
+        error: null
       });
+
+    } catch (error: any) {
+      if (!error.message?.startsWith('Bu e-posta') && 
+          !error.message?.startsWith('Şifre en az') && 
+          !error.message?.startsWith('Geçerli bir') &&
+          !error.message?.startsWith('Yeni kayıt')) {
+        this.updateState({ 
+          loading: false, 
+          error: 'Hesap oluşturulamadı. Lütfen tekrar deneyin.'
+        });
+        throw new Error('Hesap oluşturulamadı. Lütfen tekrar deneyin.');
+      }
       throw error;
     }
   }
@@ -154,10 +226,11 @@ export class AuthService {
     try {
       this.updateState({ loading: true, error: null });
       await signOut();
+      // Success state will be handled by onAuthStateChange
     } catch (error: any) {
       this.updateState({ 
         loading: false, 
-        error: error.message || 'Failed to sign out' 
+        error: 'Çıkış yapılamadı. Lütfen tekrar deneyin.'
       });
       throw error;
     }
@@ -166,7 +239,7 @@ export class AuthService {
   async updateProfile(updates: { full_name?: string; level?: string; profile_image_url?: string }): Promise<void> {
     try {
       if (!this.currentState.user) {
-        throw new Error('No authenticated user');
+        throw new Error('Kullanıcı oturumu bulunamadı');
       }
 
       const { error } = await supabase
@@ -179,7 +252,7 @@ export class AuthService {
       }
     } catch (error: any) {
       console.error('Error updating profile:', error);
-      throw error;
+      throw new Error('Profil güncellenemedi');
     }
   }
 }
