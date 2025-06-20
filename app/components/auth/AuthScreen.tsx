@@ -8,7 +8,8 @@ import {
   Alert,
   KeyboardAvoidingView,
   Platform,
-  ScrollView
+  ScrollView,
+  ActivityIndicator
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useAuth } from '@/app/hooks/useAuth';
@@ -20,9 +21,10 @@ export default function AuthScreen() {
   const [password, setPassword] = useState('');
   const [fullName, setFullName] = useState('');
   const [loading, setLoading] = useState(false);
+  const [googleLoading, setGoogleLoading] = useState(false);
   const [localError, setLocalError] = useState<string | null>(null);
 
-  const { signIn, signUp, error: authError, clearError } = useAuth();
+  const { signIn, signUp, signInWithGoogle, error: authError, clearError } = useAuth();
 
   // Clear errors when switching modes or changing inputs
   useEffect(() => {
@@ -73,6 +75,18 @@ export default function AuthScreen() {
       setLocalError(err.message || 'Bir hata oluştu');
     } finally {
       setLoading(false);
+    }
+  };
+
+  const handleGoogleSignIn = async () => {
+    try {
+      setGoogleLoading(true);
+      setLocalError(null);
+      await signInWithGoogle();
+    } catch (err: any) {
+      setLocalError(err.message || 'Google ile giriş yapılamadı');
+    } finally {
+      setGoogleLoading(false);
     }
   };
 
@@ -159,14 +173,34 @@ export default function AuthScreen() {
               onPress={handleSubmit}
               disabled={loading}
             >
-              <Text style={styles.submitButtonText}>
-                {loading 
-                  ? 'Lütfen bekleyin...' 
-                  : isSignUp 
-                    ? 'Hesap Oluştur' 
-                    : 'Giriş Yap'
-                }
-              </Text>
+              {loading ? (
+                <ActivityIndicator size="small" color={colors.white} />
+              ) : (
+                <Text style={styles.submitButtonText}>
+                  {isSignUp ? 'Hesap Oluştur' : 'Giriş Yap'}
+                </Text>
+              )}
+            </TouchableOpacity>
+
+            <View style={styles.divider}>
+              <View style={styles.dividerLine} />
+              <Text style={styles.dividerText}>veya</Text>
+              <View style={styles.dividerLine} />
+            </View>
+
+            <TouchableOpacity
+              style={[styles.googleButton, googleLoading && styles.submitButtonDisabled]}
+              onPress={handleGoogleSignIn}
+              disabled={googleLoading}
+            >
+              {googleLoading ? (
+                <ActivityIndicator size="small" color={colors.charcoal} />
+              ) : (
+                <>
+                  <Text style={styles.googleIcon}>G</Text>
+                  <Text style={styles.googleButtonText}>Google ile devam et</Text>
+                </>
+              )}
             </TouchableOpacity>
 
             <TouchableOpacity style={styles.toggleButton} onPress={toggleMode}>
@@ -253,6 +287,8 @@ const styles = StyleSheet.create({
     padding: 16,
     alignItems: 'center',
     marginBottom: 16,
+    flexDirection: 'row',
+    justifyContent: 'center',
   },
   submitButtonDisabled: {
     opacity: 0.6,
@@ -261,6 +297,44 @@ const styles = StyleSheet.create({
     fontFamily: 'Inter-Bold',
     fontSize: 16,
     color: colors.white,
+  },
+  divider: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginVertical: 20,
+  },
+  dividerLine: {
+    flex: 1,
+    height: 1,
+    backgroundColor: colors.background.tertiary,
+  },
+  dividerText: {
+    fontFamily: 'Inter-Medium',
+    fontSize: 14,
+    color: colors.text.disabled,
+    marginHorizontal: 16,
+  },
+  googleButton: {
+    backgroundColor: colors.background.secondary,
+    borderRadius: 12,
+    padding: 16,
+    alignItems: 'center',
+    marginBottom: 16,
+    flexDirection: 'row',
+    justifyContent: 'center',
+    borderWidth: 1,
+    borderColor: colors.background.tertiary,
+  },
+  googleIcon: {
+    fontFamily: 'Inter-Bold',
+    fontSize: 18,
+    color: colors.primary,
+    marginRight: 12,
+  },
+  googleButtonText: {
+    fontFamily: 'Inter-Bold',
+    fontSize: 16,
+    color: colors.charcoal,
   },
   toggleButton: {
     alignItems: 'center',

@@ -27,6 +27,15 @@ export function useAuth() {
     }
   };
 
+  const signInWithGoogle = async () => {
+    try {
+      await authService.signInWithGoogle();
+    } catch (error) {
+      console.error('Google sign in failed:', error);
+      throw error;
+    }
+  };
+
   const signOut = async () => {
     try {
       await authService.signOut();
@@ -55,6 +64,7 @@ export function useAuth() {
     error: authState.error,
     signIn,
     signUp,
+    signInWithGoogle,
     signOut,
     updateProfile,
     clearError,

@@ -1,5 +1,11 @@
 import { supabase, getCurrentUser, signInWithEmail, signUpWithEmail, signOut } from './config';
 import type { User } from '@supabase/supabase-js';
+import * as AuthSession from 'expo-auth-session';
+import * as WebBrowser from 'expo-web-browser';
+import { Platform } from 'react-native';
+
+// Configure WebBrowser for auth session
+WebBrowser.maybeCompleteAuthSession();
 
 export interface AuthState {
   user: User | null;
@@ -87,11 +93,16 @@ export class AuthService {
       if (!existingProfile) {
         const profileData = {
           id: user.id,
-          full_name: user.user_metadata?.full_name || user.email?.split('@')[0] || 'User',
+          full_name: user.user_metadata?.full_name || 
+                    user.user_metadata?.name || 
+                    user.email?.split('@')[0] || 
+                    'User',
           email: user.email,
           level: 'Başlangıç',
           role: 'user',
-          profile_image_url: user.user_metadata?.avatar_url || 'https://images.pexels.com/photos/1681010/pexels-photo-1681010.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=2'
+          profile_image_url: user.user_metadata?.avatar_url || 
+                            user.user_metadata?.picture || 
+                            'https://images.pexels.com/photos/1681010/pexels-photo-1681010.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=2'
         };
 
         const { error: insertError } = await supabase
@@ -150,12 +161,23 @@ export class AuthService {
     this.updateState({ error: null });
   }
 
+  // Email validation helper
+  private isValidEmail(email: string): boolean {
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    return emailRegex.test(email);
+  }
+
   async signIn(email: string, password: string): Promise<void> {
     try {
       this.updateState({ loading: true, error: null });
       
+      // Validate email format
+      if (!this.isValidEmail(email)) {
+        throw new Error('Geçerli bir e-posta adresi girin');
+      }
+
       const { data, error } = await supabase.auth.signInWithPassword({
-        email,
+        email: email.trim().toLowerCase(),
         password
       });
 
@@ -169,6 +191,8 @@ export class AuthService {
           errorMessage = 'E-posta adresinizi doğrulamanız gerekiyor';
         } else if (error.message?.includes('Too many requests')) {
           errorMessage = 'Çok fazla deneme. Lütfen daha sonra tekrar deneyin';
+        } else if (error.message?.includes('Invalid email')) {
+          errorMessage = 'Geçerli bir e-posta adresi girin';
         }
 
         this.updateState({ 
@@ -181,7 +205,8 @@ export class AuthService {
       // Success state will be handled by onAuthStateChange
     } catch (error: any) {
       if (!error.message?.startsWith('E-posta') && 
-          !error.message?.startsWith('Çok fazla')) {
+          !error.message?.startsWith('Çok fazla') &&
+          !error.message?.startsWith('Geçerli bir')) {
         this.updateState({ 
           loading: false, 
           error: 'Giriş yapılamadı. Lütfen tekrar deneyin.'
@@ -196,12 +221,25 @@ export class AuthService {
     try {
       this.updateState({ loading: true, error: null });
       
+      // Validate inputs
+      if (!this.isValidEmail(email)) {
+        throw new Error('Geçerli bir e-posta adresi girin');
+      }
+
+      if (password.length < 6) {
+        throw new Error('Şifre en az 6 karakter olmalıdır');
+      }
+
+      if (!fullName || fullName.trim().length < 2) {
+        throw new Error('Lütfen geçerli bir ad ve soyad girin');
+      }
+
       const { data, error } = await supabase.auth.signUp({
-        email,
+        email: email.trim().toLowerCase(),
         password,
         options: {
           data: {
-            full_name: fullName
+            full_name: fullName.trim()
           }
         }
       });
@@ -233,7 +271,6 @@ export class AuthService {
           loading: false, 
           error: null
         });
-        // Don't throw error, just show success message
         return;
       }
 
@@ -246,7 +283,8 @@ export class AuthService {
       if (!error.message?.startsWith('Bu e-posta') && 
           !error.message?.startsWith('Şifre en az') && 
           !error.message?.startsWith('Geçerli bir') &&
-          !error.message?.startsWith('Yeni kayıt')) {
+          !error.message?.startsWith('Yeni kayıt') &&
+          !error.message?.startsWith('Lütfen geçerli')) {
         this.updateState({ 
           loading: false, 
           error: 'Hesap oluşturulamadı. Lütfen tekrar deneyin.'
@@ -254,6 +292,76 @@ export class AuthService {
         throw new Error('Hesap oluşturulamadı. Lütfen tekrar deneyin.');
       }
       throw error;
+    }
+  }
+
+  async signInWithGoogle(): Promise<void> {
+    try {
+      this.updateState({ loading: true, error: null });
+
+      if (Platform.OS === 'web') {
+        // Web implementation
+        const { data, error } = await supabase.auth.signInWithOAuth({
+          provider: 'google',
+          options: {
+            redirectTo: window.location.origin
+          }
+        });
+
+        if (error) {
+          throw error;
+        }
+      } else {
+        // Mobile implementation using AuthSession
+        const redirectUrl = AuthSession.makeRedirectUri({
+          useProxy: true,
+        });
+
+        const authUrl = `${supabase.supabaseUrl}/auth/v1/authorize?provider=google&redirect_to=${encodeURIComponent(redirectUrl)}`;
+
+        const result = await AuthSession.startAsync({
+          authUrl,
+          returnUrl: redirectUrl,
+        });
+
+        if (result.type === 'success') {
+          const { url } = result;
+          const urlParams = new URLSearchParams(url.split('#')[1] || url.split('?')[1]);
+          const accessToken = urlParams.get('access_token');
+          const refreshToken = urlParams.get('refresh_token');
+
+          if (accessToken) {
+            const { data, error } = await supabase.auth.setSession({
+              access_token: accessToken,
+              refresh_token: refreshToken || '',
+            });
+
+            if (error) {
+              throw error;
+            }
+          } else {
+            throw new Error('Google giriş işlemi tamamlanamadı');
+          }
+        } else {
+          throw new Error('Google giriş işlemi iptal edildi');
+        }
+      }
+
+      // Success state will be handled by onAuthStateChange
+    } catch (error: any) {
+      let errorMessage = 'Google ile giriş yapılamadı';
+      
+      if (error.message?.includes('cancelled') || error.message?.includes('iptal')) {
+        errorMessage = 'Google giriş işlemi iptal edildi';
+      } else if (error.message?.includes('network')) {
+        errorMessage = 'İnternet bağlantınızı kontrol edin';
+      }
+
+      this.updateState({ 
+        loading: false, 
+        error: errorMessage
+      });
+      throw new Error(errorMessage);
     }
   }
 
