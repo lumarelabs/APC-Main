@@ -197,6 +197,24 @@ export class MatchesService {
     players: (MatchPlayer & { user: UserProfile })[];
   })[]> {
     try {
+      // First, get matches where the user is a player
+      const { data: userMatchIds, error: matchPlayerError } = await supabase
+        .from('match_players')
+        .select('match_id')
+        .eq('user_id', userId);
+
+      if (matchPlayerError) {
+        handleDatabaseError(matchPlayerError, 'fetch user match IDs');
+      }
+
+      // If no matches found, return empty array
+      if (!userMatchIds || userMatchIds.length === 0) {
+        return [];
+      }
+
+      const matchIds = userMatchIds.map(mp => mp.match_id);
+
+      // Now get the full match data
       const { data, error } = await supabase
         .from('matches')
         .select(`
@@ -210,8 +228,8 @@ export class MatchesService {
             user:users(*)
           )
         `)
-        .eq('players.user_id', userId)
-        .order('booking.date', { ascending: false });
+        .in('id', matchIds)
+        .order('created_at', { ascending: false });
 
       if (error) {
         handleDatabaseError(error, 'fetch user matches');

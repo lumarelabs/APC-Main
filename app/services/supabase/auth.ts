@@ -85,22 +85,40 @@ export class AuthService {
 
       // Create profile if it doesn't exist
       if (!existingProfile) {
+        const profileData = {
+          id: user.id,
+          full_name: user.user_metadata?.full_name || user.email?.split('@')[0] || 'User',
+          email: user.email,
+          level: 'Başlangıç',
+          role: 'user',
+          profile_image_url: user.user_metadata?.avatar_url || 'https://images.pexels.com/photos/1681010/pexels-photo-1681010.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=2'
+        };
+
         const { error: insertError } = await supabase
           .from('users')
-          .insert({
-            id: user.id,
-            full_name: user.user_metadata?.full_name || user.email?.split('@')[0] || 'User',
-            email: user.email,
-            level: 'Başlangıç',
-            role: 'user',
-            profile_image_url: user.user_metadata?.avatar_url || 'https://images.pexels.com/photos/1681010/pexels-photo-1681010.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=2'
-          });
+          .insert(profileData);
 
         if (insertError) {
           console.error('Error creating user profile:', insertError.message);
+          
+          // If it's a duplicate key error, try to update instead
+          if (insertError.code === '23505') {
+            const { error: updateError } = await supabase
+              .from('users')
+              .update(profileData)
+              .eq('id', user.id);
+              
+            if (updateError) {
+              console.error('Error updating user profile:', updateError.message);
+            } else {
+              console.log('✅ User profile updated successfully');
+            }
+          }
         } else {
           console.log('✅ User profile created successfully');
         }
+      } else {
+        console.log('✅ User profile already exists');
       }
     } catch (error) {
       console.error('Error ensuring user profile:', error);
@@ -135,25 +153,42 @@ export class AuthService {
   async signIn(email: string, password: string): Promise<void> {
     try {
       this.updateState({ loading: true, error: null });
-      await signInWithEmail(email, password);
-      // Success state will be handled by onAuthStateChange
-    } catch (error: any) {
-      let errorMessage = 'Giriş yapılamadı';
       
-      // Handle specific error cases
-      if (error.message?.includes('Invalid login credentials')) {
-        errorMessage = 'E-posta veya şifre hatalı';
-      } else if (error.message?.includes('Email not confirmed')) {
-        errorMessage = 'E-posta adresinizi doğrulamanız gerekiyor';
-      } else if (error.message?.includes('Too many requests')) {
-        errorMessage = 'Çok fazla deneme. Lütfen daha sonra tekrar deneyin';
+      const { data, error } = await supabase.auth.signInWithPassword({
+        email,
+        password
+      });
+
+      if (error) {
+        let errorMessage = 'Giriş yapılamadı';
+        
+        // Handle specific error cases
+        if (error.message?.includes('Invalid login credentials')) {
+          errorMessage = 'E-posta veya şifre hatalı';
+        } else if (error.message?.includes('Email not confirmed')) {
+          errorMessage = 'E-posta adresinizi doğrulamanız gerekiyor';
+        } else if (error.message?.includes('Too many requests')) {
+          errorMessage = 'Çok fazla deneme. Lütfen daha sonra tekrar deneyin';
+        }
+
+        this.updateState({ 
+          loading: false, 
+          error: errorMessage
+        });
+        throw new Error(errorMessage);
       }
 
-      this.updateState({ 
-        loading: false, 
-        error: errorMessage
-      });
-      throw new Error(errorMessage);
+      // Success state will be handled by onAuthStateChange
+    } catch (error: any) {
+      if (!error.message?.startsWith('E-posta') && 
+          !error.message?.startsWith('Çok fazla')) {
+        this.updateState({ 
+          loading: false, 
+          error: 'Giriş yapılamadı. Lütfen tekrar deneyin.'
+        });
+        throw new Error('Giriş yapılamadı. Lütfen tekrar deneyin.');
+      }
+      throw error;
     }
   }
 

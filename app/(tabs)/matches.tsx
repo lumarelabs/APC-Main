@@ -25,7 +25,7 @@ export default function MatchesScreen() {
       <SafeAreaView style={styles.safeArea}>
         <View style={styles.loadingContainer}>
           <ActivityIndicator size="large" color={colors.primary} />
-          <Text style={styles.loadingText}>Loading matches...</Text>
+          <Text style={styles.loadingText}>Maçlar yükleniyor...</Text>
         </View>
       </SafeAreaView>
     );
@@ -63,7 +63,8 @@ export default function MatchesScreen() {
         <ScrollView style={styles.content} contentContainerStyle={styles.contentContainer}>
           {error ? (
             <View style={styles.errorContainer}>
-              <Text style={styles.errorText}>Error loading matches: {error}</Text>
+              <Text style={styles.errorText}>Maçlar yüklenirken hata oluştu</Text>
+              <Text style={styles.errorSubtext}>Lütfen daha sonra tekrar deneyin</Text>
             </View>
           ) : displayMatches.length === 0 ? (
             <View style={styles.emptyContainer}>
@@ -73,12 +74,18 @@ export default function MatchesScreen() {
                   : 'Henüz tamamlanmış maçınız yok'
                 }
               </Text>
+              <Text style={styles.emptySubtext}>
+                {activeTab === 'upcoming' 
+                  ? 'Kort rezervasyonu yaparak maç oluşturabilirsiniz' 
+                  : 'Maç oynadıktan sonra burada görünecek'
+                }
+              </Text>
             </View>
           ) : (
             displayMatches.map((match) => (
               <MatchCard 
                 key={match.id}
-                courtName={match.booking?.court?.name || 'Unknown Court'}
+                courtName={match.booking?.court?.name || 'Bilinmeyen Kort'}
                 courtType={match.booking?.court?.type || 'padel'}
                 date={new Date(match.booking?.date || '').toLocaleDateString('tr-TR', {
                   weekday: 'short',
@@ -88,11 +95,11 @@ export default function MatchesScreen() {
                 time={`${match.booking?.start_time?.slice(0, 5)} - ${match.booking?.end_time?.slice(0, 5)}`}
                 opponents={match.players
                   ?.filter(p => p.team === 'away')
-                  ?.map(p => p.user?.full_name || 'Unknown Player') || []
+                  ?.map(p => p.user?.full_name || 'Bilinmeyen Oyuncu') || []
                 }
                 partners={match.players
                   ?.filter(p => p.team === 'home')
-                  ?.map(p => p.user?.full_name || 'You') || ['You']
+                  ?.map(p => p.user?.full_name || 'Sen') || ['Sen']
                 }
                 status={match.status}
                 result={match.result}
@@ -168,24 +175,44 @@ const styles = StyleSheet.create({
     paddingBottom: 100,
   },
   errorContainer: {
-    padding: 20,
+    padding: 40,
     alignItems: 'center',
     justifyContent: 'center',
+    backgroundColor: colors.background.secondary,
+    borderRadius: 16,
+    marginTop: 20,
   },
   errorText: {
-    fontFamily: 'Inter-Medium',
-    fontSize: 16,
+    fontFamily: 'Inter-Bold',
+    fontSize: 18,
     color: colors.status.error,
+    textAlign: 'center',
+    marginBottom: 8,
+  },
+  errorSubtext: {
+    fontFamily: 'Inter-Medium',
+    fontSize: 14,
+    color: colors.text.disabled,
     textAlign: 'center',
   },
   emptyContainer: {
     padding: 40,
     alignItems: 'center',
     justifyContent: 'center',
+    backgroundColor: colors.background.secondary,
+    borderRadius: 16,
+    marginTop: 20,
   },
   emptyText: {
+    fontFamily: 'Inter-Bold',
+    fontSize: 18,
+    color: colors.text.disabled,
+    textAlign: 'center',
+    marginBottom: 8,
+  },
+  emptySubtext: {
     fontFamily: 'Inter-Medium',
-    fontSize: 16,
+    fontSize: 14,
     color: colors.text.disabled,
     textAlign: 'center',
   },
