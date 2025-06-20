@@ -340,11 +340,23 @@ export class UsersService {
   }
 }
 
-// Real-time subscriptions
+// Real-time subscriptions with proper channel management
 export class RealtimeService {
+  private static activeChannels = new Map<string, any>();
+
   static subscribeToUserBookings(userId: string, callback: (payload: any) => void) {
-    return supabase
-      .channel('user-bookings')
+    const channelName = `user-bookings-${userId}`;
+    
+    // Remove existing channel if it exists
+    if (this.activeChannels.has(channelName)) {
+      const existingChannel = this.activeChannels.get(channelName);
+      supabase.removeChannel(existingChannel);
+      this.activeChannels.delete(channelName);
+    }
+
+    // Create new channel
+    const channel = supabase
+      .channel(channelName)
       .on(
         'postgres_changes',
         {
@@ -356,11 +368,26 @@ export class RealtimeService {
         callback
       )
       .subscribe();
+
+    // Store the channel reference
+    this.activeChannels.set(channelName, channel);
+    
+    return channel;
   }
 
   static subscribeToCourtBookings(courtId: string, callback: (payload: any) => void) {
-    return supabase
-      .channel('court-bookings')
+    const channelName = `court-bookings-${courtId}`;
+    
+    // Remove existing channel if it exists
+    if (this.activeChannels.has(channelName)) {
+      const existingChannel = this.activeChannels.get(channelName);
+      supabase.removeChannel(existingChannel);
+      this.activeChannels.delete(channelName);
+    }
+
+    // Create new channel
+    const channel = supabase
+      .channel(channelName)
       .on(
         'postgres_changes',
         {
@@ -372,9 +399,32 @@ export class RealtimeService {
         callback
       )
       .subscribe();
+
+    // Store the channel reference
+    this.activeChannels.set(channelName, channel);
+    
+    return channel;
   }
 
   static unsubscribe(subscription: any) {
-    return supabase.removeChannel(subscription);
+    if (subscription) {
+      // Find and remove from active channels
+      for (const [channelName, channel] of this.activeChannels.entries()) {
+        if (channel === subscription) {
+          this.activeChannels.delete(channelName);
+          break;
+        }
+      }
+      
+      return supabase.removeChannel(subscription);
+    }
+  }
+
+  static cleanup() {
+    // Clean up all active channels
+    for (const [channelName, channel] of this.activeChannels.entries()) {
+      supabase.removeChannel(channel);
+    }
+    this.activeChannels.clear();
   }
 }

@@ -47,7 +47,9 @@ export function useUserBookings() {
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    if (!user) {
+    const userId = user?.id;
+    
+    if (!userId) {
       setBookings([]);
       setLoading(false);
       return;
@@ -58,7 +60,7 @@ export function useUserBookings() {
         setLoading(true);
         setError(null);
         
-        const data = await BookingsService.getUserBookings(user.id);
+        const data = await BookingsService.getUserBookings(userId);
         setBookings(data);
       } catch (err: any) {
         setError(err.message);
@@ -72,7 +74,7 @@ export function useUserBookings() {
 
     // Set up real-time subscription
     const subscription = RealtimeService.subscribeToUserBookings(
-      user.id,
+      userId,
       (payload) => {
         console.log('Booking update:', payload);
         fetchBookings(); // Refetch on changes
@@ -82,7 +84,7 @@ export function useUserBookings() {
     return () => {
       RealtimeService.unsubscribe(subscription);
     };
-  }, [user]);
+  }, [user?.id]); // Only depend on user.id, not the entire user object
 
   const createBooking = async (bookingData: any) => {
     try {
@@ -138,7 +140,9 @@ export function useUserMatches() {
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    if (!user) {
+    const userId = user?.id;
+    
+    if (!userId) {
       setMatches([]);
       setLoading(false);
       return;
@@ -149,7 +153,7 @@ export function useUserMatches() {
         setLoading(true);
         setError(null);
         
-        const data = await MatchesService.getUserMatches(user.id);
+        const data = await MatchesService.getUserMatches(userId);
         setMatches(data);
       } catch (err: any) {
         setError(err.message);
@@ -160,7 +164,7 @@ export function useUserMatches() {
     };
 
     fetchMatches();
-  }, [user]);
+  }, [user?.id]); // Only depend on user.id, not the entire user object
 
   const createMatch = async (bookingId: string, players: any[]) => {
     try {
