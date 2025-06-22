@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { 
   CourtsService, 
   BookingsService, 
@@ -14,27 +14,27 @@ export function useCourts(type?: 'padel' | 'pickleball') {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
-  useEffect(() => {
-    const fetchCourts = async () => {
-      try {
-        setLoading(true);
-        setError(null);
-        
-        const data = type 
-          ? await CourtsService.getCourtsByType(type)
-          : await CourtsService.getAllCourts();
-        
-        setCourts(data);
-      } catch (err: any) {
-        setError(err.message);
-        console.error('Error fetching courts:', err);
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchCourts();
+  const fetchCourts = useCallback(async () => {
+    try {
+      setLoading(true);
+      setError(null);
+      
+      const data = type 
+        ? await CourtsService.getCourtsByType(type)
+        : await CourtsService.getAllCourts();
+      
+      setCourts(data);
+    } catch (err: any) {
+      setError(err.message);
+      console.error('Error fetching courts:', err);
+    } finally {
+      setLoading(false);
+    }
   }, [type]);
+
+  useEffect(() => {
+    fetchCourts();
+  }, [fetchCourts]);
 
   return { courts, loading, error, refetch: fetchCourts };
 }
@@ -46,6 +46,21 @@ export function useUserBookings() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
+  const fetchBookings = useCallback(async (userId: string) => {
+    try {
+      setLoading(true);
+      setError(null);
+      
+      const data = await BookingsService.getUserBookings(userId);
+      setBookings(data);
+    } catch (err: any) {
+      setError(err.message);
+      console.error('Error fetching bookings:', err);
+    } finally {
+      setLoading(false);
+    }
+  }, []);
+
   useEffect(() => {
     const userId = user?.id;
     
@@ -55,36 +70,21 @@ export function useUserBookings() {
       return;
     }
 
-    const fetchBookings = async () => {
-      try {
-        setLoading(true);
-        setError(null);
-        
-        const data = await BookingsService.getUserBookings(userId);
-        setBookings(data);
-      } catch (err: any) {
-        setError(err.message);
-        console.error('Error fetching bookings:', err);
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchBookings();
+    fetchBookings(userId);
 
     // Set up real-time subscription
     const subscription = RealtimeService.subscribeToUserBookings(
       userId,
       (payload) => {
         console.log('Booking update:', payload);
-        fetchBookings(); // Refetch on changes
+        fetchBookings(userId); // Refetch on changes
       }
     );
 
     return () => {
       RealtimeService.unsubscribe(subscription);
     };
-  }, [user?.id]); // Only depend on user.id, not the entire user object
+  }, [user?.id, fetchBookings]); // Include fetchBookings in dependencies
 
   const createBooking = async (bookingData: any) => {
     try {
@@ -128,7 +128,7 @@ export function useUserBookings() {
     error, 
     createBooking, 
     updateBookingStatus,
-    refetch: fetchBookings
+    refetch: () => user?.id && fetchBookings(user.id)
   };
 }
 
@@ -139,6 +139,21 @@ export function useUserMatches() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
+  const fetchMatches = useCallback(async (userId: string) => {
+    try {
+      setLoading(true);
+      setError(null);
+      
+      const data = await MatchesService.getUserMatches(userId);
+      setMatches(data);
+    } catch (err: any) {
+      setError(err.message);
+      console.error('Error fetching matches:', err);
+    } finally {
+      setLoading(false);
+    }
+  }, []);
+
   useEffect(() => {
     const userId = user?.id;
     
@@ -148,23 +163,8 @@ export function useUserMatches() {
       return;
     }
 
-    const fetchMatches = async () => {
-      try {
-        setLoading(true);
-        setError(null);
-        
-        const data = await MatchesService.getUserMatches(userId);
-        setMatches(data);
-      } catch (err: any) {
-        setError(err.message);
-        console.error('Error fetching matches:', err);
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchMatches();
-  }, [user?.id]); // Only depend on user.id, not the entire user object
+    fetchMatches(userId);
+  }, [user?.id, fetchMatches]); // Include fetchMatches in dependencies
 
   const createMatch = async (bookingId: string, players: any[]) => {
     try {
@@ -212,6 +212,21 @@ export function useUserProfile(userId?: string) {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
+  const fetchProfile = useCallback(async (id: string) => {
+    try {
+      setLoading(true);
+      setError(null);
+      
+      const data = await UsersService.getUserProfile(id);
+      setProfile(data);
+    } catch (err: any) {
+      setError(err.message);
+      console.error('Error fetching profile:', err);
+    } finally {
+      setLoading(false);
+    }
+  }, []);
+
   useEffect(() => {
     if (!targetUserId) {
       setProfile(null);
@@ -219,23 +234,8 @@ export function useUserProfile(userId?: string) {
       return;
     }
 
-    const fetchProfile = async () => {
-      try {
-        setLoading(true);
-        setError(null);
-        
-        const data = await UsersService.getUserProfile(targetUserId);
-        setProfile(data);
-      } catch (err: any) {
-        setError(err.message);
-        console.error('Error fetching profile:', err);
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchProfile();
-  }, [targetUserId]);
+    fetchProfile(targetUserId);
+  }, [targetUserId, fetchProfile]);
 
   const updateProfile = async (updates: any) => {
     try {
@@ -263,6 +263,40 @@ export function useCourtAvailability(courtId: string, date: string) {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
+  const checkAvailability = useCallback(async (id: string, dateStr: string) => {
+    try {
+      setLoading(true);
+      setError(null);
+      
+      // Generate time slots and check availability
+      const timeSlots = [];
+      for (let hour = 8; hour <= 22; hour++) {
+        const startTime = `${hour.toString().padStart(2, '0')}:00`;
+        const endTime = `${(hour + 1).toString().padStart(2, '0')}:00`;
+        
+        const isAvailable = await BookingsService.checkCourtAvailability(
+          id, 
+          dateStr, 
+          startTime, 
+          endTime
+        );
+        
+        timeSlots.push({
+          startTime,
+          endTime,
+          available: isAvailable
+        });
+      }
+      
+      setAvailability(timeSlots);
+    } catch (err: any) {
+      setError(err.message);
+      console.error('Error checking availability:', err);
+    } finally {
+      setLoading(false);
+    }
+  }, []);
+
   useEffect(() => {
     if (!courtId || !date) {
       setAvailability([]);
@@ -270,54 +304,20 @@ export function useCourtAvailability(courtId: string, date: string) {
       return;
     }
 
-    const checkAvailability = async () => {
-      try {
-        setLoading(true);
-        setError(null);
-        
-        // Generate time slots and check availability
-        const timeSlots = [];
-        for (let hour = 8; hour <= 22; hour++) {
-          const startTime = `${hour.toString().padStart(2, '0')}:00`;
-          const endTime = `${(hour + 1).toString().padStart(2, '0')}:00`;
-          
-          const isAvailable = await BookingsService.checkCourtAvailability(
-            courtId, 
-            date, 
-            startTime, 
-            endTime
-          );
-          
-          timeSlots.push({
-            startTime,
-            endTime,
-            available: isAvailable
-          });
-        }
-        
-        setAvailability(timeSlots);
-      } catch (err: any) {
-        setError(err.message);
-        console.error('Error checking availability:', err);
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    checkAvailability();
+    checkAvailability(courtId, date);
 
     // Set up real-time subscription for court bookings
     const subscription = RealtimeService.subscribeToCourtBookings(
       courtId,
       () => {
-        checkAvailability(); // Refetch on changes
+        checkAvailability(courtId, date); // Refetch on changes
       }
     );
 
     return () => {
       RealtimeService.unsubscribe(subscription);
     };
-  }, [courtId, date]);
+  }, [courtId, date, checkAvailability]);
 
   return { availability, loading, error };
 }

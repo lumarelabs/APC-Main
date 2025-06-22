@@ -3,7 +3,7 @@ import { View, Text, StyleSheet, TouchableOpacity, Modal, ScrollView, FlatList }
 import { X, Users, Calendar, Clock, MapPin } from 'lucide-react-native';
 import type { Booking } from './BookingCalendar';
 import { format } from 'date-fns';
-import { tr } from 'date-fns/locale';
+import { tr } from 'date-fns/locale/tr';
 import { colors } from '@/app/theme/colors';
 
 type BookingListViewProps = {

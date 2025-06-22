@@ -3,7 +3,7 @@ import { View, Text, StyleSheet, TouchableOpacity, Modal, ScrollView } from 'rea
 import { Calendar } from 'react-native-calendars';
 import { X, Calendar as CalendarIcon, Clock, Users } from 'lucide-react-native';
 import { format } from 'date-fns';
-import { tr } from 'date-fns/locale';
+import { tr } from 'date-fns/locale/tr';
 import { colors } from '@/app/theme/colors';
 
 export type Booking = {
