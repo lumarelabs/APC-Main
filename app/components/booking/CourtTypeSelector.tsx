@@ -40,21 +40,25 @@ const styles = StyleSheet.create({
   },
   option: {
     flex: 1,
-    backgroundColor: colors.background.secondary,
-    paddingVertical: 8,
+    paddingVertical: 12,
     paddingHorizontal: 16,
     borderRadius: 20,
+    backgroundColor: colors.background.primary,
     alignItems: 'center',
+    borderWidth: 2,
+    borderColor: 'transparent',
   },
   selectedOption: {
     backgroundColor: colors.primary,
+    borderColor: colors.primary,
   },
   optionText: {
     fontFamily: 'Inter-Medium',
     fontSize: 14,
-    color: colors.text.secondary,
+    color: colors.text.disabled,
   },
   selectedOptionText: {
-    color: colors.charcoal,
+    fontFamily: 'Inter-Bold',
+    color: colors.white,
   },
-}); 
+});

@@ -211,7 +211,7 @@ export default function BookScreen() {
         );
       case 'date-time':
         return (
-          <>
+          <View style={styles.dateTimeContainer}>
             <DateTimeSelector
               onSelectDateTime={handleDateTimeSelected}
             />
@@ -223,7 +223,7 @@ export default function BookScreen() {
                 <Text style={styles.confirmButtonText}>Tarih & Saat Onayla</Text>
               </TouchableOpacity>
             )}
-          </>
+          </View>
         );
       case 'racket-rental':
         return (
@@ -249,7 +249,12 @@ export default function BookScreen() {
 
   return (
     <SafeAreaView style={styles.safeArea}>
-      <ScrollView style={styles.container}>
+      <ScrollView 
+        style={styles.container}
+        contentContainerStyle={styles.scrollContent}
+        showsVerticalScrollIndicator={false}
+        keyboardShouldPersistTaps="handled"
+      >
         {/* Top Half - Booking Section */}
         <View style={styles.topSection}>
           <View style={styles.header}>
@@ -369,6 +374,9 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: colors.background.primary,
   },
+  scrollContent: {
+    flexGrow: 1,
+  },
   header: {
     paddingHorizontal: 16,
     paddingVertical: 12,
@@ -396,9 +404,12 @@ const styles = StyleSheet.create({
     paddingHorizontal: 16,
     borderRadius: 20,
     alignItems: 'center',
+    borderWidth: 2,
+    borderColor: 'transparent',
   },
   activeBookingTypeButton: {
     backgroundColor: colors.primary,
+    borderColor: colors.primary,
   },
   bookingTypeText: {
     fontFamily: 'Inter-Medium',
@@ -418,6 +429,9 @@ const styles = StyleSheet.create({
   },
   courtList: {
     marginBottom: 8,
+  },
+  dateTimeContainer: {
+    // Prevent auto-scroll by not using flex
   },
   bottomSection: {
     borderTopWidth: 1,

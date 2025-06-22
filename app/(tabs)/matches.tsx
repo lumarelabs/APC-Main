@@ -13,10 +13,14 @@ export default function MatchesScreen() {
   const today = new Date();
   today.setHours(0, 0, 0, 0);
 
-  // Remove duplicates by using a Set with booking IDs
-  const uniqueBookings = bookings.filter((booking, index, self) => 
-    index === self.findIndex(b => b.id === booking.id)
-  );
+  // Remove duplicates by using a Map with booking IDs as keys
+  const uniqueBookingsMap = new Map();
+  bookings.forEach(booking => {
+    if (!uniqueBookingsMap.has(booking.id)) {
+      uniqueBookingsMap.set(booking.id, booking);
+    }
+  });
+  const uniqueBookings = Array.from(uniqueBookingsMap.values());
 
   const upcomingBookings = uniqueBookings.filter(booking => {
     const bookingDate = new Date(booking.date);
@@ -96,7 +100,7 @@ export default function MatchesScreen() {
           ) : (
             displayBookings.map((booking) => (
               <MatchCard 
-                key={`${booking.id}-${activeTab}`} // Unique key to prevent React warnings
+                key={booking.id} // Use just booking.id since we've already deduplicated
                 courtName={booking.court?.name || 'Bilinmeyen Kort'}
                 courtType={booking.court?.type || 'padel'}
                 date={new Date(booking.date).toLocaleDateString('tr-TR', {
@@ -154,16 +158,20 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     paddingHorizontal: 16,
     marginBottom: 16,
+    gap: 8,
   },
   tab: {
-    paddingVertical: 8,
+    paddingVertical: 12,
     paddingHorizontal: 24,
     borderRadius: 20,
-    marginRight: 12,
-    backgroundColor: colors.background.secondary,
+    backgroundColor: colors.background.primary,
+    alignItems: 'center',
+    borderWidth: 2,
+    borderColor: 'transparent',
   },
   activeTab: {
-    backgroundColor: colors.background.secondary,
+    backgroundColor: colors.primary,
+    borderColor: colors.primary,
   },
   tabText: {
     fontFamily: 'Inter-Medium',
@@ -171,7 +179,8 @@ const styles = StyleSheet.create({
     color: colors.text.disabled,
   },
   activeTabText: {
-    color: colors.primary,
+    fontFamily: 'Inter-Bold',
+    color: colors.white,
   },
   content: {
     flex: 1,

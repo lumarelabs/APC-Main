@@ -22,6 +22,8 @@ export function CourtCard({
   const typeColor = type === 'padel' ? '#16FF91' : '#32D1FF';
   const typeText = type === 'padel' ? 'Padel' : 'Pickleball';
 
+  console.log('CourtCard rendering:', { name, type, typeText }); // Debug log
+
   return (
     <View style={styles.container}>
       <Image source={{ uri: image }} style={styles.image} />
