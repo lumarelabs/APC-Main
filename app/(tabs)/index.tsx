@@ -9,6 +9,7 @@ import { BookingDetailsModal } from '@/app/components/home/BookingDetailsModal';
 import { useUserBookings } from '@/app/hooks/useSupabaseData';
 import { useApp } from '@/app/context/AppContext';
 import { colors } from '@/app/theme/colors';
+import { router } from 'expo-router';
 import Logo2 from '../../assets/images/logo2.png';
 import RacketImage from '../../assets/images/racket.png';
 
@@ -29,11 +30,14 @@ export default function HomeScreen() {
   const { user, profile } = useApp();
   const { bookings, loading: bookingsLoading } = useUserBookings();
 
-  // Transform Supabase bookings to component format
+  // Transform Supabase bookings to component format - only upcoming user bookings
+  const today = new Date();
+  today.setHours(0, 0, 0, 0);
+
   const transformedBookings: Booking[] = bookings
     .filter(booking => {
       const bookingDate = new Date(booking.date);
-      const today = new Date();
+      bookingDate.setHours(0, 0, 0, 0);
       return bookingDate >= today; // Only show upcoming bookings
     })
     .slice(0, 5) // Limit to 5 upcoming bookings
@@ -60,8 +64,15 @@ export default function HomeScreen() {
 
   const handleNavigateToBooking = () => {
     setSelectedService(null);
-    // In a real app, this would navigate to the booking tab
-    // For now, we'll just close the modal
+    router.push('/(tabs)/book');
+  };
+
+  const handleSeeAllBookings = () => {
+    router.push('/(tabs)/matches');
+  };
+
+  const handleBookingPress = (booking: Booking) => {
+    setSelectedBooking(booking);
   };
 
   return (
@@ -94,7 +105,7 @@ export default function HomeScreen() {
         <View style={styles.section}>
           <View style={styles.sectionHeader}>
             <Text style={styles.sectionTitle}>Yaklaşan Rezervasyonlar</Text>
-            <TouchableOpacity>
+            <TouchableOpacity onPress={handleSeeAllBookings}>
               <Text style={styles.seeAll}>Hepsini Gör</Text>
             </TouchableOpacity>
           </View>
@@ -107,15 +118,16 @@ export default function HomeScreen() {
           ) : transformedBookings.length > 0 ? (
             <ScrollView horizontal showsHorizontalScrollIndicator={false} style={styles.bookingsScroll}>
               {transformedBookings.map((booking) => (
-                <TouchableOpacity key={booking.id} onPress={() => setSelectedBooking(booking)}>
+                <View key={booking.id}>
                   <UpcomingBooking 
                     courtName={booking.courtName}
                     courtType={booking.courtType}
                     date={booking.date}
                     time={booking.time}
                     image={booking.image}
+                    onPress={() => handleBookingPress(booking)}
                   />
-                </TouchableOpacity>
+                </View>
               ))}
             </ScrollView>
           ) : (

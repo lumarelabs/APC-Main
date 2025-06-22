@@ -101,7 +101,8 @@ export default function BookScreen() {
       }
 
       // Parse time to get start and end times
-      const [startTime] = selectedTime.split(' - ');
+      const timeRange = selectedTime.includes(' - ') ? selectedTime : `${selectedTime} - ${selectedTime}`;
+      const [startTime] = timeRange.split(' - ');
       const startHour = parseInt(startTime.split(':')[0]);
       const endTime = `${(startHour + 1).toString().padStart(2, '0')}:00`;
 
@@ -312,18 +313,30 @@ export default function BookScreen() {
             {/* Calendar View Selector */}
             <View style={styles.viewSelector}>
               <TouchableOpacity
-                style={[styles.viewOption, calendarViewMode === 'weekly' && styles.viewOptionActive]}
+                style={[
+                  styles.viewOption, 
+                  calendarViewMode === 'weekly' && styles.viewOptionActive
+                ]}
                 onPress={() => setCalendarViewMode('weekly')}
               >
-                <Text style={[styles.viewOptionText, calendarViewMode === 'weekly' && styles.viewOptionTextActive]}>
+                <Text style={[
+                  styles.viewOptionText, 
+                  calendarViewMode === 'weekly' && styles.viewOptionTextActive
+                ]}>
                   Haftalık Görünüm
                 </Text>
               </TouchableOpacity>
               <TouchableOpacity
-                style={[styles.viewOption, calendarViewMode === 'monthly' && styles.viewOptionActive]}
+                style={[
+                  styles.viewOption, 
+                  calendarViewMode === 'monthly' && styles.viewOptionActive
+                ]}
                 onPress={() => setCalendarViewMode('monthly')}
               >
-                <Text style={[styles.viewOptionText, calendarViewMode === 'monthly' && styles.viewOptionTextActive]}>
+                <Text style={[
+                  styles.viewOptionText, 
+                  calendarViewMode === 'monthly' && styles.viewOptionTextActive
+                ]}>
                   Aylık Görünüm
                 </Text>
               </TouchableOpacity>
@@ -418,22 +431,26 @@ const styles = StyleSheet.create({
   },
   viewOption: {
     flex: 1,
-    paddingVertical: 8,
+    paddingVertical: 12,
     paddingHorizontal: 16,
     borderRadius: 20,
-    backgroundColor: colors.background.secondary,
+    backgroundColor: colors.background.primary,
     alignItems: 'center',
+    borderWidth: 2,
+    borderColor: 'transparent',
   },
   viewOptionActive: {
-    backgroundColor: colors.secondary,
+    backgroundColor: colors.primary,
+    borderColor: colors.primary,
   },
   viewOptionText: {
     fontFamily: 'Inter-Medium',
     fontSize: 14,
-    color: colors.text.secondary,
+    color: colors.text.disabled,
   },
   viewOptionTextActive: {
-    color: colors.primary,
+    fontFamily: 'Inter-Bold',
+    color: colors.white,
   },
   confirmButton: {
     backgroundColor: colors.primary,

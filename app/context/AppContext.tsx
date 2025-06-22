@@ -1,6 +1,6 @@
 import React, { createContext, useContext, ReactNode } from 'react';
 import { useAuth } from '@/app/hooks/useAuth';
-import { useUserBookings, useUserMatches, useUserProfile } from '@/app/hooks/useSupabaseData';
+import { useUserBookings, useUserProfile } from '@/app/hooks/useSupabaseData';
 
 type AppContextType = {
   // Auth
@@ -16,13 +16,10 @@ type AppContextType = {
   // User data
   profile: any;
   bookings: any[];
-  matches: any[];
   
   // Actions
   createBooking: (booking: any) => Promise<any>;
   updateBookingStatus: (bookingId: string, status: 'pending' | 'confirmed' | 'canceled') => Promise<void>;
-  createMatch: (bookingId: string, players: any[]) => Promise<any>;
-  updateMatchResult: (matchId: string, result: 'win' | 'loss') => Promise<void>;
   updateProfile: (updates: any) => Promise<void>;
 };
 
@@ -40,11 +37,6 @@ export function AppProvider({ children }: AppProviderProps) {
     createBooking, 
     updateBookingStatus 
   } = useUserBookings();
-  const { 
-    matches, 
-    createMatch, 
-    updateMatchResult 
-  } = useUserMatches();
 
   const updateProfile = async (updates: any) => {
     try {
@@ -72,13 +64,10 @@ export function AppProvider({ children }: AppProviderProps) {
     // User data
     profile,
     bookings,
-    matches,
     
     // Actions
     createBooking,
     updateBookingStatus,
-    createMatch,
-    updateMatchResult,
     updateProfile
   };
 
