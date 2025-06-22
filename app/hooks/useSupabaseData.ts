@@ -36,7 +36,7 @@ export function useCourts(type?: 'padel' | 'pickleball') {
     fetchCourts();
   }, [type]);
 
-  return { courts, loading, error, refetch: () => fetchCourts() };
+  return { courts, loading, error, refetch: fetchCourts };
 }
 
 // User bookings hook with real-time updates
@@ -128,7 +128,7 @@ export function useUserBookings() {
     error, 
     createBooking, 
     updateBookingStatus,
-    refetch: () => fetchBookings()
+    refetch: fetchBookings
   };
 }
 

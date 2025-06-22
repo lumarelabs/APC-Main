@@ -9,25 +9,29 @@ import { WeeklyCalendar } from '@/app/components/booking/WeeklyCalendar';
 import { CourtList } from '@/app/components/booking/CourtList';
 import { RacketRental } from '@/app/components/booking/RacketRental';
 import { PaymentSummary } from '@/app/components/booking/PaymentSummary';
+import { LessonBooking } from '@/app/components/booking/LessonBooking';
 import { ChevronLeft } from 'lucide-react-native';
-import { useUserBookings } from '@/app/hooks/useSupabaseData';
+import { useUserBookings, useCourts } from '@/app/hooks/useSupabaseData';
 import { useApp } from '@/app/context/AppContext';
 import { colors } from '@/app/theme/colors';
 
-type BookingStep = 'court-selection' | 'date-time' | 'racket-rental' | 'payment';
+type BookingStep = 'type-selection' | 'court-selection' | 'lesson-booking' | 'date-time' | 'racket-rental' | 'payment';
 type CalendarViewMode = 'weekly' | 'monthly';
+type BookingType = 'court' | 'lesson';
 
 export default function BookScreen() {
+  const [bookingType, setBookingType] = useState<BookingType>('court');
   const [courtType, setCourtType] = useState<'all' | 'padel' | 'pickleball'>('all');
   const [selectedCourt, setSelectedCourt] = useState<any>(null);
   const [selectedDate, setSelectedDate] = useState<string | null>(null);
   const [selectedTime, setSelectedTime] = useState<string | null>(null);
   const [racketCount, setRacketCount] = useState(0);
-  const [currentStep, setCurrentStep] = useState<BookingStep>('court-selection');
+  const [currentStep, setCurrentStep] = useState<BookingStep>('type-selection');
   const [calendarViewMode, setCalendarViewMode] = useState<CalendarViewMode>('weekly');
 
   const { createBooking } = useApp();
   const { bookings } = useUserBookings();
+  const { courts } = useCourts();
 
   const handleBack = () => {
     switch (currentStep) {
@@ -39,15 +43,36 @@ export default function BookScreen() {
         setRacketCount(0);
         break;
       case 'date-time':
-        setCurrentStep('court-selection');
+        if (bookingType === 'lesson') {
+          setCurrentStep('lesson-booking');
+        } else {
+          setCurrentStep('court-selection');
+        }
         setSelectedDate(null);
         setSelectedTime(null);
+        break;
+      case 'lesson-booking':
+        setCurrentStep('type-selection');
         break;
       case 'court-selection':
         if (selectedCourt) {
           setSelectedCourt(null);
+        } else {
+          setCurrentStep('type-selection');
         }
         break;
+      case 'type-selection':
+        // Can't go back from first step
+        break;
+    }
+  };
+
+  const handleBookingTypeSelect = (type: BookingType) => {
+    setBookingType(type);
+    if (type === 'lesson') {
+      setCurrentStep('lesson-booking');
+    } else {
+      setCurrentStep('court-selection');
     }
   };
 
@@ -85,7 +110,7 @@ export default function BookScreen() {
         start_time: `${startTime}:00`,
         end_time: endTime,
         status: 'confirmed' as const,
-        type: 'court_booking',
+        type: bookingType === 'lesson' ? 'lesson_booking' : 'court_booking',
         includes_racket: racketCount > 0
       };
 
@@ -103,7 +128,8 @@ export default function BookScreen() {
               setSelectedDate(null);
               setSelectedTime(null);
               setRacketCount(0);
-              setCurrentStep('court-selection');
+              setCurrentStep('type-selection');
+              setBookingType('court');
             }
           }
         ]
@@ -113,41 +139,69 @@ export default function BookScreen() {
     }
   };
 
-  // Transform bookings for calendar display - show ALL bookings from ALL users
+  // Transform bookings for calendar display - show ALL future bookings from ALL users
   const existingBookings: Record<string, any[]> = {};
   
-  // For now, we'll show user's own bookings. In a real app, you'd fetch all bookings
-  // from a separate endpoint that returns public booking information
-  bookings.forEach(booking => {
-    const dateKey = booking.date;
-    if (!existingBookings[dateKey]) {
-      existingBookings[dateKey] = [];
-    }
-    existingBookings[dateKey].push({
-      id: booking.id,
-      courtName: booking.court?.name || 'Bilinmeyen Kort',
-      courtType: booking.court?.type || 'padel',
-      time: `${booking.start_time.slice(0, 5)} - ${booking.end_time.slice(0, 5)}`,
-      date: new Date(booking.date).toLocaleDateString('tr-TR', {
-        month: 'long',
-        day: 'numeric',
-        weekday: 'long',
-        hour: 'numeric',
-        minute: '2-digit',
-        year: 'numeric'
-      }),
-      maxPlayers: 4,
-      players: [
-        {
-          name: 'Kullanıcı',
-          skillLevel: 'Orta'
-        }
-      ] // Mock player data - in real app this would come from matches/players data
+  // Filter to show only future bookings
+  const today = new Date();
+  today.setHours(0, 0, 0, 0);
+  
+  bookings
+    .filter(booking => {
+      const bookingDate = new Date(booking.date);
+      bookingDate.setHours(0, 0, 0, 0);
+      return bookingDate >= today;
+    })
+    .forEach(booking => {
+      const dateKey = booking.date;
+      if (!existingBookings[dateKey]) {
+        existingBookings[dateKey] = [];
+      }
+      existingBookings[dateKey].push({
+        id: booking.id,
+        courtName: booking.court?.name || 'Bilinmeyen Kort',
+        courtType: booking.court?.type || 'padel',
+        time: `${booking.start_time.slice(0, 5)} - ${booking.end_time.slice(0, 5)}`,
+        date: new Date(booking.date).toLocaleDateString('tr-TR', {
+          month: 'long',
+          day: 'numeric',
+          weekday: 'long',
+          hour: 'numeric',
+          minute: '2-digit',
+          year: 'numeric'
+        }),
+        maxPlayers: 4,
+        players: [
+          {
+            name: 'Kullanıcı',
+            skillLevel: 'Orta'
+          }
+        ] // Mock player data - in real app this would come from matches/players data
+      });
     });
-  });
 
   const renderBookingStep = () => {
     switch (currentStep) {
+      case 'type-selection':
+        return (
+          <View style={styles.typeSelection}>
+            <Text style={styles.stepTitle}>Rezervasyon Türü Seçin</Text>
+            <TouchableOpacity 
+              style={styles.typeCard}
+              onPress={() => handleBookingTypeSelect('court')}
+            >
+              <Text style={styles.typeCardTitle}>Kort Rezervasyonu</Text>
+              <Text style={styles.typeCardDescription}>Kort kiralayın ve oyununuzu planlayın</Text>
+            </TouchableOpacity>
+            <TouchableOpacity 
+              style={styles.typeCard}
+              onPress={() => handleBookingTypeSelect('lesson')}
+            >
+              <Text style={styles.typeCardTitle}>Ders Rezervasyonu</Text>
+              <Text style={styles.typeCardDescription}>Profesyonel eğitmenlerden ders alın</Text>
+            </TouchableOpacity>
+          </View>
+        );
       case 'court-selection':
         return (
           <View style={styles.courtList}>
@@ -159,6 +213,19 @@ export default function BookScreen() {
               }}
             />
           </View>
+        );
+      case 'lesson-booking':
+        return (
+          <LessonBooking
+            onComplete={(lessonData) => {
+              // Set a default court for lessons (you might want to handle this differently)
+              const padelCourts = courts.filter(court => court.type === 'padel');
+              if (padelCourts.length > 0) {
+                setSelectedCourt(padelCourts[0]);
+              }
+              setCurrentStep('date-time');
+            }}
+          />
         );
       case 'date-time':
         return (
@@ -204,7 +271,7 @@ export default function BookScreen() {
         {/* Top Half - Booking Section */}
         <View style={styles.topSection}>
           <View style={styles.header}>
-            {(currentStep !== 'court-selection' || selectedCourt) && (
+            {currentStep !== 'type-selection' && (
               <TouchableOpacity 
                 style={styles.backButton} 
                 onPress={handleBack}
@@ -212,7 +279,9 @@ export default function BookScreen() {
                 <ChevronLeft size={24} color={colors.charcoal} />
               </TouchableOpacity>
             )}
-            <Text style={styles.headerTitle}>Kort Rezervasyonu</Text>
+            <Text style={styles.headerTitle}>
+              {bookingType === 'lesson' ? 'Ders Rezervasyonu' : 'Kort Rezervasyonu'}
+            </Text>
           </View>
           
           {currentStep === 'court-selection' && (
@@ -228,7 +297,7 @@ export default function BookScreen() {
         </View>
 
         {/* Bottom Half - Calendar and Bookings */}
-        {(currentStep === 'court-selection' || currentStep === 'date-time') && (
+        {(currentStep === 'type-selection' || currentStep === 'court-selection' || currentStep === 'date-time') && (
           <View style={styles.bottomSection}>
             {/* Calendar View Selector */}
             <View style={styles.viewSelector}>
@@ -303,6 +372,35 @@ const styles = StyleSheet.create({
   },
   bookingContent: {
     paddingHorizontal: 16,
+  },
+  typeSelection: {
+    padding: 16,
+  },
+  stepTitle: {
+    fontFamily: 'Inter-Bold',
+    fontSize: 24,
+    color: colors.charcoal,
+    marginBottom: 24,
+    textAlign: 'center',
+  },
+  typeCard: {
+    backgroundColor: colors.background.secondary,
+    borderRadius: 16,
+    padding: 20,
+    marginBottom: 16,
+    alignItems: 'center',
+  },
+  typeCardTitle: {
+    fontFamily: 'Inter-Bold',
+    fontSize: 18,
+    color: colors.charcoal,
+    marginBottom: 8,
+  },
+  typeCardDescription: {
+    fontFamily: 'Inter-Regular',
+    fontSize: 14,
+    color: colors.text.disabled,
+    textAlign: 'center',
   },
   courtList: {
     marginBottom: 8,

@@ -58,6 +58,12 @@ export default function HomeScreen() {
     // This is just a placeholder for the scroll functionality
   };
 
+  const handleNavigateToBooking = () => {
+    setSelectedService(null);
+    // In a real app, this would navigate to the booking tab
+    // For now, we'll just close the modal
+  };
+
   return (
     <SafeAreaView style={styles.safeArea}>
       <ScrollView style={styles.container} contentContainerStyle={styles.contentContainer}>
@@ -195,10 +201,7 @@ export default function HomeScreen() {
           isVisible={selectedService !== null}
           onClose={() => setSelectedService(null)}
           serviceType={selectedService || 'court'}
-          onNavigateToBooking={() => {
-            setSelectedService(null);
-            // Navigation to booking tab would be handled by parent navigator
-          }}
+          onNavigateToBooking={handleNavigateToBooking}
           onNavigateToTournaments={scrollToTournaments}
         />
 
@@ -323,7 +326,6 @@ const styles = StyleSheet.create({
   },
   servicesGrid: {
     flexDirection: 'row',
-    flexWrap: 'wrap',
     justifyContent: 'space-between',
     marginTop: 16,
   },
@@ -334,6 +336,8 @@ const styles = StyleSheet.create({
     padding: 16,
     alignItems: 'center',
     marginBottom: 16,
+    minHeight: 120,
+    justifyContent: 'center',
   },
   serviceIcon: {
     width: 48,
@@ -348,6 +352,7 @@ const styles = StyleSheet.create({
     fontSize: 14,
     color: colors.charcoal,
     textAlign: 'center',
+    lineHeight: 18,
   },
   noTournamentsContainer: {
     padding: 20,
