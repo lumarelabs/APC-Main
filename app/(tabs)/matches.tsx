@@ -2,30 +2,37 @@ import React, { useState } from 'react';
 import { View, Text, StyleSheet, ScrollView, TouchableOpacity, ActivityIndicator } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { MatchCard } from '@/app/components/matches/MatchCard';
-import { useUserMatches } from '@/app/hooks/useSupabaseData';
+import { useUserBookings } from '@/app/hooks/useSupabaseData';
 import { colors } from '@/app/theme/colors';
 
 export default function MatchesScreen() {
   const [activeTab, setActiveTab] = useState('upcoming');
-  const { matches, loading, error } = useUserMatches();
+  const { bookings, loading, error } = useUserBookings();
 
-  // Filter matches based on status
-  const upcomingMatches = matches.filter(match => 
-    match.status === 'pending' || match.status === 'confirmed'
-  );
+  // Filter bookings based on date for upcoming vs past
+  const today = new Date();
+  today.setHours(0, 0, 0, 0);
+
+  const upcomingBookings = bookings.filter(booking => {
+    const bookingDate = new Date(booking.date);
+    bookingDate.setHours(0, 0, 0, 0);
+    return bookingDate >= today;
+  });
   
-  const pastMatches = matches.filter(match => 
-    match.status === 'completed'
-  );
+  const pastBookings = bookings.filter(booking => {
+    const bookingDate = new Date(booking.date);
+    bookingDate.setHours(0, 0, 0, 0);
+    return bookingDate < today;
+  });
 
-  const displayMatches = activeTab === 'upcoming' ? upcomingMatches : pastMatches;
+  const displayBookings = activeTab === 'upcoming' ? upcomingBookings : pastBookings;
 
   if (loading) {
     return (
       <SafeAreaView style={styles.safeArea}>
         <View style={styles.loadingContainer}>
           <ActivityIndicator size="large" color={colors.primary} />
-          <Text style={styles.loadingText}>Maçlar yükleniyor...</Text>
+          <Text style={styles.loadingText}>Rezervasyonlar yükleniyor...</Text>
         </View>
       </SafeAreaView>
     );
@@ -46,7 +53,7 @@ export default function MatchesScreen() {
             onPress={() => setActiveTab('upcoming')}
           >
             <Text style={[styles.tabText, activeTab === 'upcoming' && styles.activeTabText]}>
-              Yaklaşan ({upcomingMatches.length})
+              Yaklaşan ({upcomingBookings.length})
             </Text>
           </TouchableOpacity>
           <TouchableOpacity 
@@ -54,7 +61,7 @@ export default function MatchesScreen() {
             onPress={() => setActiveTab('past')}
           >
             <Text style={[styles.tabText, activeTab === 'past' && styles.activeTabText]}>
-              Geçmiş ({pastMatches.length})
+              Geçmiş ({pastBookings.length})
             </Text>
           </TouchableOpacity>
         </View>
@@ -63,46 +70,40 @@ export default function MatchesScreen() {
         <ScrollView style={styles.content} contentContainerStyle={styles.contentContainer}>
           {error ? (
             <View style={styles.errorContainer}>
-              <Text style={styles.errorText}>Maçlar yüklenirken hata oluştu</Text>
+              <Text style={styles.errorText}>Rezervasyonlar yüklenirken hata oluştu</Text>
               <Text style={styles.errorSubtext}>Lütfen daha sonra tekrar deneyin</Text>
             </View>
-          ) : displayMatches.length === 0 ? (
+          ) : displayBookings.length === 0 ? (
             <View style={styles.emptyContainer}>
               <Text style={styles.emptyText}>
                 {activeTab === 'upcoming' 
-                  ? 'Henüz yaklaşan maçınız yok' 
-                  : 'Henüz tamamlanmış maçınız yok'
+                  ? 'Henüz yaklaşan rezervasyonunuz yok' 
+                  : 'Henüz geçmiş rezervasyonunuz yok'
                 }
               </Text>
               <Text style={styles.emptySubtext}>
                 {activeTab === 'upcoming' 
                   ? 'Kort rezervasyonu yaparak maç oluşturabilirsiniz' 
-                  : 'Maç oynadıktan sonra burada görünecek'
+                  : 'Rezervasyon yaptıktan sonra burada görünecek'
                 }
               </Text>
             </View>
           ) : (
-            displayMatches.map((match) => (
+            displayBookings.map((booking) => (
               <MatchCard 
-                key={match.id}
-                courtName={match.booking?.court?.name || 'Bilinmeyen Kort'}
-                courtType={match.booking?.court?.type || 'padel'}
-                date={new Date(match.booking?.date || '').toLocaleDateString('tr-TR', {
+                key={booking.id}
+                courtName={booking.court?.name || 'Bilinmeyen Kort'}
+                courtType={booking.court?.type || 'padel'}
+                date={new Date(booking.date).toLocaleDateString('tr-TR', {
                   weekday: 'short',
                   day: 'numeric',
                   month: 'short'
                 })}
-                time={`${match.booking?.start_time?.slice(0, 5)} - ${match.booking?.end_time?.slice(0, 5)}`}
-                opponents={match.players
-                  ?.filter(p => p.team === 'away')
-                  ?.map(p => p.user?.full_name || 'Bilinmeyen Oyuncu') || []
-                }
-                partners={match.players
-                  ?.filter(p => p.team === 'home')
-                  ?.map(p => p.user?.full_name || 'Sen') || ['Sen']
-                }
-                status={match.status}
-                result={match.result}
+                time={`${booking.start_time?.slice(0, 5)} - ${booking.end_time?.slice(0, 5)}`}
+                opponents={[]} // No opponents data available yet
+                partners={['Sen']} // User is always a partner
+                status={booking.status === 'confirmed' ? 'confirmed' : 'pending'}
+                result={undefined} // No match results yet
               />
             ))
           )}

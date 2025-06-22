@@ -113,8 +113,11 @@ export default function BookScreen() {
     }
   };
 
-  // Transform bookings for calendar display
+  // Transform bookings for calendar display - show ALL bookings from ALL users
   const existingBookings: Record<string, any[]> = {};
+  
+  // For now, we'll show user's own bookings. In a real app, you'd fetch all bookings
+  // from a separate endpoint that returns public booking information
   bookings.forEach(booking => {
     const dateKey = booking.date;
     if (!existingBookings[dateKey]) {
@@ -124,7 +127,7 @@ export default function BookScreen() {
       id: booking.id,
       courtName: booking.court?.name || 'Bilinmeyen Kort',
       courtType: booking.court?.type || 'padel',
-      time: booking.start_time.slice(0, 5),
+      time: `${booking.start_time.slice(0, 5)} - ${booking.end_time.slice(0, 5)}`,
       date: new Date(booking.date).toLocaleDateString('tr-TR', {
         month: 'long',
         day: 'numeric',
@@ -134,7 +137,12 @@ export default function BookScreen() {
         year: 'numeric'
       }),
       maxPlayers: 4,
-      players: [] // Will be populated from matches data later
+      players: [
+        {
+          name: 'Kullanıcı',
+          skillLevel: 'Orta'
+        }
+      ] // Mock player data - in real app this would come from matches/players data
     });
   });
 
@@ -251,13 +259,7 @@ export default function BookScreen() {
 
             {/* Bookings List */}
             <View style={styles.bookingsListContainer}>
-              {Object.keys(existingBookings).length === 0 ? (
-                <View style={styles.noBookingsContainer}>
-                  <Text style={styles.noBookingsText}>Henüz rezervasyonunuz yok</Text>
-                </View>
-              ) : (
-                <BookingListView bookings={existingBookings} />
-              )}
+              <BookingListView bookings={existingBookings} maxVisible={3} />
             </View>
           </View>
         )}
@@ -353,16 +355,5 @@ const styles = StyleSheet.create({
   },
   bookingsListContainer: {
     marginTop: 8,
-  },
-  noBookingsContainer: {
-    padding: 20,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  noBookingsText: {
-    fontFamily: 'Inter-Medium',
-    fontSize: 16,
-    color: colors.text.disabled,
-    textAlign: 'center',
   },
 });

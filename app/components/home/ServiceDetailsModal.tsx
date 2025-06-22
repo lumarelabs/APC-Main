@@ -1,21 +1,32 @@
 import React from 'react';
 import { View, Text, StyleSheet, Modal, TouchableOpacity, ScrollView } from 'react-native';
-import { X } from 'lucide-react-native';
+import { X, ArrowRight } from 'lucide-react-native';
 import { colors } from '@/app/theme/colors';
 
 type ServiceDetailsModalProps = {
   isVisible: boolean;
   onClose: () => void;
   serviceType: 'court' | 'lessons' | 'tournaments';
+  onNavigateToBooking?: () => void;
+  onNavigateToTournaments?: () => void;
 };
 
-export const ServiceDetailsModal = ({ isVisible, onClose, serviceType }: ServiceDetailsModalProps) => {
+export const ServiceDetailsModal = ({ 
+  isVisible, 
+  onClose, 
+  serviceType, 
+  onNavigateToBooking,
+  onNavigateToTournaments 
+}: ServiceDetailsModalProps) => {
   const renderContent = () => {
     switch (serviceType) {
       case 'court':
         return (
           <>
             <Text style={styles.title}>Kort Rezervasyonu</Text>
+            <Text style={styles.description}>
+              Kort rezervasyonu yapın ve oyununuzu planlayın. Tercih ettiğiniz kort tipini ve zaman dilimini seçin. Tüm kortlarımız profesyonel standartlarda donatılmış ve en yüksek kalitede bakımı yapılmaktadır.
+            </Text>
             <View style={styles.priceContainer}>
               <View style={styles.priceItem}>
                 <Text style={styles.courtType}>Padel Kortları</Text>
@@ -26,15 +37,22 @@ export const ServiceDetailsModal = ({ isVisible, onClose, serviceType }: Service
                 <Text style={styles.price}>₺250/saat</Text>
               </View>
             </View>
-            <Text style={styles.description}>
-              Tercih ettiğiniz kort tipini ve zaman dilimini seçin. Tüm kortlarımız profesyonel standartlarda donatılmış ve en yüksek kalitede bakımı yapılmaktadır.
-            </Text>
+            <TouchableOpacity 
+              style={styles.actionButton}
+              onPress={onNavigateToBooking}
+            >
+              <Text style={styles.actionButtonText}>Rezervasyon Yap</Text>
+              <ArrowRight size={20} color={colors.white} />
+            </TouchableOpacity>
           </>
         );
       case 'lessons':
         return (
           <>
             <Text style={styles.title}>Padel Dersleri</Text>
+            <Text style={styles.description}>
+              Dersler. Deneyimli eğitmenlerimizden ders alın. Başlangıç seviyesinden ileri seviyeye kadar tüm seviyelerde dersler mevcuttur.
+            </Text>
             <View style={styles.priceContainer}>
               <View style={styles.priceItem}>
                 <Text style={styles.courtType}>Özel Ders</Text>
@@ -45,18 +63,32 @@ export const ServiceDetailsModal = ({ isVisible, onClose, serviceType }: Service
                 <Text style={styles.price}>₺300/kişi/saat</Text>
               </View>
             </View>
-            <Text style={styles.description}>
-              Deneyimli eğitmenlerimizden ders alın. Başlangıç seviyesinden ileri seviyeye kadar tüm seviyelerde dersler mevcuttur.
-            </Text>
+            <TouchableOpacity 
+              style={styles.actionButton}
+              onPress={onNavigateToBooking}
+            >
+              <Text style={styles.actionButtonText}>Ders Rezervasyonu</Text>
+              <ArrowRight size={20} color={colors.white} />
+            </TouchableOpacity>
           </>
         );
       case 'tournaments':
         return (
           <>
-            <Text style={styles.title}>Tournaments</Text>
+            <Text style={styles.title}>Turnuvalar</Text>
             <Text style={styles.description}>
-              There are no tournaments scheduled at the moment. Please check back later for upcoming events.
+              Turnuvalara katılın ve ödüller kazanın. Düzenli olarak farklı seviyelerde turnuvalar düzenlenmektedir. Hem eğlenceli hem de rekabetçi bir ortamda oyun deneyimi yaşayın.
             </Text>
+            <TouchableOpacity 
+              style={styles.actionButton}
+              onPress={() => {
+                onClose();
+                onNavigateToTournaments?.();
+              }}
+            >
+              <Text style={styles.actionButtonText}>Yaklaşan Turnuvalara Git</Text>
+              <ArrowRight size={20} color={colors.white} />
+            </TouchableOpacity>
           </>
         );
     }
@@ -117,11 +149,18 @@ const styles = StyleSheet.create({
   title: {
     fontFamily: 'Inter-Bold',
     fontSize: 24,
-    color: colors.white,
+    color: colors.charcoal,
     marginBottom: 16,
   },
+  description: {
+    fontFamily: 'Inter-Regular',
+    fontSize: 16,
+    color: colors.text.disabled,
+    lineHeight: 24,
+    marginBottom: 20,
+  },
   priceContainer: {
-    marginBottom: 16,
+    marginBottom: 24,
   },
   priceItem: {
     flexDirection: 'row',
@@ -129,22 +168,31 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     paddingVertical: 12,
     borderBottomWidth: 1,
-    borderBottomColor: colors.text.disabled,
+    borderBottomColor: colors.background.primary,
   },
   courtType: {
     fontFamily: 'Inter-Medium',
     fontSize: 16,
-    color: colors.white,
+    color: colors.charcoal,
   },
   price: {
     fontFamily: 'Inter-Bold',
     fontSize: 16,
     color: colors.primary,
   },
-  description: {
-    fontFamily: 'Inter-Regular',
-    fontSize: 14,
-    color: colors.text.disabled,
-    lineHeight: 20,
+  actionButton: {
+    backgroundColor: colors.primary,
+    borderRadius: 12,
+    paddingVertical: 16,
+    paddingHorizontal: 20,
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
   },
-}); 
+  actionButtonText: {
+    fontFamily: 'Inter-Bold',
+    fontSize: 16,
+    color: colors.white,
+    marginRight: 8,
+  },
+});

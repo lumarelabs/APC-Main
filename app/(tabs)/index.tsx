@@ -11,7 +11,6 @@ import { useApp } from '@/app/context/AppContext';
 import { colors } from '@/app/theme/colors';
 import Logo2 from '../../assets/images/logo2.png';
 import RacketImage from '../../assets/images/racket.png';
-import LocationMap from '../components/home/LocationMap';
 
 type Booking = {
   id: string;
@@ -53,6 +52,11 @@ export default function HomeScreen() {
     }));
 
   const displayName = profile?.full_name || user?.email?.split('@')[0] || 'Kullanıcı';
+
+  const scrollToTournaments = () => {
+    // Since tournaments section is on the same page, we don't need navigation
+    // This is just a placeholder for the scroll functionality
+  };
 
   return (
     <SafeAreaView style={styles.safeArea}>
@@ -127,7 +131,6 @@ export default function HomeScreen() {
                 <BookOpen size={24} color="#16FF91" />
               </View>
               <Text style={styles.serviceTitle}>Kort Rezervasyonu</Text>
-              <Text style={styles.serviceDescription}>Kort rezervasyonu yapın ve oyununuzu planlayın</Text>
             </TouchableOpacity>
             <TouchableOpacity 
               style={styles.serviceCard}
@@ -137,7 +140,6 @@ export default function HomeScreen() {
                 <GraduationCap size={24} color="#32D1FF" />
               </View>
               <Text style={styles.serviceTitle}>Dersler</Text>
-              <Text style={styles.serviceDescription}>Profesyonel eğitmenlerden özel ders alın</Text>
             </TouchableOpacity>
             <TouchableOpacity 
               style={styles.serviceCard}
@@ -147,7 +149,6 @@ export default function HomeScreen() {
                 <Trophy size={24} color="#FF5656" />
               </View>
               <Text style={styles.serviceTitle}>Turnuvalar</Text>
-              <Text style={styles.serviceDescription}>Turnuvalara katılın ve ödüller kazanın</Text>
             </TouchableOpacity>
           </View>
         </View>
@@ -156,22 +157,10 @@ export default function HomeScreen() {
         <View style={styles.section}>
           <View style={styles.sectionHeader}>
             <Text style={styles.sectionTitle}>Yaklaşan Turnuvalar</Text>
-            <TouchableOpacity>
-              <Text style={styles.seeAll}>Tümünü Gör</Text>
-            </TouchableOpacity>
           </View>
-          <View style={styles.tournamentCard}>
-            <Image 
-              source={{ uri: "https://images.pexels.com/photos/8224728/pexels-photo-8224728.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=2" }}
-              style={styles.tournamentImage}
-            />
-            <View style={styles.tournamentInfo}>
-              <Text style={styles.tournamentTitle}>Bahar Padel Şampiyonası</Text>
-              <Text style={styles.tournamentDate}>15-17 Mart 2024</Text>
-              <TouchableOpacity style={styles.registerButton}>
-                <Text style={styles.registerButtonText}>Şimdi Kayıt Ol</Text>
-              </TouchableOpacity>
-            </View>
+          <View style={styles.noTournamentsContainer}>
+            <Text style={styles.noTournamentsText}>Şu anda yaklaşan turnuva yok</Text>
+            <Text style={styles.noTournamentsSubtext}>Yeni turnuvalar için takipte kalın!</Text>
           </View>
         </View>
 
@@ -179,11 +168,6 @@ export default function HomeScreen() {
         <View style={styles.contactSection}>
           <Text style={styles.contactTitle}>İletişim</Text>
           
-          {/* Map */}
-          <View style={styles.mapContainer}>
-            <LocationMap />
-          </View>
-
           <View style={styles.contactContent}>
             <TouchableOpacity 
               style={styles.contactLink}
@@ -211,6 +195,11 @@ export default function HomeScreen() {
           isVisible={selectedService !== null}
           onClose={() => setSelectedService(null)}
           serviceType={selectedService || 'court'}
+          onNavigateToBooking={() => {
+            setSelectedService(null);
+            // Navigation to booking tab would be handled by parent navigator
+          }}
+          onNavigateToTournaments={scrollToTournaments}
         />
 
         {/* Booking Details Modal */}
@@ -358,49 +347,27 @@ const styles = StyleSheet.create({
     fontFamily: 'Inter-Bold',
     fontSize: 14,
     color: colors.charcoal,
-    marginBottom: 4,
     textAlign: 'center',
   },
-  serviceDescription: {
-    fontFamily: 'Inter-Regular',
-    fontSize: 12,
-    color: colors.text.disabled,
-    textAlign: 'center',
-  },
-  tournamentCard: {
+  noTournamentsContainer: {
+    padding: 20,
+    alignItems: 'center',
+    justifyContent: 'center',
     backgroundColor: colors.background.secondary,
     borderRadius: 16,
-    overflow: 'hidden',
   },
-  tournamentImage: {
-    width: '100%',
-    height: 160,
-  },
-  tournamentInfo: {
-    padding: 16,
-  },
-  tournamentTitle: {
+  noTournamentsText: {
     fontFamily: 'Inter-Bold',
-    fontSize: 18,
-    color: colors.charcoal,
+    fontSize: 16,
+    color: colors.text.disabled,
+    textAlign: 'center',
     marginBottom: 4,
   },
-  tournamentDate: {
+  noTournamentsSubtext: {
     fontFamily: 'Inter-Regular',
     fontSize: 14,
     color: colors.text.disabled,
-    marginBottom: 12,
-  },
-  registerButton: {
-    backgroundColor: colors.primary,
-    borderRadius: 8,
-    paddingVertical: 8,
-    alignItems: 'center',
-  },
-  registerButtonText: {
-    fontFamily: 'Inter-Bold',
-    fontSize: 14,
-    color: colors.white,
+    textAlign: 'center',
   },
   contactSection: {
     marginTop: 32,
@@ -445,12 +412,5 @@ const styles = StyleSheet.create({
   topRightLogo: {
     width: 130,
     height: 50,
-  },
-  mapContainer: {
-    width: Dimensions.get('window').width - 32,
-    height: 200,
-    borderRadius: 16,
-    overflow: 'hidden',
-    marginBottom: 16,
   },
 });

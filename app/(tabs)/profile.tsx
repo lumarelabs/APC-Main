@@ -15,18 +15,18 @@ export default function ProfileScreen() {
 
   const handleSignOut = async () => {
     Alert.alert(
-      'Sign Out',
-      'Are you sure you want to sign out?',
+      'Çıkış Yap',
+      'Çıkış yapmak istediğinizden emin misiniz?',
       [
-        { text: 'Cancel', style: 'cancel' },
+        { text: 'İptal', style: 'cancel' },
         { 
-          text: 'Sign Out', 
+          text: 'Çıkış Yap', 
           style: 'destructive',
           onPress: async () => {
             try {
               await signOut();
             } catch (error) {
-              Alert.alert('Error', 'Failed to sign out. Please try again.');
+              Alert.alert('Hata', 'Çıkış yapılamadı. Lütfen tekrar deneyin.');
             }
           }
         }
@@ -38,14 +38,14 @@ export default function ProfileScreen() {
     return (
       <SafeAreaView style={styles.safeArea}>
         <View style={styles.loadingContainer}>
-          <Text style={styles.loadingText}>Loading profile...</Text>
+          <Text style={styles.loadingText}>Profil yükleniyor...</Text>
         </View>
       </SafeAreaView>
     );
   }
 
   const displayProfile = profile || {
-    full_name: user?.email?.split('@')[0] || 'User',
+    full_name: user?.email?.split('@')[0] || 'Kullanıcı',
     level: 'Başlangıç',
     profile_image_url: 'https://images.pexels.com/photos/1681010/pexels-photo-1681010.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=2'
   };
@@ -73,7 +73,7 @@ export default function ProfileScreen() {
             </View>
             <Text style={styles.profileEmail}>{user?.email}</Text>
             <View style={styles.levelBadge}>
-              <Text style={styles.levelText}>Level {displayProfile.level}</Text>
+              <Text style={styles.levelText}>Seviye {displayProfile.level}</Text>
             </View>
           </View>
         </View>
@@ -81,15 +81,15 @@ export default function ProfileScreen() {
         {/* Stats */}
         <View style={styles.statsContainer}>
           <View style={styles.statCard}>
-            <Text style={styles.statValue}>24</Text>
+            <Text style={styles.statValue}>0</Text>
             <Text style={styles.statLabel}>Toplam Maç</Text>
           </View>
           <View style={styles.statCard}>
-            <Text style={styles.statValue}>18</Text>
+            <Text style={styles.statValue}>0</Text>
             <Text style={styles.statLabel}>Kazanılan</Text>
           </View>
           <View style={styles.statCard}>
-            <Text style={styles.statValue}>75%</Text>
+            <Text style={styles.statValue}>-</Text>
             <Text style={styles.statLabel}>Kazanma Oranı</Text>
           </View>
         </View>

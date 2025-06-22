@@ -1,20 +1,24 @@
 import React, { useState } from 'react';
-import { View, Text, StyleSheet, TouchableOpacity, Modal, ScrollView } from 'react-native';
+import { View, Text, StyleSheet, TouchableOpacity, Modal, ScrollView, FlatList } from 'react-native';
+import { X, Users, Calendar, Clock, MapPin } from 'lucide-react-native';
 import type { Booking } from './BookingCalendar';
 import { format } from 'date-fns';
+import { tr } from 'date-fns/locale';
 import { colors } from '@/app/theme/colors';
 
 type BookingListViewProps = {
   bookings: Record<string, Booking[]>;
+  maxVisible?: number;
 };
 
-export function BookingListView({ bookings }: BookingListViewProps) {
+export function BookingListView({ bookings, maxVisible = 3 }: BookingListViewProps) {
   const [selectedBooking, setSelectedBooking] = useState<Booking | null>(null);
   const [selectedDate, setSelectedDate] = useState<string | null>(null);
+  const [showAllBookings, setShowAllBookings] = useState(false);
 
   const formatBookingDate = (dateString: string) => {
     const date = new Date(dateString);
-    return `${format(date, 'MMMM d')} - ${format(date, 'EEEE')} - ${format(date, 'h:mm a')} - ${format(date, 'yyyy')}`;
+    return format(date, 'dd MMMM yyyy - EEEE', { locale: tr });
   };
 
   const getPlayerCountStyle = (currentPlayers: number, maxPlayers: number = 4) => {
@@ -33,39 +37,108 @@ export function BookingListView({ bookings }: BookingListViewProps) {
     };
   };
 
+  // Flatten and sort all bookings by date
+  const allBookings = Object.entries(bookings)
+    .flatMap(([date, dateBookings]) => 
+      dateBookings.map(booking => ({ ...booking, dateKey: date }))
+    )
+    .sort((a, b) => new Date(a.dateKey).getTime() - new Date(b.dateKey).getTime());
+
+  const visibleBookings = showAllBookings ? allBookings : allBookings.slice(0, maxVisible);
+  const hasMoreBookings = allBookings.length > maxVisible;
+
+  const renderBookingItem = ({ item: booking }: { item: any }) => (
+    <TouchableOpacity
+      style={styles.bookingBar}
+      onPress={() => {
+        setSelectedBooking(booking);
+        setSelectedDate(booking.dateKey);
+      }}
+    >
+      <View style={styles.bookingInfo}>
+        <Text style={styles.courtName}>{booking.courtName}</Text>
+        <View style={styles.detailsRow}>
+          <Calendar size={14} color={colors.text.disabled} />
+          <Text style={styles.dateTime}>{formatBookingDate(booking.dateKey)}</Text>
+        </View>
+        <View style={styles.detailsRow}>
+          <Clock size={14} color={colors.text.disabled} />
+          <Text style={styles.dateTime}>{booking.time}</Text>
+        </View>
+        <View style={styles.detailsRow}>
+          <Users size={14} color={colors.text.disabled} />
+          <Text style={styles.dateTime}>
+            {booking.players.length} oyuncu
+          </Text>
+        </View>
+      </View>
+      <View style={[
+        styles.playerCount,
+        getPlayerCountStyle(booking.players.length, booking.maxPlayers)
+      ]}>
+        <Text style={[
+          styles.playerCountText,
+          getPlayerCountTextStyle(booking.players.length, booking.maxPlayers)
+        ]}>
+          {booking.players.length}/{booking.maxPlayers || 4}
+        </Text>
+      </View>
+    </TouchableOpacity>
+  );
+
   return (
     <View style={styles.container}>
-      <Text style={styles.title}>Mevcut Rezervasyonlar</Text>
-      <ScrollView style={styles.bookingsList}>
-        {Object.entries(bookings).map(([date, dateBookings]) =>
-          dateBookings.map((booking) => (
-            <TouchableOpacity
-              key={booking.id}
-              style={styles.bookingBar}
-              onPress={() => {
-                setSelectedBooking(booking);
-                setSelectedDate(date);
-              }}
-            >
-              <View style={styles.bookingInfo}>
-                <Text style={styles.courtName}>{booking.courtName}</Text>
-                <Text style={styles.dateTime}>{formatBookingDate(date)}</Text>
-              </View>
-              <View style={[
-                styles.playerCount,
-                getPlayerCountStyle(booking.players.length, booking.maxPlayers)
-              ]}>
-                <Text style={[
-                  styles.playerCountText,
-                  getPlayerCountTextStyle(booking.players.length, booking.maxPlayers)
-                ]}>
-                  {booking.players.length}/{booking.maxPlayers || 4}
-                </Text>
-              </View>
-            </TouchableOpacity>
-          ))
+      <View style={styles.header}>
+        <Text style={styles.title}>Mevcut Rezervasyonlar</Text>
+        {hasMoreBookings && !showAllBookings && (
+          <TouchableOpacity onPress={() => setShowAllBookings(true)}>
+            <Text style={styles.seeAll}>Hepsini Gör</Text>
+          </TouchableOpacity>
         )}
-      </ScrollView>
+      </View>
+
+      {allBookings.length === 0 ? (
+        <View style={styles.emptyContainer}>
+          <Text style={styles.emptyText}>Henüz rezervasyon yok</Text>
+        </View>
+      ) : (
+        <FlatList
+          data={visibleBookings}
+          renderItem={renderBookingItem}
+          keyExtractor={(item) => item.id}
+          showsVerticalScrollIndicator={false}
+          style={styles.bookingsList}
+        />
+      )}
+
+      {/* All Bookings Modal */}
+      <Modal
+        visible={showAllBookings}
+        transparent
+        animationType="slide"
+        onRequestClose={() => setShowAllBookings(false)}
+      >
+        <View style={styles.modalOverlay}>
+          <View style={styles.allBookingsModal}>
+            <View style={styles.modalHeader}>
+              <Text style={styles.modalTitle}>Tüm Rezervasyonlar</Text>
+              <TouchableOpacity 
+                style={styles.closeButton}
+                onPress={() => setShowAllBookings(false)}
+              >
+                <X size={24} color={colors.charcoal} />
+              </TouchableOpacity>
+            </View>
+            <FlatList
+              data={allBookings}
+              renderItem={renderBookingItem}
+              keyExtractor={(item) => item.id}
+              showsVerticalScrollIndicator={false}
+              style={styles.modalBookingsList}
+            />
+          </View>
+        </View>
+      </Modal>
 
       {/* Booking Details Modal */}
       <Modal
@@ -79,17 +152,39 @@ export function BookingListView({ bookings }: BookingListViewProps) {
       >
         <View style={styles.modalOverlay}>
           <View style={styles.modalContent}>
-            <Text style={styles.modalTitle}>Rezervasyon Detayları</Text>
+            <View style={styles.modalHeader}>
+              <Text style={styles.modalTitle}>Rezervasyon Detayları</Text>
+              <TouchableOpacity 
+                style={styles.closeButton}
+                onPress={() => {
+                  setSelectedBooking(null);
+                  setSelectedDate(null);
+                }}
+              >
+                <X size={24} color={colors.charcoal} />
+              </TouchableOpacity>
+            </View>
+            
             {selectedBooking && selectedDate && (
-              <>
+              <ScrollView showsVerticalScrollIndicator={false}>
                 <View style={styles.bookingHeader}>
                   <Text style={styles.modalCourtName}>{selectedBooking.courtName}</Text>
-                  <Text style={styles.modalDateTime}>
-                    {formatBookingDate(selectedDate)}
-                  </Text>
+                  <View style={styles.modalDetailRow}>
+                    <Calendar size={16} color={colors.text.disabled} />
+                    <Text style={styles.modalDateTime}>
+                      {formatBookingDate(selectedDate)}
+                    </Text>
+                  </View>
+                  <View style={styles.modalDetailRow}>
+                    <Clock size={16} color={colors.text.disabled} />
+                    <Text style={styles.modalDateTime}>
+                      {selectedBooking.time}
+                    </Text>
+                  </View>
                 </View>
+                
                 <View style={styles.playersList}>
-                  <Text style={styles.playersTitle}>Oyuncular</Text>
+                  <Text style={styles.playersTitle}>Oyuncular ({selectedBooking.players.length})</Text>
                   {selectedBooking.players.map((player, index) => (
                     <View key={index} style={styles.playerItem}>
                       <Text style={styles.playerName}>{player.name}</Text>
@@ -98,18 +193,12 @@ export function BookingListView({ bookings }: BookingListViewProps) {
                       </View>
                     </View>
                   ))}
+                  {selectedBooking.players.length === 0 && (
+                    <Text style={styles.noPlayersText}>Henüz oyuncu yok</Text>
+                  )}
                 </View>
-              </>
+              </ScrollView>
             )}
-            <TouchableOpacity
-              style={styles.closeButton}
-              onPress={() => {
-                setSelectedBooking(null);
-                setSelectedDate(null);
-              }}
-            >
-              <Text style={styles.closeButtonText}>Kapat</Text>
-            </TouchableOpacity>
           </View>
         </View>
       </Modal>
@@ -119,11 +208,11 @@ export function BookingListView({ bookings }: BookingListViewProps) {
 
 function getSkillBadgeStyle(skillLevel: string) {
   switch (skillLevel) {
-    case 'Beginner':
+    case 'Başlangıç':
       return { backgroundColor: colors.secondary, borderColor: colors.secondary };
-    case 'Intermediate':
+    case 'Orta':
       return { backgroundColor: colors.status.warning, borderColor: colors.status.warning };
-    case 'Advanced':
+    case 'İleri':
       return { backgroundColor: colors.status.error, borderColor: colors.status.error };
     default:
       return { backgroundColor: colors.primary, borderColor: colors.primary };
@@ -132,18 +221,40 @@ function getSkillBadgeStyle(skillLevel: string) {
 
 const styles = StyleSheet.create({
   container: {
-    flex: 1,
     backgroundColor: colors.background.primary,
     padding: 16,
+  },
+  header: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginBottom: 16,
   },
   title: {
     fontFamily: 'Inter-Bold',
     fontSize: 18,
     color: colors.charcoal,
-    marginBottom: 16,
+  },
+  seeAll: {
+    fontFamily: 'Inter-Medium',
+    fontSize: 14,
+    color: colors.primary,
   },
   bookingsList: {
-    flex: 1,
+    maxHeight: 300,
+  },
+  emptyContainer: {
+    padding: 20,
+    alignItems: 'center',
+    justifyContent: 'center',
+    backgroundColor: colors.background.secondary,
+    borderRadius: 16,
+  },
+  emptyText: {
+    fontFamily: 'Inter-Medium',
+    fontSize: 16,
+    color: colors.text.disabled,
+    textAlign: 'center',
   },
   bookingBar: {
     backgroundColor: colors.background.secondary,
@@ -161,12 +272,18 @@ const styles = StyleSheet.create({
     fontFamily: 'Inter-Bold',
     fontSize: 16,
     color: colors.charcoal,
+    marginBottom: 8,
+  },
+  detailsRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
     marginBottom: 4,
   },
   dateTime: {
     fontFamily: 'Inter-Medium',
     fontSize: 14,
     color: colors.text.disabled,
+    marginLeft: 8,
   },
   playerCount: {
     paddingHorizontal: 12,
@@ -177,7 +294,6 @@ const styles = StyleSheet.create({
   playerCountText: {
     fontFamily: 'Inter-Bold',
     fontSize: 14,
-    color: colors.charcoal,
   },
   modalOverlay: {
     flex: 1,
@@ -185,18 +301,36 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
   },
-  modalContent: {
+  allBookingsModal: {
     backgroundColor: colors.background.secondary,
-    borderRadius: 12,
-    padding: 20,
+    borderRadius: 16,
     width: '90%',
     maxHeight: '80%',
+    padding: 20,
+  },
+  modalContent: {
+    backgroundColor: colors.background.secondary,
+    borderRadius: 16,
+    width: '90%',
+    maxHeight: '80%',
+    padding: 20,
+  },
+  modalHeader: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginBottom: 20,
   },
   modalTitle: {
     fontFamily: 'Inter-Bold',
     fontSize: 20,
     color: colors.charcoal,
-    marginBottom: 16,
+  },
+  closeButton: {
+    padding: 4,
+  },
+  modalBookingsList: {
+    flex: 1,
   },
   bookingHeader: {
     marginBottom: 20,
@@ -205,15 +339,23 @@ const styles = StyleSheet.create({
     fontFamily: 'Inter-Bold',
     fontSize: 18,
     color: colors.charcoal,
-    marginBottom: 4,
+    marginBottom: 12,
+  },
+  modalDetailRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginBottom: 8,
   },
   modalDateTime: {
     fontFamily: 'Inter-Medium',
     fontSize: 16,
     color: colors.text.disabled,
+    marginLeft: 8,
   },
   playersList: {
-    marginBottom: 20,
+    backgroundColor: colors.background.primary,
+    borderRadius: 12,
+    padding: 16,
   },
   playersTitle: {
     fontFamily: 'Inter-Bold',
@@ -225,7 +367,9 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    marginBottom: 8,
+    paddingVertical: 8,
+    borderBottomWidth: 1,
+    borderBottomColor: colors.background.secondary,
   },
   playerName: {
     fontFamily: 'Inter-Medium',
@@ -243,15 +387,11 @@ const styles = StyleSheet.create({
     fontSize: 12,
     color: colors.charcoal,
   },
-  closeButton: {
-    backgroundColor: colors.primary,
-    borderRadius: 8,
-    padding: 12,
-    alignItems: 'center',
+  noPlayersText: {
+    fontFamily: 'Inter-Medium',
+    fontSize: 14,
+    color: colors.text.disabled,
+    textAlign: 'center',
+    fontStyle: 'italic',
   },
-  closeButtonText: {
-    fontFamily: 'Inter-Bold',
-    fontSize: 16,
-    color: colors.white,
-  },
-}); 
+});
