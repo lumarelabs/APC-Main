@@ -13,14 +13,19 @@ export default function MatchesScreen() {
   const today = new Date();
   today.setHours(0, 0, 0, 0);
 
-  // Remove duplicates by using a Map with booking IDs as keys
-  const uniqueBookingsMap = new Map();
-  bookings.forEach(booking => {
-    if (!uniqueBookingsMap.has(booking.id)) {
-      uniqueBookingsMap.set(booking.id, booking);
+  // FIXED: Remove duplicates more effectively using Set with booking IDs
+  const uniqueBookingIds = new Set();
+  const uniqueBookings = bookings.filter(booking => {
+    if (uniqueBookingIds.has(booking.id)) {
+      return false; // Skip duplicate
     }
+    uniqueBookingIds.add(booking.id);
+    return true; // Keep unique booking
   });
-  const uniqueBookings = Array.from(uniqueBookingsMap.values());
+
+  console.log('Total bookings:', bookings.length);
+  console.log('Unique bookings:', uniqueBookings.length);
+  console.log('Duplicate count:', bookings.length - uniqueBookings.length);
 
   const upcomingBookings = uniqueBookings.filter(booking => {
     const bookingDate = new Date(booking.date);
@@ -100,7 +105,7 @@ export default function MatchesScreen() {
           ) : (
             displayBookings.map((booking) => (
               <MatchCard 
-                key={booking.id} // Use just booking.id since we've already deduplicated
+                key={`match-${booking.id}`} // FIXED: Use unique key prefix
                 courtName={booking.court?.name || 'Bilinmeyen Kort'}
                 courtType={booking.court?.type || 'padel'}
                 date={new Date(booking.date).toLocaleDateString('tr-TR', {

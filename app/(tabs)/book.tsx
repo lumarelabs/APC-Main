@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useRef } from 'react';
 import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Alert } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { CourtTypeSelector } from '@/app/components/booking/CourtTypeSelector';
@@ -28,6 +28,9 @@ export default function BookScreen() {
   const [racketCount, setRacketCount] = useState(0);
   const [currentStep, setCurrentStep] = useState<BookingStep>('court-selection');
   const [calendarViewMode, setCalendarViewMode] = useState<CalendarViewMode>('weekly');
+
+  // FIXED: Add scroll ref to control scrolling
+  const scrollViewRef = useRef<ScrollView>(null);
 
   const { createBooking } = useApp();
   const { bookings } = useAllBookings(); // Use all bookings for calendar display
@@ -85,12 +88,16 @@ export default function BookScreen() {
   const handleDateTimeConfirm = () => {
     if (selectedDate && selectedTime) {
       setCurrentStep('racket-rental');
+      // FIXED: Scroll to top when moving to next step
+      scrollViewRef.current?.scrollTo({ y: 0, animated: true });
     }
   };
 
   const handleRacketRentalComplete = (count: number) => {
     setRacketCount(count);
     setCurrentStep('payment');
+    // FIXED: Scroll to top when moving to payment
+    scrollViewRef.current?.scrollTo({ y: 0, animated: true });
   };
 
   const handlePaymentConfirm = async () => {
@@ -125,13 +132,14 @@ export default function BookScreen() {
           {
             text: 'Tamam',
             onPress: () => {
-              // Reset form
+              // Reset form and scroll to top
               setSelectedCourt(null);
               setSelectedDate(null);
               setSelectedTime(null);
               setRacketCount(0);
               setCurrentStep('court-selection');
               setBookingType('court');
+              scrollViewRef.current?.scrollTo({ y: 0, animated: true });
             }
           }
         ]
@@ -192,6 +200,8 @@ export default function BookScreen() {
               onSelectCourt={(court) => {
                 setSelectedCourt(court);
                 setCurrentStep('date-time');
+                // FIXED: Scroll to top when court is selected
+                scrollViewRef.current?.scrollTo({ y: 0, animated: true });
               }}
             />
           </View>
@@ -206,6 +216,7 @@ export default function BookScreen() {
                 setSelectedCourt(padelCourts[0]);
               }
               setCurrentStep('date-time');
+              scrollViewRef.current?.scrollTo({ y: 0, animated: true });
             }}
           />
         );
@@ -250,6 +261,7 @@ export default function BookScreen() {
   return (
     <SafeAreaView style={styles.safeArea}>
       <ScrollView 
+        ref={scrollViewRef}
         style={styles.container}
         contentContainerStyle={styles.scrollContent}
         showsVerticalScrollIndicator={false}

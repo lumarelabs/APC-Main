@@ -19,10 +19,12 @@ export function CourtCard({
   location,
   onPress,
 }: CourtCardProps) {
-  const typeColor = type === 'padel' ? '#16FF91' : '#32D1FF';
-  const typeText = type === 'padel' ? 'Padel' : 'Pickleball';
+  // FIXED: Ensure proper type handling and display
+  const normalizedType = type?.toLowerCase();
+  const typeColor = normalizedType === 'padel' ? '#16FF91' : '#32D1FF';
+  const typeText = normalizedType === 'padel' ? 'Padel' : 'Pickleball';
 
-  console.log('CourtCard rendering:', { name, type, typeText }); // Debug log
+  console.log('CourtCard rendering:', { name, type, normalizedType, typeText }); // Debug log
 
   return (
     <View style={styles.container}>

@@ -14,12 +14,17 @@ export function CourtList({ courtType, onSelectCourt }: CourtListProps) {
   console.log('CourtList - courtType:', courtType);
   console.log('CourtList - all courts:', courts);
 
-  // Filter courts based on selected type
+  // Filter courts based on selected type - FIXED: Use exact string matching
   const filteredCourts = courtType === 'all' 
     ? courts 
     : courts.filter(court => {
-        console.log('Filtering court:', court.name, 'type:', court.type, 'matches:', court.type === courtType);
-        return court.type === courtType;
+        console.log('Filtering court:', court.name, 'type:', court.type, 'courtType:', courtType);
+        // Ensure exact string matching and handle case sensitivity
+        const courtTypeNormalized = court.type?.toLowerCase();
+        const selectedTypeNormalized = courtType.toLowerCase();
+        const matches = courtTypeNormalized === selectedTypeNormalized;
+        console.log('Match result:', matches);
+        return matches;
       });
 
   console.log('CourtList - filtered courts:', filteredCourts);
@@ -45,19 +50,19 @@ export function CourtList({ courtType, onSelectCourt }: CourtListProps) {
     return (
       <View style={styles.emptyContainer}>
         <Text style={styles.emptyText}>Hiç kort bulunamadı</Text>
+        <Text style={styles.emptySubtext}>Lütfen daha sonra tekrar deneyin.</Text>
       </View>
     );
   }
 
-  if (filteredCourts.length === 0) {
+  // FIXED: Only show empty state if no courts match the filter AND a specific type is selected
+  if (filteredCourts.length === 0 && courtType !== 'all') {
     return (
       <View style={styles.emptyContainer}>
         <Text style={styles.emptyText}>
           {courtType === 'padel' 
             ? 'Padel kortu bulunamadı' 
-            : courtType === 'pickleball'
-            ? 'Pickleball kortu bulunamadı'
-            : 'Uygun kort bulunamadı'
+            : 'Pickleball kortu bulunamadı'
           }
         </Text>
         <Text style={styles.emptySubtext}>
@@ -69,14 +74,14 @@ export function CourtList({ courtType, onSelectCourt }: CourtListProps) {
 
   return (
     <View style={styles.container}>
-      <Text style={styles.title}>Kort Seçiniz</Text>
+      <Text style={styles.title}>Kort Seçiniz ({filteredCourts.length} kort)</Text>
       
       <FlatList
         data={filteredCourts}
         keyExtractor={(item) => item.id}
         numColumns={2}
         contentContainerStyle={styles.listContent}
-        columnWrapperStyle={styles.columnWrapper}
+        columnWrapperStyle={filteredCourts.length > 1 ? styles.columnWrapper : null}
         renderItem={({ item }) => (
           <CourtCard
             name={item.name}
