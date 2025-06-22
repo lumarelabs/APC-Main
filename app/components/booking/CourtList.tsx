@@ -11,10 +11,18 @@ type CourtListProps = {
 export function CourtList({ courtType, onSelectCourt }: CourtListProps) {
   const { courts, loading, error } = useCourts();
 
+  console.log('CourtList - courtType:', courtType);
+  console.log('CourtList - all courts:', courts);
+
   // Filter courts based on selected type
   const filteredCourts = courtType === 'all' 
     ? courts 
-    : courts.filter(court => court.type === courtType);
+    : courts.filter(court => {
+        console.log('Filtering court:', court.name, 'type:', court.type, 'matches:', court.type === courtType);
+        return court.type === courtType;
+      });
+
+  console.log('CourtList - filtered courts:', filteredCourts);
 
   if (loading) {
     return (
@@ -33,14 +41,27 @@ export function CourtList({ courtType, onSelectCourt }: CourtListProps) {
     );
   }
 
+  if (courts.length === 0) {
+    return (
+      <View style={styles.emptyContainer}>
+        <Text style={styles.emptyText}>Hiç kort bulunamadı</Text>
+      </View>
+    );
+  }
+
   if (filteredCourts.length === 0) {
     return (
       <View style={styles.emptyContainer}>
         <Text style={styles.emptyText}>
-          {courtType === 'all' 
-            ? 'Uygun kort bulunamadı' 
-            : `${courtType === 'padel' ? 'Padel' : 'Pickleball'} kortu bulunamadı`
+          {courtType === 'padel' 
+            ? 'Padel kortu bulunamadı' 
+            : courtType === 'pickleball'
+            ? 'Pickleball kortu bulunamadı'
+            : 'Uygun kort bulunamadı'
           }
+        </Text>
+        <Text style={styles.emptySubtext}>
+          Lütfen farklı bir kort türü seçin veya daha sonra tekrar deneyin.
         </Text>
       </View>
     );
@@ -117,10 +138,20 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
     padding: 40,
+    backgroundColor: colors.background.secondary,
+    borderRadius: 16,
+    marginTop: 20,
   },
   emptyText: {
+    fontFamily: 'Inter-Bold',
+    fontSize: 18,
+    color: colors.text.disabled,
+    textAlign: 'center',
+    marginBottom: 8,
+  },
+  emptySubtext: {
     fontFamily: 'Inter-Medium',
-    fontSize: 16,
+    fontSize: 14,
     color: colors.text.disabled,
     textAlign: 'center',
   },

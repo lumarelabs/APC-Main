@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React from 'react';
 import { View, Text, StyleSheet, Modal, TouchableOpacity, ScrollView } from 'react-native';
 import { X, ArrowRight } from 'lucide-react-native';
 import { router } from 'expo-router';
@@ -19,28 +19,21 @@ export const ServiceDetailsModal = ({
   onNavigateToBooking,
   onNavigateToTournaments 
 }: ServiceDetailsModalProps) => {
-  
-  // Reset modal state when closing to prevent flash
-  useEffect(() => {
-    if (!isVisible) {
-      // Small delay to ensure modal is fully closed before resetting
-      const timer = setTimeout(() => {
-        // Reset any internal state if needed
-      }, 300);
-      return () => clearTimeout(timer);
-    }
-  }, [isVisible]);
 
   const handleNavigateToBooking = () => {
     onClose();
-    // Navigate to booking tab
-    router.push('/(tabs)/book');
+    // Small delay to ensure modal is fully closed before navigation
+    setTimeout(() => {
+      router.push('/(tabs)/book');
+    }, 100);
   };
 
   const handleNavigateToTournaments = () => {
     onClose();
     // Scroll to tournaments section on the same page
-    onNavigateToTournaments?.();
+    setTimeout(() => {
+      onNavigateToTournaments?.();
+    }, 100);
   };
 
   const renderContent = () => {
@@ -113,8 +106,15 @@ export const ServiceDetailsModal = ({
             </TouchableOpacity>
           </>
         );
+      default:
+        return null;
     }
   };
+
+  // Only render modal content if visible and serviceType is valid
+  if (!isVisible || !serviceType) {
+    return null;
+  }
 
   return (
     <Modal

@@ -13,13 +13,18 @@ export default function MatchesScreen() {
   const today = new Date();
   today.setHours(0, 0, 0, 0);
 
-  const upcomingBookings = bookings.filter(booking => {
+  // Remove duplicates by using a Set with booking IDs
+  const uniqueBookings = bookings.filter((booking, index, self) => 
+    index === self.findIndex(b => b.id === booking.id)
+  );
+
+  const upcomingBookings = uniqueBookings.filter(booking => {
     const bookingDate = new Date(booking.date);
     bookingDate.setHours(0, 0, 0, 0);
     return bookingDate >= today;
   });
   
-  const pastBookings = bookings.filter(booking => {
+  const pastBookings = uniqueBookings.filter(booking => {
     const bookingDate = new Date(booking.date);
     bookingDate.setHours(0, 0, 0, 0);
     return bookingDate < today;
@@ -91,7 +96,7 @@ export default function MatchesScreen() {
           ) : (
             displayBookings.map((booking) => (
               <MatchCard 
-                key={booking.id}
+                key={`${booking.id}-${activeTab}`} // Unique key to prevent React warnings
                 courtName={booking.court?.name || 'Bilinmeyen Kort'}
                 courtType={booking.court?.type || 'padel'}
                 date={new Date(booking.date).toLocaleDateString('tr-TR', {

@@ -1,10 +1,28 @@
 import React, { useState } from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, Modal, ScrollView } from 'react-native';
-import { Calendar } from 'react-native-calendars';
+import { Calendar, LocaleConfig } from 'react-native-calendars';
 import { X, Calendar as CalendarIcon, Clock, Users } from 'lucide-react-native';
 import { format } from 'date-fns';
 import { tr } from 'date-fns/locale/tr';
 import { colors } from '@/app/theme/colors';
+
+// Configure Turkish locale for react-native-calendars
+LocaleConfig.locales['tr'] = {
+  monthNames: [
+    'Ocak', 'Şubat', 'Mart', 'Nisan', 'Mayıs', 'Haziran',
+    'Temmuz', 'Ağustos', 'Eylül', 'Ekim', 'Kasım', 'Aralık'
+  ],
+  monthNamesShort: [
+    'Oca', 'Şub', 'Mar', 'Nis', 'May', 'Haz',
+    'Tem', 'Ağu', 'Eyl', 'Eki', 'Kas', 'Ara'
+  ],
+  dayNames: [
+    'Pazar', 'Pazartesi', 'Salı', 'Çarşamba', 'Perşembe', 'Cuma', 'Cumartesi'
+  ],
+  dayNamesShort: ['Paz', 'Pzt', 'Sal', 'Çar', 'Per', 'Cum', 'Cmt'],
+  today: 'Bugün'
+};
+LocaleConfig.defaultLocale = 'tr';
 
 export type Booking = {
   id: string;
@@ -117,8 +135,8 @@ export function BookingCalendar({ bookings }: BookingCalendarProps) {
         markedDates={markedDates}
         enableSwipeMonths={true}
         onDayPress={handleDayPress}
-        monthFormat={'MMMM yyyy'}
         firstDay={1}
+        locale={'tr'}
       />
 
       {/* Day Details Modal */}
@@ -234,6 +252,7 @@ const styles = StyleSheet.create({
     fontSize: 18,
     color: colors.charcoal,
     flex: 1,
+    textTransform: 'capitalize',
   },
   closeButton: {
     padding: 4,
