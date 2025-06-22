@@ -214,28 +214,47 @@ export class MatchesService {
 
       const matchIds = userMatchIds.map(mp => mp.match_id);
 
-      // Now get the full match data
-      const { data, error } = await supabase
+      // Get the matches data without nested players to avoid recursion
+      const { data: matches, error: matchesError } = await supabase
         .from('matches')
         .select(`
           *,
           booking:bookings(
             *,
             court:courts(*)
-          ),
-          players:match_players(
-            *,
-            user:users(*)
           )
         `)
         .in('id', matchIds)
         .order('created_at', { ascending: false });
 
-      if (error) {
-        handleDatabaseError(error, 'fetch user matches');
+      if (matchesError) {
+        handleDatabaseError(matchesError, 'fetch user matches');
       }
 
-      return data || [];
+      if (!matches || matches.length === 0) {
+        return [];
+      }
+
+      // Separately fetch match players with user data
+      const { data: matchPlayers, error: playersError } = await supabase
+        .from('match_players')
+        .select(`
+          *,
+          user:users(*)
+        `)
+        .in('match_id', matchIds);
+
+      if (playersError) {
+        handleDatabaseError(playersError, 'fetch match players');
+      }
+
+      // Combine the data in application logic
+      const matchesWithPlayers = matches.map(match => ({
+        ...match,
+        players: (matchPlayers || []).filter(player => player.match_id === match.id)
+      }));
+
+      return matchesWithPlayers;
     } catch (error) {
       handleDatabaseError(error, 'fetch user matches');
       return [];
