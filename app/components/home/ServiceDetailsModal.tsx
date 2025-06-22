@@ -1,6 +1,7 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { View, Text, StyleSheet, Modal, TouchableOpacity, ScrollView } from 'react-native';
 import { X, ArrowRight } from 'lucide-react-native';
+import { router } from 'expo-router';
 import { colors } from '@/app/theme/colors';
 
 type ServiceDetailsModalProps = {
@@ -18,6 +19,30 @@ export const ServiceDetailsModal = ({
   onNavigateToBooking,
   onNavigateToTournaments 
 }: ServiceDetailsModalProps) => {
+  
+  // Reset modal state when closing to prevent flash
+  useEffect(() => {
+    if (!isVisible) {
+      // Small delay to ensure modal is fully closed before resetting
+      const timer = setTimeout(() => {
+        // Reset any internal state if needed
+      }, 300);
+      return () => clearTimeout(timer);
+    }
+  }, [isVisible]);
+
+  const handleNavigateToBooking = () => {
+    onClose();
+    // Navigate to booking tab
+    router.push('/(tabs)/book');
+  };
+
+  const handleNavigateToTournaments = () => {
+    onClose();
+    // Scroll to tournaments section on the same page
+    onNavigateToTournaments?.();
+  };
+
   const renderContent = () => {
     switch (serviceType) {
       case 'court':
@@ -39,7 +64,7 @@ export const ServiceDetailsModal = ({
             </View>
             <TouchableOpacity 
               style={styles.actionButton}
-              onPress={onNavigateToBooking}
+              onPress={handleNavigateToBooking}
             >
               <Text style={styles.actionButtonText}>Rezervasyon Yap</Text>
               <ArrowRight size={20} color={colors.white} />
@@ -51,7 +76,7 @@ export const ServiceDetailsModal = ({
           <>
             <Text style={styles.title}>Padel Dersleri</Text>
             <Text style={styles.description}>
-              Dersler. Deneyimli eğitmenlerimizden ders alın. Başlangıç seviyesinden ileri seviyeye kadar tüm seviyelerde dersler mevcuttur.
+              Profesyonel eğitmenlerden özel ders alın. Deneyimli eğitmenlerimizden ders alın. Başlangıç seviyesinden ileri seviyeye kadar tüm seviyelerde dersler mevcuttur.
             </Text>
             <View style={styles.priceContainer}>
               <View style={styles.priceItem}>
@@ -65,7 +90,7 @@ export const ServiceDetailsModal = ({
             </View>
             <TouchableOpacity 
               style={styles.actionButton}
-              onPress={onNavigateToBooking}
+              onPress={handleNavigateToBooking}
             >
               <Text style={styles.actionButtonText}>Ders Rezervasyonu</Text>
               <ArrowRight size={20} color={colors.white} />
@@ -81,10 +106,7 @@ export const ServiceDetailsModal = ({
             </Text>
             <TouchableOpacity 
               style={styles.actionButton}
-              onPress={() => {
-                onClose();
-                onNavigateToTournaments?.();
-              }}
+              onPress={handleNavigateToTournaments}
             >
               <Text style={styles.actionButtonText}>Yaklaşan Turnuvalara Git</Text>
               <ArrowRight size={20} color={colors.white} />

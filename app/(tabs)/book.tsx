@@ -11,11 +11,11 @@ import { RacketRental } from '@/app/components/booking/RacketRental';
 import { PaymentSummary } from '@/app/components/booking/PaymentSummary';
 import { LessonBooking } from '@/app/components/booking/LessonBooking';
 import { ChevronLeft } from 'lucide-react-native';
-import { useUserBookings, useCourts } from '@/app/hooks/useSupabaseData';
+import { useAllBookings, useCourts } from '@/app/hooks/useSupabaseData';
 import { useApp } from '@/app/context/AppContext';
 import { colors } from '@/app/theme/colors';
 
-type BookingStep = 'type-selection' | 'court-selection' | 'lesson-booking' | 'date-time' | 'racket-rental' | 'payment';
+type BookingStep = 'court-selection' | 'lesson-booking' | 'date-time' | 'racket-rental' | 'payment';
 type CalendarViewMode = 'weekly' | 'monthly';
 type BookingType = 'court' | 'lesson';
 
@@ -26,11 +26,11 @@ export default function BookScreen() {
   const [selectedDate, setSelectedDate] = useState<string | null>(null);
   const [selectedTime, setSelectedTime] = useState<string | null>(null);
   const [racketCount, setRacketCount] = useState(0);
-  const [currentStep, setCurrentStep] = useState<BookingStep>('type-selection');
+  const [currentStep, setCurrentStep] = useState<BookingStep>('court-selection');
   const [calendarViewMode, setCalendarViewMode] = useState<CalendarViewMode>('weekly');
 
   const { createBooking } = useApp();
-  const { bookings } = useUserBookings();
+  const { bookings } = useAllBookings(); // Use all bookings for calendar display
   const { courts } = useCourts();
 
   const handleBack = () => {
@@ -52,23 +52,24 @@ export default function BookScreen() {
         setSelectedTime(null);
         break;
       case 'lesson-booking':
-        setCurrentStep('type-selection');
+        setCurrentStep('court-selection');
         break;
       case 'court-selection':
         if (selectedCourt) {
           setSelectedCourt(null);
-        } else {
-          setCurrentStep('type-selection');
         }
-        break;
-      case 'type-selection':
-        // Can't go back from first step
         break;
     }
   };
 
-  const handleBookingTypeSelect = (type: BookingType) => {
+  const handleBookingTypeToggle = (type: BookingType) => {
     setBookingType(type);
+    // Reset selections when switching types
+    setSelectedCourt(null);
+    setSelectedDate(null);
+    setSelectedTime(null);
+    setRacketCount(0);
+    
     if (type === 'lesson') {
       setCurrentStep('lesson-booking');
     } else {
@@ -128,7 +129,7 @@ export default function BookScreen() {
               setSelectedDate(null);
               setSelectedTime(null);
               setRacketCount(0);
-              setCurrentStep('type-selection');
+              setCurrentStep('court-selection');
               setBookingType('court');
             }
           }
@@ -182,26 +183,6 @@ export default function BookScreen() {
 
   const renderBookingStep = () => {
     switch (currentStep) {
-      case 'type-selection':
-        return (
-          <View style={styles.typeSelection}>
-            <Text style={styles.stepTitle}>Rezervasyon Türü Seçin</Text>
-            <TouchableOpacity 
-              style={styles.typeCard}
-              onPress={() => handleBookingTypeSelect('court')}
-            >
-              <Text style={styles.typeCardTitle}>Kort Rezervasyonu</Text>
-              <Text style={styles.typeCardDescription}>Kort kiralayın ve oyununuzu planlayın</Text>
-            </TouchableOpacity>
-            <TouchableOpacity 
-              style={styles.typeCard}
-              onPress={() => handleBookingTypeSelect('lesson')}
-            >
-              <Text style={styles.typeCardTitle}>Ders Rezervasyonu</Text>
-              <Text style={styles.typeCardDescription}>Profesyonel eğitmenlerden ders alın</Text>
-            </TouchableOpacity>
-          </View>
-        );
       case 'court-selection':
         return (
           <View style={styles.courtList}>
@@ -271,7 +252,7 @@ export default function BookScreen() {
         {/* Top Half - Booking Section */}
         <View style={styles.topSection}>
           <View style={styles.header}>
-            {currentStep !== 'type-selection' && (
+            {(currentStep !== 'court-selection' || selectedCourt) && (
               <TouchableOpacity 
                 style={styles.backButton} 
                 onPress={handleBack}
@@ -279,12 +260,41 @@ export default function BookScreen() {
                 <ChevronLeft size={24} color={colors.charcoal} />
               </TouchableOpacity>
             )}
-            <Text style={styles.headerTitle}>
-              {bookingType === 'lesson' ? 'Ders Rezervasyonu' : 'Kort Rezervasyonu'}
-            </Text>
+            
+            {/* Booking Type Selector */}
+            <View style={styles.bookingTypeSelector}>
+              <TouchableOpacity
+                style={[
+                  styles.bookingTypeButton,
+                  bookingType === 'court' && styles.activeBookingTypeButton
+                ]}
+                onPress={() => handleBookingTypeToggle('court')}
+              >
+                <Text style={[
+                  styles.bookingTypeText,
+                  bookingType === 'court' && styles.activeBookingTypeText
+                ]}>
+                  Kort Rezervasyonu
+                </Text>
+              </TouchableOpacity>
+              <TouchableOpacity
+                style={[
+                  styles.bookingTypeButton,
+                  bookingType === 'lesson' && styles.activeBookingTypeButton
+                ]}
+                onPress={() => handleBookingTypeToggle('lesson')}
+              >
+                <Text style={[
+                  styles.bookingTypeText,
+                  bookingType === 'lesson' && styles.activeBookingTypeText
+                ]}>
+                  Ders Rezervasyonu
+                </Text>
+              </TouchableOpacity>
+            </View>
           </View>
           
-          {currentStep === 'court-selection' && (
+          {currentStep === 'court-selection' && bookingType === 'court' && (
             <CourtTypeSelector
               selectedType={courtType}
               onSelectType={setCourtType}
@@ -297,7 +307,7 @@ export default function BookScreen() {
         </View>
 
         {/* Bottom Half - Calendar and Bookings */}
-        {(currentStep === 'type-selection' || currentStep === 'court-selection' || currentStep === 'date-time') && (
+        {(currentStep === 'court-selection' || currentStep === 'date-time') && (
           <View style={styles.bottomSection}>
             {/* Calendar View Selector */}
             <View style={styles.viewSelector}>
@@ -347,8 +357,6 @@ const styles = StyleSheet.create({
     backgroundColor: colors.background.primary,
   },
   header: {
-    flexDirection: 'row',
-    alignItems: 'center',
     paddingHorizontal: 16,
     paddingVertical: 12,
     backgroundColor: colors.secondary,
@@ -357,14 +365,36 @@ const styles = StyleSheet.create({
   backButton: {
     position: 'absolute',
     left: 16,
+    top: 12,
     zIndex: 1,
   },
-  headerTitle: {
+  bookingTypeSelector: {
+    flexDirection: 'row',
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: colors.background.primary,
+    borderRadius: 25,
+    padding: 4,
+    marginHorizontal: 20,
+  },
+  bookingTypeButton: {
     flex: 1,
-    textAlign: 'center',
+    paddingVertical: 12,
+    paddingHorizontal: 16,
+    borderRadius: 20,
+    alignItems: 'center',
+  },
+  activeBookingTypeButton: {
+    backgroundColor: colors.primary,
+  },
+  bookingTypeText: {
+    fontFamily: 'Inter-Medium',
+    fontSize: 14,
+    color: colors.text.disabled,
+  },
+  activeBookingTypeText: {
     fontFamily: 'Inter-Bold',
-    fontSize: 20,
-    color: colors.charcoal,
+    color: colors.white,
   },
   topSection: {
     paddingTop: 16,
@@ -372,35 +402,6 @@ const styles = StyleSheet.create({
   },
   bookingContent: {
     paddingHorizontal: 16,
-  },
-  typeSelection: {
-    padding: 16,
-  },
-  stepTitle: {
-    fontFamily: 'Inter-Bold',
-    fontSize: 24,
-    color: colors.charcoal,
-    marginBottom: 24,
-    textAlign: 'center',
-  },
-  typeCard: {
-    backgroundColor: colors.background.secondary,
-    borderRadius: 16,
-    padding: 20,
-    marginBottom: 16,
-    alignItems: 'center',
-  },
-  typeCardTitle: {
-    fontFamily: 'Inter-Bold',
-    fontSize: 18,
-    color: colors.charcoal,
-    marginBottom: 8,
-  },
-  typeCardDescription: {
-    fontFamily: 'Inter-Regular',
-    fontSize: 14,
-    color: colors.text.disabled,
-    textAlign: 'center',
   },
   courtList: {
     marginBottom: 8,

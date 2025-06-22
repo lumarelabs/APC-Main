@@ -9,7 +9,12 @@ type CourtListProps = {
 };
 
 export function CourtList({ courtType, onSelectCourt }: CourtListProps) {
-  const { courts, loading, error } = useCourts(courtType === 'all' ? undefined : courtType);
+  const { courts, loading, error } = useCourts();
+
+  // Filter courts based on selected type
+  const filteredCourts = courtType === 'all' 
+    ? courts 
+    : courts.filter(court => court.type === courtType);
 
   if (loading) {
     return (
@@ -28,10 +33,15 @@ export function CourtList({ courtType, onSelectCourt }: CourtListProps) {
     );
   }
 
-  if (courts.length === 0) {
+  if (filteredCourts.length === 0) {
     return (
       <View style={styles.emptyContainer}>
-        <Text style={styles.emptyText}>Uygun kort bulunamadı</Text>
+        <Text style={styles.emptyText}>
+          {courtType === 'all' 
+            ? 'Uygun kort bulunamadı' 
+            : `${courtType === 'padel' ? 'Padel' : 'Pickleball'} kortu bulunamadı`
+          }
+        </Text>
       </View>
     );
   }
@@ -41,7 +51,7 @@ export function CourtList({ courtType, onSelectCourt }: CourtListProps) {
       <Text style={styles.title}>Kort Seçiniz</Text>
       
       <FlatList
-        data={courts}
+        data={filteredCourts}
         keyExtractor={(item) => item.id}
         numColumns={2}
         contentContainerStyle={styles.listContent}

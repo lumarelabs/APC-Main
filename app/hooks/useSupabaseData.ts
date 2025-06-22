@@ -39,6 +39,37 @@ export function useCourts(type?: 'padel' | 'pickleball') {
   return { courts, loading, error, refetch: fetchCourts };
 }
 
+// All bookings hook (for showing all users' bookings in calendar)
+export function useAllBookings() {
+  const [bookings, setBookings] = useState<any[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+
+  const fetchAllBookings = useCallback(async () => {
+    try {
+      setLoading(true);
+      setError(null);
+      
+      // Get all confirmed bookings from today onwards
+      const today = new Date().toISOString().split('T')[0];
+      const data = await BookingsService.getBookingsByDateRange(today, '2025-12-31');
+      
+      setBookings(data);
+    } catch (err: any) {
+      setError(err.message);
+      console.error('Error fetching all bookings:', err);
+    } finally {
+      setLoading(false);
+    }
+  }, []);
+
+  useEffect(() => {
+    fetchAllBookings();
+  }, [fetchAllBookings]);
+
+  return { bookings, loading, error, refetch: fetchAllBookings };
+}
+
 // User bookings hook with real-time updates
 export function useUserBookings() {
   const { user } = useAuth();

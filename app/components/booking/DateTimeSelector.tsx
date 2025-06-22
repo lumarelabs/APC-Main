@@ -13,8 +13,8 @@ export function DateTimeSelector({ onSelectDateTime }: DateTimeSelectorProps) {
   const [calendarVisible, setCalendarVisible] = useState(false);
 
   const timeSlots = [
-    '09:00', '10:30', '12:00', '13:30', '15:00', 
-    '16:30', '18:00', '19:30', '21:00'
+    '09:00 - 10:00', '10:30 - 11:30', '12:00 - 13:00', '13:30 - 14:30', 
+    '15:00 - 16:00', '16:30 - 17:30', '18:00 - 19:00', '19:30 - 20:30', '21:00 - 22:00'
   ];
 
   const handleDateSelect = (date: string) => {
@@ -29,16 +29,26 @@ export function DateTimeSelector({ onSelectDateTime }: DateTimeSelectorProps) {
     }
   };
 
+  const formatDisplayDate = (dateString: string) => {
+    const date = new Date(dateString);
+    return date.toLocaleDateString('tr-TR', {
+      day: 'numeric',
+      month: 'long',
+      year: 'numeric',
+      weekday: 'long'
+    });
+  };
+
   return (
     <View style={styles.container}>
       <View style={styles.dateSection}>
-        <Text style={styles.sectionTitle}>Select Date & Time</Text>
+        <Text style={styles.sectionTitle}>Tarih & Saat Seçin</Text>
         <TouchableOpacity 
           style={styles.dateButton} 
           onPress={() => setCalendarVisible(true)}
         >
           <Text style={styles.dateButtonText}>
-            {selectedDate || 'Select Date'}
+            {selectedDate ? formatDisplayDate(selectedDate) : 'Tarih Seçin'}
           </Text>
         </TouchableOpacity>
       </View>
@@ -77,24 +87,30 @@ export function DateTimeSelector({ onSelectDateTime }: DateTimeSelectorProps) {
             <Calendar
               onDayPress={({ dateString }) => handleDateSelect(dateString)}
               markedDates={selectedDate ? {
-                [selectedDate]: { selected: true, selectedColor: '#16FF91' }
+                [selectedDate]: { selected: true, selectedColor: colors.primary }
               } : {}}
               theme={{
-                calendarBackground: '#22293A',
-                monthTextColor: '#16FF91',
-                dayTextColor: '#FFFFFF',
-                textDisabledColor: '#8F98A8',
-                selectedDayBackgroundColor: '#16FF91',
-                selectedDayTextColor: '#000000',
-                todayTextColor: '#32D1FF',
-                arrowColor: '#16FF91',
+                calendarBackground: colors.background.secondary,
+                monthTextColor: colors.primary,
+                dayTextColor: colors.charcoal,
+                textDisabledColor: colors.text.disabled,
+                selectedDayBackgroundColor: colors.primary,
+                selectedDayTextColor: colors.white,
+                todayTextColor: colors.primary,
+                arrowColor: colors.primary,
+                textDayFontFamily: 'Inter-Medium',
+                textMonthFontFamily: 'Inter-Bold',
+                textDayHeaderFontFamily: 'Inter-Medium',
               }}
+              monthFormat={'MMMM yyyy'}
+              firstDay={1}
+              minDate={new Date().toISOString().split('T')[0]}
             />
             <TouchableOpacity 
               style={styles.closeButton}
               onPress={() => setCalendarVisible(false)}
             >
-              <Text style={styles.closeButtonText}>Close</Text>
+              <Text style={styles.closeButtonText}>Kapat</Text>
             </TouchableOpacity>
           </View>
         </View>
@@ -128,7 +144,7 @@ const styles = StyleSheet.create({
   dateButtonText: {
     fontFamily: 'Inter-Bold',
     fontSize: 16,
-    color: '#000000',
+    color: colors.white,
   },
   timeSection: {
     flexGrow: 0,
@@ -138,7 +154,7 @@ const styles = StyleSheet.create({
     borderRadius: 8,
     padding: 12,
     marginRight: 8,
-    minWidth: 80,
+    minWidth: 120,
     alignItems: 'center',
   },
   selectedTimeSlot: {
@@ -150,7 +166,7 @@ const styles = StyleSheet.create({
     color: colors.text.primary,
   },
   selectedTimeText: {
-    color: '#000000',
+    color: colors.white,
     fontFamily: 'Inter-Bold',
   },
   modalOverlay: {
@@ -175,6 +191,6 @@ const styles = StyleSheet.create({
   closeButtonText: {
     fontFamily: 'Inter-Bold',
     fontSize: 16,
-    color: '#000000',
+    color: colors.white,
   },
-}); 
+});
