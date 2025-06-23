@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
+import { View, Text, StyleSheet, TouchableOpacity, Alert } from 'react-native';
 import { colors } from '@/app/theme/colors';
 
 type LessonType = 'private' | 'group';
@@ -29,8 +29,12 @@ export function LessonBooking({ onComplete }: LessonBookingProps) {
   ];
 
   const handleLessonSelect = (type: LessonType, price: number) => {
-    setSelectedType(type);
-    onComplete({ type, price });
+    // Show construction popup instead of proceeding
+    Alert.alert(
+      'Yapım Aşamasında',
+      'Ders rezervasyon sistemi şu anda geliştirilme aşamasındadır. Yakında hizmete sunulacaktır.',
+      [{ text: 'Tamam', style: 'default' }]
+    );
   };
 
   return (
@@ -44,21 +48,35 @@ export function LessonBooking({ onComplete }: LessonBookingProps) {
             key={lesson.type}
             style={[
               styles.lessonCard,
+              styles.disabledLessonCard, // Always show as disabled
               selectedType === lesson.type && styles.selectedLessonCard
             ]}
             onPress={() => handleLessonSelect(lesson.type, lesson.price)}
           >
             <View style={styles.lessonHeader}>
-              <Text style={styles.lessonTitle}>{lesson.title}</Text>
-              <Text style={styles.lessonPrice}>₺{lesson.price}</Text>
+              <Text style={[styles.lessonTitle, styles.disabledText]}>
+                {lesson.title}
+              </Text>
+              <Text style={[styles.lessonPrice, styles.disabledText]}>
+                ₺{lesson.price}
+              </Text>
             </View>
-            <Text style={styles.lessonDescription}>{lesson.description}</Text>
-            <Text style={styles.lessonDuration}>{lesson.duration}</Text>
+            <Text style={[styles.lessonDescription, styles.disabledText]}>
+              {lesson.description}
+            </Text>
+            <Text style={[styles.lessonDuration, styles.disabledText]}>
+              {lesson.duration}
+            </Text>
             {lesson.type === 'group' && (
-              <Text style={styles.lessonNote}>
+              <Text style={[styles.lessonNote, styles.disabledText]}>
                 * Kişi başı ücret, 3 haftalık toplam program
               </Text>
             )}
+            
+            {/* Construction badge */}
+            <View style={styles.constructionBadge}>
+              <Text style={styles.constructionText}>Yapım Aşamasında</Text>
+            </View>
           </TouchableOpacity>
         ))}
       </View>
@@ -111,6 +129,11 @@ const styles = StyleSheet.create({
     marginBottom: 12,
     borderWidth: 2,
     borderColor: 'transparent',
+    position: 'relative',
+  },
+  disabledLessonCard: {
+    opacity: 0.6,
+    backgroundColor: colors.background.tertiary,
   },
   selectedLessonCard: {
     borderColor: colors.primary,
@@ -149,6 +172,23 @@ const styles = StyleSheet.create({
     color: colors.primary,
     marginTop: 8,
     fontStyle: 'italic',
+  },
+  disabledText: {
+    color: colors.text.disabled,
+  },
+  constructionBadge: {
+    position: 'absolute',
+    top: 12,
+    right: 12,
+    backgroundColor: colors.status.warning,
+    paddingHorizontal: 8,
+    paddingVertical: 4,
+    borderRadius: 8,
+  },
+  constructionText: {
+    fontFamily: 'Inter-Bold',
+    fontSize: 10,
+    color: colors.white,
   },
   infoBox: {
     backgroundColor: colors.background.secondary,
