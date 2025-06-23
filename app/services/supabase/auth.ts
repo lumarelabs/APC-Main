@@ -98,7 +98,7 @@ export class AuthService {
                     user.email?.split('@')[0] || 
                     'User',
           email: user.email,
-          level: 'Başlangıç',
+          level: user.user_metadata?.level || 'Başlangıç', // FIXED: Use level from metadata
           role: 'user',
           profile_image_url: user.user_metadata?.avatar_url || 
                             user.user_metadata?.picture || 
@@ -217,7 +217,8 @@ export class AuthService {
     }
   }
 
-  async signUp(email: string, password: string, fullName?: string): Promise<void> {
+  // FIXED: Add skill level parameter
+  async signUp(email: string, password: string, fullName?: string, level?: string): Promise<void> {
     try {
       this.updateState({ loading: true, error: null });
       
@@ -239,7 +240,8 @@ export class AuthService {
         password,
         options: {
           data: {
-            full_name: fullName.trim()
+            full_name: fullName.trim(),
+            level: level || 'Başlangıç' // FIXED: Include skill level
           }
         }
       });

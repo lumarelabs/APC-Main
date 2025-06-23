@@ -29,11 +29,10 @@ export default function BookScreen() {
   const [currentStep, setCurrentStep] = useState<BookingStep>('court-selection');
   const [calendarViewMode, setCalendarViewMode] = useState<CalendarViewMode>('weekly');
 
-  // FIXED: Add scroll ref to control scrolling
   const scrollViewRef = useRef<ScrollView>(null);
 
   const { createBooking } = useApp();
-  const { bookings } = useAllBookings(); // Use all bookings for calendar display
+  const { bookings } = useAllBookings();
   const { courts } = useCourts();
 
   const handleBack = () => {
@@ -63,11 +62,12 @@ export default function BookScreen() {
         }
         break;
     }
+    // Always scroll to top when going back
+    scrollViewRef.current?.scrollTo({ y: 0, animated: true });
   };
 
   const handleBookingTypeToggle = (type: BookingType) => {
     setBookingType(type);
-    // Reset selections when switching types
     setSelectedCourt(null);
     setSelectedDate(null);
     setSelectedTime(null);
@@ -78,6 +78,7 @@ export default function BookScreen() {
     } else {
       setCurrentStep('court-selection');
     }
+    scrollViewRef.current?.scrollTo({ y: 0, animated: true });
   };
 
   const handleDateTimeSelected = (date: string, time: string) => {
@@ -88,7 +89,6 @@ export default function BookScreen() {
   const handleDateTimeConfirm = () => {
     if (selectedDate && selectedTime) {
       setCurrentStep('racket-rental');
-      // FIXED: Scroll to top when moving to next step
       scrollViewRef.current?.scrollTo({ y: 0, animated: true });
     }
   };
@@ -96,7 +96,6 @@ export default function BookScreen() {
   const handleRacketRentalComplete = (count: number) => {
     setRacketCount(count);
     setCurrentStep('payment');
-    // FIXED: Scroll to top when moving to payment
     scrollViewRef.current?.scrollTo({ y: 0, animated: true });
   };
 
@@ -107,11 +106,18 @@ export default function BookScreen() {
         return;
       }
 
-      // Parse time to get start and end times
       const timeRange = selectedTime.includes(' - ') ? selectedTime : `${selectedTime} - ${selectedTime}`;
       const [startTime] = timeRange.split(' - ');
       const startHour = parseInt(startTime.split(':')[0]);
       const endTime = `${(startHour + 1).toString().padStart(2, '0')}:00`;
+
+      // FIXED: Calculate dynamic pricing based on time
+      let finalPrice = selectedCourt.price_per_hour / 100; // Convert from cents to TL
+      
+      // Add 300 TL if booking is after 8:30 PM (20:30)
+      if (startHour >= 20 && parseInt(startTime.split(':')[1]) >= 30) {
+        finalPrice += 300;
+      }
 
       const bookingData = {
         court_id: selectedCourt.id,
@@ -127,12 +133,11 @@ export default function BookScreen() {
       
       Alert.alert(
         'Başarılı!', 
-        'Rezervasyonunuz onaylandı.',
+        `Rezervasyonunuz onaylandı. ${finalPrice > selectedCourt.price_per_hour / 100 ? 'Gece tarifesi uygulandı.' : ''}`,
         [
           {
             text: 'Tamam',
             onPress: () => {
-              // Reset form and scroll to top
               setSelectedCourt(null);
               setSelectedDate(null);
               setSelectedTime(null);
@@ -149,10 +154,9 @@ export default function BookScreen() {
     }
   };
 
-  // Transform bookings for calendar display - show ALL future bookings from ALL users
+  // Transform bookings for calendar display
   const existingBookings: Record<string, any[]> = {};
   
-  // Filter to show only future bookings
   const today = new Date();
   today.setHours(0, 0, 0, 0);
   
@@ -186,7 +190,7 @@ export default function BookScreen() {
             name: 'Kullanıcı',
             skillLevel: 'Orta'
           }
-        ] // Mock player data - in real app this would come from matches/players data
+        ]
       });
     });
 
@@ -200,7 +204,6 @@ export default function BookScreen() {
               onSelectCourt={(court) => {
                 setSelectedCourt(court);
                 setCurrentStep('date-time');
-                // FIXED: Scroll to top when court is selected
                 scrollViewRef.current?.scrollTo({ y: 0, animated: true });
               }}
             />
@@ -210,7 +213,6 @@ export default function BookScreen() {
         return (
           <LessonBooking
             onComplete={(lessonData) => {
-              // Set a default court for lessons (you might want to handle this differently)
               const padelCourts = courts.filter(court => court.type === 'padel');
               if (padelCourts.length > 0) {
                 setSelectedCourt(padelCourts[0]);
@@ -243,13 +245,23 @@ export default function BookScreen() {
           />
         );
       case 'payment':
+        // FIXED: Calculate dynamic pricing for payment summary
+        let courtPrice = selectedCourt.price_per_hour / 100;
+        if (selectedTime) {
+          const [startTime] = selectedTime.split(' - ');
+          const startHour = parseInt(startTime.split(':')[0]);
+          if (startHour >= 20 && parseInt(startTime.split(':')[1]) >= 30) {
+            courtPrice += 300;
+          }
+        }
+        
         return (
           <PaymentSummary
             courtName={selectedCourt.name}
             courtType={selectedCourt.type}
             date={selectedDate!}
             time={selectedTime!}
-            courtPrice={selectedCourt.price_per_hour / 100}
+            courtPrice={courtPrice}
             racketCount={racketCount}
             racketPrice={100}
             onConfirm={handlePaymentConfirm}
@@ -327,7 +339,7 @@ export default function BookScreen() {
         {/* Bottom Half - Calendar and Bookings */}
         {(currentStep === 'court-selection' || currentStep === 'date-time') && (
           <View style={styles.bottomSection}>
-            {/* Calendar View Selector */}
+            {/* Calendar View Selector - FIXED: Same design as booking type selector */}
             <View style={styles.viewSelector}>
               <TouchableOpacity
                 style={[

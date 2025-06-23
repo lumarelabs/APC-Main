@@ -59,6 +59,6 @@ const styles = StyleSheet.create({
   },
   selectedOptionText: {
     fontFamily: 'Inter-Bold',
-    color: colors.white,
+    color: colors.white, // FIXED: White text when selected
   },
 });

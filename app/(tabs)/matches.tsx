@@ -13,15 +13,15 @@ export default function MatchesScreen() {
   const today = new Date();
   today.setHours(0, 0, 0, 0);
 
-  // FIXED: Remove duplicates more effectively using Set with booking IDs
-  const uniqueBookingIds = new Set();
-  const uniqueBookings = bookings.filter(booking => {
-    if (uniqueBookingIds.has(booking.id)) {
-      return false; // Skip duplicate
+  // FIXED: More robust duplicate removal using Map
+  const uniqueBookingsMap = new Map();
+  bookings.forEach(booking => {
+    const key = `${booking.id}-${booking.date}-${booking.start_time}`;
+    if (!uniqueBookingsMap.has(key)) {
+      uniqueBookingsMap.set(key, booking);
     }
-    uniqueBookingIds.add(booking.id);
-    return true; // Keep unique booking
   });
+  const uniqueBookings = Array.from(uniqueBookingsMap.values());
 
   console.log('Total bookings:', bookings.length);
   console.log('Unique bookings:', uniqueBookings.length);
@@ -60,7 +60,7 @@ export default function MatchesScreen() {
           <Text style={styles.headerTitle}>Maçlarım</Text>
         </View>
 
-        {/* Tabs */}
+        {/* FIXED: Tabs with consistent design */}
         <View style={styles.tabsContainer}>
           <TouchableOpacity 
             style={[styles.tab, activeTab === 'upcoming' && styles.activeTab]}
@@ -105,7 +105,7 @@ export default function MatchesScreen() {
           ) : (
             displayBookings.map((booking) => (
               <MatchCard 
-                key={`match-${booking.id}`} // FIXED: Use unique key prefix
+                key={`match-${booking.id}-${booking.date}`} // FIXED: More unique key
                 courtName={booking.court?.name || 'Bilinmeyen Kort'}
                 courtType={booking.court?.type || 'padel'}
                 date={new Date(booking.date).toLocaleDateString('tr-TR', {
@@ -166,6 +166,7 @@ const styles = StyleSheet.create({
     gap: 8,
   },
   tab: {
+    flex: 1,
     paddingVertical: 12,
     paddingHorizontal: 24,
     borderRadius: 20,
@@ -185,7 +186,7 @@ const styles = StyleSheet.create({
   },
   activeTabText: {
     fontFamily: 'Inter-Bold',
-    color: colors.white,
+    color: colors.white, // FIXED: White text when selected
   },
   content: {
     flex: 1,

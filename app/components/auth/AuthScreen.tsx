@@ -20,6 +20,7 @@ export default function AuthScreen() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [fullName, setFullName] = useState('');
+  const [skillLevel, setSkillLevel] = useState<'Başlangıç' | 'Orta' | 'İleri'>('Başlangıç'); // FIXED: Add skill level
   const [loading, setLoading] = useState(false);
   const [googleLoading, setGoogleLoading] = useState(false);
   const [localError, setLocalError] = useState<string | null>(null);
@@ -30,7 +31,7 @@ export default function AuthScreen() {
   useEffect(() => {
     setLocalError(null);
     if (clearError) clearError();
-  }, [isSignUp, email, password, fullName]);
+  }, [isSignUp, email, password, fullName, skillLevel]);
 
   const handleSubmit = async () => {
     if (!email || !password) {
@@ -53,7 +54,8 @@ export default function AuthScreen() {
       setLocalError(null);
 
       if (isSignUp) {
-        await signUp(email, password, fullName);
+        // FIXED: Pass skill level during signup
+        await signUp(email, password, fullName, skillLevel);
         Alert.alert(
           'Başarılı!', 
           'Hesabınız oluşturuldu. Giriş yapabilirsiniz.',
@@ -64,6 +66,7 @@ export default function AuthScreen() {
                 setIsSignUp(false);
                 setPassword('');
                 setFullName('');
+                setSkillLevel('Başlangıç');
               }
             }
           ]
@@ -96,6 +99,7 @@ export default function AuthScreen() {
     setEmail('');
     setPassword('');
     setFullName('');
+    setSkillLevel('Başlangıç');
     if (clearError) clearError();
   };
 
@@ -122,17 +126,43 @@ export default function AuthScreen() {
 
           <View style={styles.form}>
             {isSignUp && (
-              <View style={styles.inputContainer}>
-                <Text style={styles.label}>Ad Soyad</Text>
-                <TextInput
-                  style={styles.input}
-                  value={fullName}
-                  onChangeText={setFullName}
-                  placeholder="Adınızı ve soyadınızı girin"
-                  placeholderTextColor={colors.text.disabled}
-                  autoCapitalize="words"
-                />
-              </View>
+              <>
+                <View style={styles.inputContainer}>
+                  <Text style={styles.label}>Ad Soyad</Text>
+                  <TextInput
+                    style={styles.input}
+                    value={fullName}
+                    onChangeText={setFullName}
+                    placeholder="Adınızı ve soyadınızı girin"
+                    placeholderTextColor={colors.text.disabled}
+                    autoCapitalize="words"
+                  />
+                </View>
+
+                {/* FIXED: Add skill level selection */}
+                <View style={styles.inputContainer}>
+                  <Text style={styles.label}>Seviye</Text>
+                  <View style={styles.skillLevelContainer}>
+                    {(['Başlangıç', 'Orta', 'İleri'] as const).map((level) => (
+                      <TouchableOpacity
+                        key={level}
+                        style={[
+                          styles.skillLevelButton,
+                          skillLevel === level && styles.skillLevelButtonActive
+                        ]}
+                        onPress={() => setSkillLevel(level)}
+                      >
+                        <Text style={[
+                          styles.skillLevelText,
+                          skillLevel === level && styles.skillLevelTextActive
+                        ]}>
+                          {level}
+                        </Text>
+                      </TouchableOpacity>
+                    ))}
+                  </View>
+                </View>
+              </>
             )}
 
             <View style={styles.inputContainer}>
@@ -268,6 +298,33 @@ const styles = StyleSheet.create({
     color: colors.charcoal,
     borderWidth: 1,
     borderColor: colors.background.tertiary,
+  },
+  skillLevelContainer: {
+    flexDirection: 'row',
+    gap: 8,
+  },
+  skillLevelButton: {
+    flex: 1,
+    paddingVertical: 12,
+    paddingHorizontal: 16,
+    borderRadius: 20,
+    backgroundColor: colors.background.primary,
+    alignItems: 'center',
+    borderWidth: 2,
+    borderColor: 'transparent',
+  },
+  skillLevelButtonActive: {
+    backgroundColor: colors.primary,
+    borderColor: colors.primary,
+  },
+  skillLevelText: {
+    fontFamily: 'Inter-Medium',
+    fontSize: 14,
+    color: colors.text.disabled,
+  },
+  skillLevelTextActive: {
+    fontFamily: 'Inter-Bold',
+    color: colors.white,
   },
   errorContainer: {
     backgroundColor: colors.status.error + '20',

@@ -23,7 +23,7 @@ export const UpcomingBooking = ({
   const typeColor = colors.primary;
 
   return (
-    <View style={styles.container}>
+    <TouchableOpacity style={styles.container} onPress={onPress}>
       <Image source={{ uri: image }} style={styles.image} />
       <View style={styles.content}>
         <View style={[styles.typeBadge, { backgroundColor: colors.primary }]}>
@@ -46,14 +46,18 @@ export const UpcomingBooking = ({
           </View>
         </View>
 
+        {/* FIXED: Only show details button, make it clickable */}
         <TouchableOpacity 
           style={[styles.detailsButton, { borderColor: colors.primary }]}
-          onPress={onPress}
+          onPress={(e) => {
+            e.stopPropagation(); // Prevent parent onPress
+            onPress?.();
+          }}
         >
           <Text style={[styles.detailsButtonText, { color: colors.primary }]}>Detayları Gör</Text>
         </TouchableOpacity>
       </View>
-    </View>
+    </TouchableOpacity>
   );
 };
 

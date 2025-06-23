@@ -1,17 +1,14 @@
 import React, { useState } from 'react';
-import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Image, Linking, Dimensions, Platform, ActivityIndicator } from 'react-native';
+import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Linking, Dimensions, Platform, ActivityIndicator } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Search, Bell, Trophy, GraduationCap, BookOpen, Instagram, MapPin } from 'lucide-react-native';
 import { UpcomingBooking } from '@/app/components/home/UpcomingBooking';
-import { ImageSlider } from '@/app/components/home/ImageSlider';
 import { ServiceDetailsModal } from '@/app/components/home/ServiceDetailsModal';
 import { BookingDetailsModal } from '@/app/components/home/BookingDetailsModal';
 import { useUserBookings } from '@/app/hooks/useSupabaseData';
 import { useApp } from '@/app/context/AppContext';
 import { colors } from '@/app/theme/colors';
 import { router } from 'expo-router';
-import Logo2 from '../../assets/images/logo2.png';
-import RacketImage from '../../assets/images/racket.png';
 
 type Booking = {
   id: string;
@@ -55,6 +52,7 @@ export default function HomeScreen() {
       players: [] // Will be populated from matches data later
     }));
 
+  // FIXED: Use full_name from profile, fallback to email username
   const displayName = profile?.full_name || user?.email?.split('@')[0] || 'Kullanıcı';
 
   const scrollToTournaments = () => {
@@ -78,18 +76,19 @@ export default function HomeScreen() {
   return (
     <SafeAreaView style={styles.safeArea}>
       <ScrollView style={styles.container} contentContainerStyle={styles.contentContainer}>
-        {/* Welcome Header */}
+        {/* FIXED: Responsive Welcome Header */}
         <View style={styles.welcomeHeader}>
-          <View>
-            <Text style={styles.greeting}>Hoş geldin, {displayName}!</Text>
+          <View style={styles.welcomeTextContainer}>
+            <Text style={styles.greeting} numberOfLines={1} adjustsFontSizeToFit>
+              Hoş geldin, {displayName}!
+            </Text>
             <Text style={styles.subtitle}>Oynamaya hazır mısın?</Text>
           </View>
-          <Image source={Logo2} style={styles.topRightLogo} resizeMode="contain" />
+          {/* REMOVED: Logo2 image slider as requested */}
         </View>
 
         {/* Header with About */}
         <View style={styles.headerContainer}>
-          <Image source={RacketImage} style={styles.headerLogo} resizeMode="contain" />
           <View style={styles.aboutContainer}>
             <Text style={styles.aboutTitle}>Alaçatı Padel Club</Text>
             <Text style={styles.aboutText}>
@@ -97,9 +96,6 @@ export default function HomeScreen() {
             </Text>
           </View>
         </View>
-
-        {/* Image Slider */}
-        <ImageSlider />
 
         {/* Upcoming bookings */}
         <View style={styles.section}>
@@ -250,6 +246,10 @@ const styles = StyleSheet.create({
     paddingTop: 16,
     paddingBottom: 8,
   },
+  welcomeTextContainer: {
+    flex: 1,
+    marginRight: 16,
+  },
   greeting: {
     fontFamily: 'Inter-Bold',
     fontSize: 24,
@@ -267,11 +267,6 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     borderBottomWidth: 1,
     borderBottomColor: colors.background.secondary,
-  },
-  headerLogo: {
-    width: 140,
-    height: 140,
-    marginRight: 16,
   },
   aboutContainer: {
     flex: 1,
@@ -425,9 +420,5 @@ const styles = StyleSheet.create({
     fontFamily: 'Inter-Medium',
     fontSize: 14,
     color: colors.primary,
-  },
-  topRightLogo: {
-    width: 130,
-    height: 50,
   },
 });
