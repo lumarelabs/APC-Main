@@ -62,7 +62,6 @@ export default function BookScreen() {
         }
         break;
     }
-    // Always scroll to top when going back
     scrollViewRef.current?.scrollTo({ y: 0, animated: true });
   };
 
@@ -111,7 +110,7 @@ export default function BookScreen() {
       const startHour = parseInt(startTime.split(':')[0]);
       const endTime = `${(startHour + 1).toString().padStart(2, '0')}:00`;
 
-      // FIXED: Calculate dynamic pricing based on time - direct TL calculation
+      // Calculate dynamic pricing based on time - direct TL calculation
       let finalPrice = selectedCourt.price_per_hour; // Direct TL value from database
       
       // Add 300 TL if booking is after 8:30 PM (20:30)
@@ -245,7 +244,7 @@ export default function BookScreen() {
           />
         );
       case 'payment':
-        // FIXED: Calculate dynamic pricing for payment summary - direct TL
+        // Calculate dynamic pricing for payment summary - direct TL
         let courtPrice = selectedCourt.price_per_hour; // Direct TL value
         if (selectedTime) {
           const [startTime] = selectedTime.split(' - ');
@@ -263,7 +262,7 @@ export default function BookScreen() {
             time={selectedTime!}
             courtPrice={courtPrice}
             racketCount={racketCount}
-            racketPrice={100}
+            racketPrice={125} // Updated to 125 TL
             onConfirm={handlePaymentConfirm}
           />
         );
@@ -339,7 +338,7 @@ export default function BookScreen() {
         {/* Bottom Half - Calendar and Bookings */}
         {(currentStep === 'court-selection' || currentStep === 'date-time') && (
           <View style={styles.bottomSection}>
-            {/* Calendar View Selector - FIXED: Same design as booking type selector */}
+            {/* Calendar View Selector */}
             <View style={styles.viewSelector}>
               <TouchableOpacity
                 style={[

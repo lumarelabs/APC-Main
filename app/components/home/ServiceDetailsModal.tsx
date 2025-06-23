@@ -36,17 +36,17 @@ export const ServiceDetailsModal = ({
     }, 100);
   };
 
-  // FIXED: Calculate average prices from database - direct TL values
+  // Calculate average prices from database - both types are 2000 TL
   const padelCourts = courts.filter(court => court.type === 'padel');
   const pickleballCourts = courts.filter(court => court.type === 'pickleball');
   
   const padelPrice = padelCourts.length > 0 
     ? Math.round(padelCourts.reduce((sum, court) => sum + court.price_per_hour, 0) / padelCourts.length)
-    : 350;
+    : 2000;
     
   const pickleballPrice = pickleballCourts.length > 0
     ? Math.round(pickleballCourts.reduce((sum, court) => sum + court.price_per_hour, 0) / pickleballCourts.length)
-    : 250;
+    : 2000;
 
   const renderContent = () => {
     switch (serviceType) {
@@ -91,11 +91,16 @@ export const ServiceDetailsModal = ({
             <View style={styles.priceContainer}>
               <View style={styles.priceItem}>
                 <Text style={styles.courtType}>Özel Ders</Text>
-                <Text style={styles.price}>₺600/saat</Text>
+                <Text style={styles.price}>₺1.000/saat</Text>
               </View>
               <View style={styles.priceItem}>
-                <Text style={styles.courtType}>Grup Dersi (4 kişi)</Text>
-                <Text style={styles.price}>₺300/kişi/saat</Text>
+                <Text style={styles.courtType}>Grup Dersi (3 haftalık)</Text>
+                <Text style={styles.price}>₺7.500/kişi</Text>
+              </View>
+              <View style={styles.lessonInfo}>
+                <Text style={styles.lessonInfoText}>
+                  * Grup dersleri max 4 kişilik, 3 hafta sürer (haftada 2 gün)
+                </Text>
               </View>
             </View>
             <TouchableOpacity 
@@ -228,6 +233,18 @@ const styles = StyleSheet.create({
     fontFamily: 'Inter-Medium',
     fontSize: 12,
     color: colors.primary,
+    textAlign: 'center',
+  },
+  lessonInfo: {
+    marginTop: 12,
+    padding: 12,
+    backgroundColor: colors.secondary + '50',
+    borderRadius: 8,
+  },
+  lessonInfoText: {
+    fontFamily: 'Inter-Medium',
+    fontSize: 12,
+    color: colors.charcoal,
     textAlign: 'center',
   },
   actionButton: {

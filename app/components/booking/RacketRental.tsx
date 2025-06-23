@@ -48,9 +48,9 @@ export function RacketRental({ onComplete }: RacketRentalProps) {
 
       <View style={styles.priceContainer}>
         <Text style={styles.priceLabel}>Raket başına ücret:</Text>
-        <Text style={styles.priceValue}>₺100</Text>
+        <Text style={styles.priceValue}>₺125</Text>
         <Text style={styles.totalLabel}>Toplam:</Text>
-        <Text style={styles.totalValue}>₺{racketCount * 100}</Text>
+        <Text style={styles.totalValue}>₺{racketCount * 125}</Text>
       </View>
 
       <View style={styles.buttonContainer}>
@@ -176,4 +176,4 @@ const styles = StyleSheet.create({
   disabledButton: {
     opacity: 0.5,
   },
-}); 
+});

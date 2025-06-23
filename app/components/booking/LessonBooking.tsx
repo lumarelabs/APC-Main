@@ -16,15 +16,15 @@ export function LessonBooking({ onComplete }: LessonBookingProps) {
       type: 'private' as LessonType,
       title: 'Özel Ders',
       description: 'Birebir özel ders',
-      price: 600, // FIXED: Direct TL value
+      price: 1000,
       duration: '1 saat'
     },
     {
       type: 'group' as LessonType,
       title: 'Grup Dersi',
-      description: '4 kişilik grup dersi',
-      price: 300, // FIXED: Direct TL value per person
-      duration: '1 saat'
+      description: 'Max 4 kişilik, 3 hafta (haftada 2 gün)',
+      price: 7500,
+      duration: '3 haftalık program'
     }
   ];
 
@@ -54,6 +54,11 @@ export function LessonBooking({ onComplete }: LessonBookingProps) {
             </View>
             <Text style={styles.lessonDescription}>{lesson.description}</Text>
             <Text style={styles.lessonDuration}>{lesson.duration}</Text>
+            {lesson.type === 'group' && (
+              <Text style={styles.lessonNote}>
+                * Kişi başı ücret, 3 haftalık toplam program
+              </Text>
+            )}
           </TouchableOpacity>
         ))}
       </View>
@@ -137,6 +142,13 @@ const styles = StyleSheet.create({
     fontFamily: 'Inter-Medium',
     fontSize: 12,
     color: colors.text.disabled,
+  },
+  lessonNote: {
+    fontFamily: 'Inter-Medium',
+    fontSize: 11,
+    color: colors.primary,
+    marginTop: 8,
+    fontStyle: 'italic',
   },
   infoBox: {
     backgroundColor: colors.background.secondary,
