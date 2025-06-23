@@ -2,6 +2,7 @@ import React from 'react';
 import { View, Text, StyleSheet, Modal, TouchableOpacity, ScrollView } from 'react-native';
 import { X, ArrowRight } from 'lucide-react-native';
 import { router } from 'expo-router';
+import { useCourts } from '@/app/hooks/useSupabaseData';
 import { colors } from '@/app/theme/colors';
 
 type ServiceDetailsModalProps = {
@@ -19,10 +20,10 @@ export const ServiceDetailsModal = ({
   onNavigateToBooking,
   onNavigateToTournaments 
 }: ServiceDetailsModalProps) => {
+  const { courts } = useCourts();
 
   const handleNavigateToBooking = () => {
     onClose();
-    // Small delay to ensure modal is fully closed before navigation
     setTimeout(() => {
       router.push('/(tabs)/book');
     }, 100);
@@ -30,11 +31,22 @@ export const ServiceDetailsModal = ({
 
   const handleNavigateToTournaments = () => {
     onClose();
-    // Scroll to tournaments section on the same page
     setTimeout(() => {
       onNavigateToTournaments?.();
     }, 100);
   };
+
+  // Calculate average prices from database
+  const padelCourts = courts.filter(court => court.type === 'padel');
+  const pickleballCourts = courts.filter(court => court.type === 'pickleball');
+  
+  const padelPrice = padelCourts.length > 0 
+    ? Math.round(padelCourts.reduce((sum, court) => sum + court.price_per_hour, 0) / padelCourts.length / 100)
+    : 350;
+    
+  const pickleballPrice = pickleballCourts.length > 0
+    ? Math.round(pickleballCourts.reduce((sum, court) => sum + court.price_per_hour, 0) / pickleballCourts.length / 100)
+    : 250;
 
   const renderContent = () => {
     switch (serviceType) {
@@ -48,11 +60,16 @@ export const ServiceDetailsModal = ({
             <View style={styles.priceContainer}>
               <View style={styles.priceItem}>
                 <Text style={styles.courtType}>Padel Kortları</Text>
-                <Text style={styles.price}>₺350/saat</Text>
+                <Text style={styles.price}>₺{padelPrice}/saat</Text>
               </View>
               <View style={styles.priceItem}>
                 <Text style={styles.courtType}>Pickleball Kortları</Text>
-                <Text style={styles.price}>₺250/saat</Text>
+                <Text style={styles.price}>₺{pickleballPrice}/saat</Text>
+              </View>
+              <View style={styles.nightRateInfo}>
+                <Text style={styles.nightRateText}>
+                  * 20:30'dan sonraki rezervasyonlara +₺300 gece tarifesi uygulanır
+                </Text>
               </View>
             </View>
             <TouchableOpacity 
@@ -111,7 +128,6 @@ export const ServiceDetailsModal = ({
     }
   };
 
-  // Only render modal content if visible and serviceType is valid
   if (!isVisible || !serviceType) {
     return null;
   }
@@ -201,6 +217,18 @@ const styles = StyleSheet.create({
     fontFamily: 'Inter-Bold',
     fontSize: 16,
     color: colors.primary,
+  },
+  nightRateInfo: {
+    marginTop: 12,
+    padding: 12,
+    backgroundColor: colors.primary + '10',
+    borderRadius: 8,
+  },
+  nightRateText: {
+    fontFamily: 'Inter-Medium',
+    fontSize: 12,
+    color: colors.primary,
+    textAlign: 'center',
   },
   actionButton: {
     backgroundColor: colors.primary,

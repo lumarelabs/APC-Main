@@ -26,50 +26,61 @@ export function PaymentSummary({
   const totalRacketPrice = racketCount * racketPrice;
   const totalPrice = courtPrice + totalRacketPrice;
 
+  // Format date for display
+  const formatDate = (dateString: string) => {
+    const date = new Date(dateString);
+    return date.toLocaleDateString('tr-TR', {
+      day: 'numeric',
+      month: 'long',
+      year: 'numeric',
+      weekday: 'long'
+    });
+  };
+
   return (
     <View style={styles.container}>
-      <Text style={styles.title}>Booking Summary</Text>
+      <Text style={styles.title}>Rezervasyon Özeti</Text>
 
       <View style={styles.section}>
-        <Text style={styles.sectionTitle}>Court Details</Text>
+        <Text style={styles.sectionTitle}>Kort Detayları</Text>
         <View style={styles.detailRow}>
-          <Text style={styles.label}>Court</Text>
+          <Text style={styles.label}>Kort</Text>
           <Text style={styles.value}>{courtName}</Text>
         </View>
         <View style={styles.detailRow}>
-          <Text style={styles.label}>Type</Text>
-          <Text style={styles.value}>{courtType}</Text>
+          <Text style={styles.label}>Tür</Text>
+          <Text style={styles.value}>{courtType === 'padel' ? 'Padel' : 'Pickleball'}</Text>
         </View>
         <View style={styles.detailRow}>
-          <Text style={styles.label}>Date</Text>
-          <Text style={styles.value}>{date}</Text>
+          <Text style={styles.label}>Tarih</Text>
+          <Text style={styles.value}>{formatDate(date)}</Text>
         </View>
         <View style={styles.detailRow}>
-          <Text style={styles.label}>Time</Text>
+          <Text style={styles.label}>Saat</Text>
           <Text style={styles.value}>{time}</Text>
         </View>
       </View>
 
       <View style={styles.section}>
-        <Text style={styles.sectionTitle}>Price Breakdown</Text>
+        <Text style={styles.sectionTitle}>Ücret Detayları</Text>
         <View style={styles.detailRow}>
-          <Text style={styles.label}>Court Rental</Text>
-          <Text style={styles.value}>${courtPrice}</Text>
+          <Text style={styles.label}>Kort Kirası</Text>
+          <Text style={styles.value}>₺{courtPrice}</Text>
         </View>
         {racketCount > 0 && (
           <View style={styles.detailRow}>
-            <Text style={styles.label}>Racket Rental ({racketCount}x)</Text>
-            <Text style={styles.value}>${totalRacketPrice}</Text>
+            <Text style={styles.label}>Raket Kirası ({racketCount}x)</Text>
+            <Text style={styles.value}>₺{totalRacketPrice}</Text>
           </View>
         )}
         <View style={styles.totalRow}>
-          <Text style={styles.totalLabel}>Total</Text>
-          <Text style={styles.totalValue}>${totalPrice}</Text>
+          <Text style={styles.totalLabel}>Toplam</Text>
+          <Text style={styles.totalValue}>₺{totalPrice}</Text>
         </View>
       </View>
 
       <TouchableOpacity style={styles.confirmButton} onPress={onConfirm}>
-        <Text style={styles.confirmButtonText}>Confirm & Pay</Text>
+        <Text style={styles.confirmButtonText}>Onayla & Öde</Text>
       </TouchableOpacity>
     </View>
   );
@@ -85,6 +96,7 @@ const styles = StyleSheet.create({
     fontSize: 24,
     color: colors.charcoal,
     marginBottom: 24,
+    textAlign: 'center',
   },
   section: {
     backgroundColor: colors.background.secondary,
@@ -137,10 +149,15 @@ const styles = StyleSheet.create({
     borderRadius: 12,
     alignItems: 'center',
     marginTop: 24,
+    shadowColor: colors.primary,
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.3,
+    shadowRadius: 4,
+    elevation: 5,
   },
   confirmButtonText: {
     fontFamily: 'Inter-Bold',
     fontSize: 16,
     color: colors.white,
   },
-}); 
+});
