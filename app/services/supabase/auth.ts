@@ -372,7 +372,7 @@ export class AuthService {
       // Success state will be handled by onAuthStateChange
     } catch (error: any) {
   let errorMessage = 'Google ile giriş yapılamadı';
-
+  console.error('Google Auth Error:', error);
   const message = error?.message?.toLowerCase() || '';
 
   if (message.includes('cancelled') || message.includes('iptal')) {
