@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
-import { MinusCircle, PlusCircle } from 'lucide-react-native';
+import { CircleMinus as MinusCircle, CirclePlus as PlusCircle } from 'lucide-react-native';
 import { colors } from '@/app/theme/colors';
 
 type RacketRentalProps = {
