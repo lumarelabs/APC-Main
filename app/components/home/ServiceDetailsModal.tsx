@@ -36,16 +36,16 @@ export const ServiceDetailsModal = ({
     }, 100);
   };
 
-  // Calculate average prices from database
+  // FIXED: Calculate average prices from database - direct TL values
   const padelCourts = courts.filter(court => court.type === 'padel');
   const pickleballCourts = courts.filter(court => court.type === 'pickleball');
   
   const padelPrice = padelCourts.length > 0 
-    ? Math.round(padelCourts.reduce((sum, court) => sum + court.price_per_hour, 0) / padelCourts.length / 100)
+    ? Math.round(padelCourts.reduce((sum, court) => sum + court.price_per_hour, 0) / padelCourts.length)
     : 350;
     
   const pickleballPrice = pickleballCourts.length > 0
-    ? Math.round(pickleballCourts.reduce((sum, court) => sum + court.price_per_hour, 0) / pickleballCourts.length / 100)
+    ? Math.round(pickleballCourts.reduce((sum, court) => sum + court.price_per_hour, 0) / pickleballCourts.length)
     : 250;
 
   const renderContent = () => {

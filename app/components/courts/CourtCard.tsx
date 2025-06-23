@@ -44,6 +44,7 @@ export function CourtCard({
         )}
         
         <View style={styles.priceContainer}>
+          {/* FIXED: Direct TL display, no cent conversion */}
           <Text style={styles.price}>₺{price}</Text>
           <Text style={styles.perHour}>/saat</Text>
         </View>

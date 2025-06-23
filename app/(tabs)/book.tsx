@@ -111,8 +111,8 @@ export default function BookScreen() {
       const startHour = parseInt(startTime.split(':')[0]);
       const endTime = `${(startHour + 1).toString().padStart(2, '0')}:00`;
 
-      // FIXED: Calculate dynamic pricing based on time
-      let finalPrice = selectedCourt.price_per_hour / 100; // Convert from cents to TL
+      // FIXED: Calculate dynamic pricing based on time - direct TL calculation
+      let finalPrice = selectedCourt.price_per_hour; // Direct TL value from database
       
       // Add 300 TL if booking is after 8:30 PM (20:30)
       if (startHour >= 20 && parseInt(startTime.split(':')[1]) >= 30) {
@@ -133,7 +133,7 @@ export default function BookScreen() {
       
       Alert.alert(
         'Başarılı!', 
-        `Rezervasyonunuz onaylandı. ${finalPrice > selectedCourt.price_per_hour / 100 ? 'Gece tarifesi uygulandı.' : ''}`,
+        `Rezervasyonunuz onaylandı. ${finalPrice > selectedCourt.price_per_hour ? 'Gece tarifesi uygulandı.' : ''}`,
         [
           {
             text: 'Tamam',
@@ -245,8 +245,8 @@ export default function BookScreen() {
           />
         );
       case 'payment':
-        // FIXED: Calculate dynamic pricing for payment summary
-        let courtPrice = selectedCourt.price_per_hour / 100;
+        // FIXED: Calculate dynamic pricing for payment summary - direct TL
+        let courtPrice = selectedCourt.price_per_hour; // Direct TL value
         if (selectedTime) {
           const [startTime] = selectedTime.split(' - ');
           const startHour = parseInt(startTime.split(':')[0]);
