@@ -114,14 +114,13 @@ export class LessonsService {
 
 // Bookings Service
 export class BookingsService {
-  static async getUserBookings(userId: string): Promise<(Booking & { court: Court; lesson?: Lesson })[]> {
+  static async getUserBookings(userId: string): Promise<(Booking & { court: Court })[]> {
     try {
       const { data, error } = await supabase
         .from('bookings')
         .select(`
           *,
-          court:courts(*),
-          lesson:lessons(*)
+          court:courts(*)
         `)
         .eq('user_id', userId)
         .order('date', { ascending: true })
@@ -188,14 +187,13 @@ export class BookingsService {
   static async getBookingsByDateRange(
     startDate: string, 
     endDate: string
-  ): Promise<(Booking & { court: Court; lesson?: Lesson })[]> {
+  ): Promise<(Booking & { court: Court })[]> {
     try {
       const { data, error } = await supabase
         .from('bookings')
         .select(`
           *,
-          court:courts(*),
-          lesson:lessons(*)
+          court:courts(*)
         `)
         .gte('date', startDate)
         .lte('date', endDate)
@@ -251,7 +249,11 @@ export class UsersService {
         .eq('id', userId)
         .single();
 
-      if (error && error.code !== 'PGRST116') {
+      if (error) {
+        if (error.code === 'PGRST116') {
+          // No rows returned - user profile doesn't exist yet
+          return null;
+        }
         handleDatabaseError(error, 'fetch user profile');
       }
 
