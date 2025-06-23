@@ -13,8 +13,8 @@ import {
   Modal
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { useAuth } from '@/hooks/useAuth';
-import { colors } from '@/theme/colors';
+import { useAuth } from '@/app/hooks/useAuth';
+import { colors } from '@/app/theme/colors';
 
 export default function AuthScreen() {
   const [isSignUp, setIsSignUp] = useState(false);

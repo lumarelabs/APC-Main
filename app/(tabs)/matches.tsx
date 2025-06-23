@@ -1,9 +1,9 @@
 import React, { useState } from 'react';
 import { View, Text, StyleSheet, ScrollView, TouchableOpacity, ActivityIndicator } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { MatchCard } from '@/components/matches/MatchCard';
-import { useUserBookings } from '@/hooks/useSupabaseData';
-import { colors } from '@/theme/colors';
+import { MatchCard } from '@/app/components/matches/MatchCard';
+import { useUserBookings } from '@/app/hooks/useSupabaseData';
+import { colors } from '@/app/theme/colors';
 
 export default function MatchesScreen() {
   const [activeTab, setActiveTab] = useState('upcoming');
