@@ -123,7 +123,9 @@ export default function BookScreen() {
         date: selectedDate,
         start_time: `${startTime}:00`,
         end_time: endTime,
-        status: 'confirmed' as const
+        status: 'confirmed' as const,
+        type: bookingType === 'lesson' ? 'lesson_booking' : 'court_booking',
+        includes_racket: racketCount > 0
       };
 
       await createBooking(bookingData);

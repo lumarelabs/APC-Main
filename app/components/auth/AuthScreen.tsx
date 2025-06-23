@@ -9,7 +9,8 @@ import {
   KeyboardAvoidingView,
   Platform,
   ScrollView,
-  ActivityIndicator
+  ActivityIndicator,
+  Modal
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useAuth } from '@/app/hooks/useAuth';
@@ -20,12 +21,16 @@ export default function AuthScreen() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [fullName, setFullName] = useState('');
-  const [skillLevel, setSkillLevel] = useState<'Başlangıç' | 'Orta' | 'İleri'>('Başlangıç'); // FIXED: Add skill level
+  const [skillLevel, setSkillLevel] = useState<'Başlangıç' | 'Orta' | 'İleri'>('Başlangıç');
   const [loading, setLoading] = useState(false);
   const [googleLoading, setGoogleLoading] = useState(false);
   const [localError, setLocalError] = useState<string | null>(null);
+  
+  // Google OAuth completion modal
+  const [showGoogleModal, setShowGoogleModal] = useState(false);
+  const [googleUserData, setGoogleUserData] = useState<any>(null);
 
-  const { signIn, signUp, signInWithGoogle, error: authError, clearError } = useAuth();
+  const { signIn, signUp, signInWithGoogle, error: authError, clearError, updateProfile } = useAuth();
 
   // Clear errors when switching modes or changing inputs
   useEffect(() => {
@@ -54,7 +59,6 @@ export default function AuthScreen() {
       setLocalError(null);
 
       if (isSignUp) {
-        // FIXED: Pass skill level during signup
         await signUp(email, password, fullName, skillLevel);
         Alert.alert(
           'Başarılı!', 
@@ -85,11 +89,44 @@ export default function AuthScreen() {
     try {
       setGoogleLoading(true);
       setLocalError(null);
-      await signInWithGoogle();
+      
+      const result = await signInWithGoogle();
+      
+      // If Google sign-in is successful but user needs to complete profile
+      if (result && result.isNewUser) {
+        setGoogleUserData(result.user);
+        setShowGoogleModal(true);
+      }
     } catch (err: any) {
       setLocalError(err.message || 'Google ile giriş yapılamadı');
     } finally {
       setGoogleLoading(false);
+    }
+  };
+
+  const handleGoogleProfileComplete = async () => {
+    if (!fullName.trim()) {
+      setLocalError('Lütfen adınızı ve soyadınızı girin');
+      return;
+    }
+
+    try {
+      setLoading(true);
+      
+      // Update user profile with additional info
+      await updateProfile({
+        full_name: fullName.trim(),
+        level: skillLevel
+      });
+      
+      setShowGoogleModal(false);
+      setGoogleUserData(null);
+      setFullName('');
+      setSkillLevel('Başlangıç');
+    } catch (err: any) {
+      setLocalError(err.message || 'Profil güncellenemedi');
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -139,7 +176,6 @@ export default function AuthScreen() {
                   />
                 </View>
 
-                {/* FIXED: Add skill level selection */}
                 <View style={styles.inputContainer}>
                   <Text style={styles.label}>Seviye</Text>
                   <View style={styles.skillLevelContainer}>
@@ -244,6 +280,76 @@ export default function AuthScreen() {
           </View>
         </ScrollView>
       </KeyboardAvoidingView>
+
+      {/* Google Profile Completion Modal */}
+      <Modal
+        visible={showGoogleModal}
+        transparent
+        animationType="slide"
+        onRequestClose={() => setShowGoogleModal(false)}
+      >
+        <View style={styles.modalOverlay}>
+          <View style={styles.modalContent}>
+            <Text style={styles.modalTitle}>Profili Tamamla</Text>
+            <Text style={styles.modalSubtitle}>
+              Google hesabınızla giriş yaptınız. Lütfen profil bilgilerinizi tamamlayın.
+            </Text>
+
+            <View style={styles.inputContainer}>
+              <Text style={styles.label}>Ad Soyad</Text>
+              <TextInput
+                style={styles.input}
+                value={fullName}
+                onChangeText={setFullName}
+                placeholder="Adınızı ve soyadınızı girin"
+                placeholderTextColor={colors.text.disabled}
+                autoCapitalize="words"
+              />
+            </View>
+
+            <View style={styles.inputContainer}>
+              <Text style={styles.label}>Seviye</Text>
+              <View style={styles.skillLevelContainer}>
+                {(['Başlangıç', 'Orta', 'İleri'] as const).map((level) => (
+                  <TouchableOpacity
+                    key={level}
+                    style={[
+                      styles.skillLevelButton,
+                      skillLevel === level && styles.skillLevelButtonActive
+                    ]}
+                    onPress={() => setSkillLevel(level)}
+                  >
+                    <Text style={[
+                      styles.skillLevelText,
+                      skillLevel === level && styles.skillLevelTextActive
+                    ]}>
+                      {level}
+                    </Text>
+                  </TouchableOpacity>
+                ))}
+              </View>
+            </View>
+
+            {displayError && (
+              <View style={styles.errorContainer}>
+                <Text style={styles.errorText}>{displayError}</Text>
+              </View>
+            )}
+
+            <TouchableOpacity
+              style={[styles.submitButton, loading && styles.submitButtonDisabled]}
+              onPress={handleGoogleProfileComplete}
+              disabled={loading}
+            >
+              {loading ? (
+                <ActivityIndicator size="small" color={colors.white} />
+              ) : (
+                <Text style={styles.submitButtonText}>Profili Tamamla</Text>
+              )}
+            </TouchableOpacity>
+          </View>
+        </View>
+      </Modal>
     </SafeAreaView>
   );
 }
@@ -401,5 +507,32 @@ const styles = StyleSheet.create({
     fontFamily: 'Inter-Medium',
     fontSize: 14,
     color: colors.primary,
+  },
+  modalOverlay: {
+    flex: 1,
+    backgroundColor: 'rgba(0, 0, 0, 0.5)',
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  modalContent: {
+    backgroundColor: colors.background.secondary,
+    borderRadius: 16,
+    padding: 24,
+    width: '90%',
+    maxWidth: 400,
+  },
+  modalTitle: {
+    fontFamily: 'Inter-Bold',
+    fontSize: 24,
+    color: colors.charcoal,
+    textAlign: 'center',
+    marginBottom: 8,
+  },
+  modalSubtitle: {
+    fontFamily: 'Inter-Regular',
+    fontSize: 16,
+    color: colors.text.disabled,
+    textAlign: 'center',
+    marginBottom: 24,
   },
 });

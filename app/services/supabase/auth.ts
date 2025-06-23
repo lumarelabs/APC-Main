@@ -98,7 +98,7 @@ export class AuthService {
                     user.email?.split('@')[0] || 
                     'User',
           email: user.email,
-          level: user.user_metadata?.level || 'Başlangıç', // FIXED: Use level from metadata
+          level: user.user_metadata?.level || 'Başlangıç',
           role: 'user',
           profile_image_url: user.user_metadata?.avatar_url || 
                             user.user_metadata?.picture || 
@@ -217,7 +217,6 @@ export class AuthService {
     }
   }
 
-  // FIXED: Add skill level parameter
   async signUp(email: string, password: string, fullName?: string, level?: string): Promise<void> {
     try {
       this.updateState({ loading: true, error: null });
@@ -241,7 +240,7 @@ export class AuthService {
         options: {
           data: {
             full_name: fullName.trim(),
-            level: level || 'Başlangıç' // FIXED: Include skill level
+            level: level || 'Başlangıç'
           }
         }
       });
@@ -297,7 +296,7 @@ export class AuthService {
     }
   }
 
-  async signInWithGoogle(): Promise<void> {
+  async signInWithGoogle(): Promise<{ user: User; isNewUser: boolean } | void> {
     try {
       this.updateState({ loading: true, error: null });
 
@@ -306,7 +305,11 @@ export class AuthService {
         const { data, error } = await supabase.auth.signInWithOAuth({
           provider: 'google',
           options: {
-            redirectTo: window.location.origin
+            redirectTo: window.location.origin,
+            queryParams: {
+              access_type: 'offline',
+              prompt: 'consent',
+            }
           }
         });
 
@@ -340,6 +343,23 @@ export class AuthService {
 
             if (error) {
               throw error;
+            }
+
+            // Check if this is a new user by looking for existing profile
+            if (data.user) {
+              const { data: existingProfile } = await supabase
+                .from('users')
+                .select('id')
+                .eq('id', data.user.id)
+                .single();
+
+              if (!existingProfile) {
+                // New user - return user data for profile completion
+                return {
+                  user: data.user,
+                  isNewUser: true
+                };
+              }
             }
           } else {
             throw new Error('Google giriş işlemi tamamlanamadı');

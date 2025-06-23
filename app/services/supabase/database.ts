@@ -114,13 +114,14 @@ export class LessonsService {
 
 // Bookings Service
 export class BookingsService {
-  static async getUserBookings(userId: string): Promise<(Booking & { court: Court })[]> {
+  static async getUserBookings(userId: string): Promise<(Booking & { court: Court; lesson?: Lesson })[]> {
     try {
       const { data, error } = await supabase
         .from('bookings')
         .select(`
           *,
-          court:courts(*)
+          court:courts(*),
+          lesson:lessons(*)
         `)
         .eq('user_id', userId)
         .order('date', { ascending: true })
@@ -187,13 +188,14 @@ export class BookingsService {
   static async getBookingsByDateRange(
     startDate: string, 
     endDate: string
-  ): Promise<(Booking & { court: Court })[]> {
+  ): Promise<(Booking & { court: Court; lesson?: Lesson })[]> {
     try {
       const { data, error } = await supabase
         .from('bookings')
         .select(`
           *,
-          court:courts(*)
+          court:courts(*),
+          lesson:lessons(*)
         `)
         .gte('date', startDate)
         .lte('date', endDate)

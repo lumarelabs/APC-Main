@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Linking, Dimensions, Platform, ActivityIndicator } from 'react-native';
+import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Linking, Dimensions, Platform, ActivityIndicator, Image } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Search, Bell, Trophy, GraduationCap, BookOpen, Instagram, MapPin } from 'lucide-react-native';
 import { UpcomingBooking } from '@/app/components/home/UpcomingBooking';
@@ -9,6 +9,7 @@ import { useUserBookings } from '@/app/hooks/useSupabaseData';
 import { useApp } from '@/app/context/AppContext';
 import { colors } from '@/app/theme/colors';
 import { router } from 'expo-router';
+import Logo2 from '../../assets/images/logo2.png';
 
 type Booking = {
   id: string;
@@ -52,7 +53,7 @@ export default function HomeScreen() {
       players: [] // Will be populated from matches data later
     }));
 
-  // FIXED: Use full_name from profile, fallback to email username
+  // Use full_name from profile, fallback to email username
   const displayName = profile?.full_name || user?.email?.split('@')[0] || 'Kullanıcı';
 
   const scrollToTournaments = () => {
@@ -76,7 +77,7 @@ export default function HomeScreen() {
   return (
     <SafeAreaView style={styles.safeArea}>
       <ScrollView style={styles.container} contentContainerStyle={styles.contentContainer}>
-        {/* FIXED: Responsive Welcome Header */}
+        {/* Welcome Header with Logo */}
         <View style={styles.welcomeHeader}>
           <View style={styles.welcomeTextContainer}>
             <Text style={styles.greeting} numberOfLines={1} adjustsFontSizeToFit>
@@ -84,7 +85,9 @@ export default function HomeScreen() {
             </Text>
             <Text style={styles.subtitle}>Oynamaya hazır mısın?</Text>
           </View>
-          {/* REMOVED: Logo2 image slider as requested */}
+          <View style={styles.logoContainer}>
+            <Image source={Logo2} style={styles.logo} resizeMode="contain" />
+          </View>
         </View>
 
         {/* Header with About */}
@@ -260,6 +263,16 @@ const styles = StyleSheet.create({
     fontFamily: 'Inter-Regular',
     fontSize: 16,
     color: colors.text.disabled,
+  },
+  logoContainer: {
+    width: 80,
+    height: 60,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  logo: {
+    width: '100%',
+    height: '100%',
   },
   headerContainer: {
     flexDirection: 'row',

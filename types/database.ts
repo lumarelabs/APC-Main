@@ -134,7 +134,9 @@ export interface Database {
           start_time: string
           end_time: string
           status: 'pending' | 'confirmed' | 'canceled'
+          type: string | null
           lesson_id: string | null
+          includes_racket: boolean | null
           includes_lighting: boolean | null
           created_at: string
           updated_at: string
@@ -147,7 +149,9 @@ export interface Database {
           start_time: string
           end_time: string
           status?: 'pending' | 'confirmed' | 'canceled'
+          type?: string | null
           lesson_id?: string | null
+          includes_racket?: boolean | null
           includes_lighting?: boolean | null
           created_at?: string
           updated_at?: string
@@ -160,7 +164,9 @@ export interface Database {
           start_time?: string
           end_time?: string
           status?: 'pending' | 'confirmed' | 'canceled'
+          type?: string | null
           lesson_id?: string | null
+          includes_racket?: boolean | null
           includes_lighting?: boolean | null
           created_at?: string
           updated_at?: string
@@ -178,6 +184,13 @@ export interface Database {
             columns: ["user_id"]
             isOneToOne: false
             referencedRelation: "users"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "bookings_lesson_id_fkey"
+            columns: ["lesson_id"]
+            isOneToOne: false
+            referencedRelation: "lessons"
             referencedColumns: ["id"]
           }
         ]
