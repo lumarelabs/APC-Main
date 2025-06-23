@@ -212,6 +212,9 @@ export function BookingCalendar({ bookings }: BookingCalendarProps) {
   );
 }
 
+// Default export to satisfy Expo Router
+export default BookingCalendar;
+
 const styles = StyleSheet.create({
   container: {
     backgroundColor: colors.background.primary,

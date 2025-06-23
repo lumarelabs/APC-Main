@@ -2,12 +2,12 @@ import React, { useState } from 'react';
 import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Linking, Dimensions, Platform, ActivityIndicator, Image } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Search, Bell, Trophy, GraduationCap, BookOpen, Instagram, MapPin } from 'lucide-react-native';
-import { UpcomingBooking } from '@/app/components/home/UpcomingBooking';
-import { ServiceDetailsModal } from '@/app/components/home/ServiceDetailsModal';
-import { BookingDetailsModal } from '@/app/components/home/BookingDetailsModal';
-import { useUserBookings } from '@/app/hooks/useSupabaseData';
-import { useApp } from '@/app/context/AppContext';
-import { colors } from '@/app/theme/colors';
+import { UpcomingBooking } from '@/components/home/UpcomingBooking';
+import { ServiceDetailsModal } from '@/components/home/ServiceDetailsModal';
+import { BookingDetailsModal } from '@/components/home/BookingDetailsModal';
+import { useUserBookings } from '@/hooks/useSupabaseData';
+import { useApp } from '@/context/AppContext';
+import { colors } from '@/theme/colors';
 import { router } from 'expo-router';
 import Logo2 from '../../assets/images/logo2.png';
 
