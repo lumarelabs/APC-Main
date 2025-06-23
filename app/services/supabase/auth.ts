@@ -317,14 +317,14 @@ export class AuthService {
           throw error;
         }
       } else {
-        // Mobile implementation using AuthSession with correct API
+        // Mobile implementation using AuthSession with promptAsync
         const redirectUrl = AuthSession.makeRedirectUri({
           useProxy: true,
         });
 
         const authUrl = `${supabase.supabaseUrl}/auth/v1/authorize?provider=google&redirect_to=${encodeURIComponent(redirectUrl)}`;
 
-        // Use the correct AuthSession API
+        // Use promptAsync instead of startAsync
         const result = await AuthSession.promptAsync({
           authUrl,
           returnUrl: redirectUrl,
@@ -386,7 +386,7 @@ export class AuthService {
         errorMessage = 'Google Play Hizmetleri güncel değil';
       } else if (message.includes('sign_in_failed')) {
         errorMessage = 'Google hesabı ile giriş başarısız';
-      } else if (message.includes('authsession.startasync is not a function')) {
+      } else if (message.includes('promptasync is not a function') || message.includes('startasync is not a function')) {
         errorMessage = 'Google giriş özelliği şu anda kullanılamıyor';
       }
 
