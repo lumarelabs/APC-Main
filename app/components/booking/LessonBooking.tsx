@@ -73,7 +73,7 @@ export function LessonBooking({ onComplete }: LessonBookingProps) {
               </Text>
             )}
             
-            {/* Construction badge */}
+            {/* Construction badge - moved to bottom-right */}
             <View style={styles.constructionBadge}>
               <Text style={styles.constructionText}>Yapım Aşamasında</Text>
             </View>
@@ -178,7 +178,7 @@ const styles = StyleSheet.create({
   },
   constructionBadge: {
     position: 'absolute',
-    top: 12,
+    bottom: 12,
     right: 12,
     backgroundColor: colors.status.warning,
     paddingHorizontal: 8,
