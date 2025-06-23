@@ -81,7 +81,7 @@ export default function HomeScreen() {
         <View style={styles.welcomeHeader}>
           <View style={styles.welcomeTextContainer}>
             <Text style={styles.greeting} numberOfLines={1} adjustsFontSizeToFit>
-              Hoş geldin, {displayName}!
+              Hoş geldin, {displayName.split(" ")[0]}!
             </Text>
             <Text style={styles.subtitle}>Oynamaya hazır mısın?</Text>
           </View>
