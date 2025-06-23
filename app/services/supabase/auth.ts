@@ -325,7 +325,7 @@ export class AuthService {
         const authUrl = `${supabase.supabaseUrl}/auth/v1/authorize?provider=google&redirect_to=${encodeURIComponent(redirectUrl)}`;
 
         // Use the correct AuthSession API
-        const result = await AuthSession.startAsync({
+        const result = await AuthSession.promptAsync({
           authUrl,
           returnUrl: redirectUrl,
         });
