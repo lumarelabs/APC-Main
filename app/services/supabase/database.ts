@@ -249,13 +249,9 @@ export class UsersService {
         .from('users')
         .select('*')
         .eq('id', userId)
-        .single();
+        .maybeSingle();
 
       if (error) {
-        if (error.code === 'PGRST116') {
-          // No rows returned - user profile doesn't exist yet
-          return null;
-        }
         handleDatabaseError(error, 'fetch user profile');
       }
 
