@@ -83,6 +83,48 @@ export interface Database {
         }
         Relationships: []
       }
+      lessons: {
+        Row: {
+          id: string
+          title: string
+          type: 'private' | 'group'
+          description: string | null
+          price: number
+          duration_weeks: number | null
+          sessions_per_week: number | null
+          max_participants: number | null
+          instructor_name: string | null
+          created_at: string
+          updated_at: string
+        }
+        Insert: {
+          id?: string
+          title: string
+          type: 'private' | 'group'
+          description?: string | null
+          price: number
+          duration_weeks?: number | null
+          sessions_per_week?: number | null
+          max_participants?: number | null
+          instructor_name?: string | null
+          created_at?: string
+          updated_at?: string
+        }
+        Update: {
+          id?: string
+          title?: string
+          type?: 'private' | 'group'
+          description?: string | null
+          price?: number
+          duration_weeks?: number | null
+          sessions_per_week?: number | null
+          max_participants?: number | null
+          instructor_name?: string | null
+          created_at?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       bookings: {
         Row: {
           id: string
@@ -95,6 +137,7 @@ export interface Database {
           type: string | null
           lesson_id: string | null
           includes_racket: boolean | null
+          includes_lighting: boolean | null
           created_at: string
           updated_at: string
         }
@@ -109,6 +152,7 @@ export interface Database {
           type?: string | null
           lesson_id?: string | null
           includes_racket?: boolean | null
+          includes_lighting?: boolean | null
           created_at?: string
           updated_at?: string
         }
@@ -123,6 +167,7 @@ export interface Database {
           type?: string | null
           lesson_id?: string | null
           includes_racket?: boolean | null
+          includes_lighting?: boolean | null
           created_at?: string
           updated_at?: string
         }
@@ -140,79 +185,12 @@ export interface Database {
             isOneToOne: false
             referencedRelation: "users"
             referencedColumns: ["id"]
-          }
-        ]
-      }
-      matches: {
-        Row: {
-          id: string
-          booking_id: string
-          status: 'pending' | 'confirmed' | 'completed'
-          result: 'win' | 'loss' | null
-          created_at: string
-          updated_at: string
-        }
-        Insert: {
-          id?: string
-          booking_id: string
-          status?: 'pending' | 'confirmed' | 'completed'
-          result?: 'win' | 'loss' | null
-          created_at?: string
-          updated_at?: string
-        }
-        Update: {
-          id?: string
-          booking_id?: string
-          status?: 'pending' | 'confirmed' | 'completed'
-          result?: 'win' | 'loss' | null
-          created_at?: string
-          updated_at?: string
-        }
-        Relationships: [
-          {
-            foreignKeyName: "matches_booking_id_fkey"
-            columns: ["booking_id"]
-            isOneToOne: false
-            referencedRelation: "bookings"
-            referencedColumns: ["id"]
-          }
-        ]
-      }
-      match_players: {
-        Row: {
-          id: string
-          match_id: string
-          user_id: string
-          team: 'home' | 'away'
-          created_at: string
-        }
-        Insert: {
-          id?: string
-          match_id: string
-          user_id: string
-          team: 'home' | 'away'
-          created_at?: string
-        }
-        Update: {
-          id?: string
-          match_id?: string
-          user_id?: string
-          team?: 'home' | 'away'
-          created_at?: string
-        }
-        Relationships: [
-          {
-            foreignKeyName: "match_players_match_id_fkey"
-            columns: ["match_id"]
-            isOneToOne: false
-            referencedRelation: "matches"
-            referencedColumns: ["id"]
           },
           {
-            foreignKeyName: "match_players_user_id_fkey"
-            columns: ["user_id"]
+            foreignKeyName: "bookings_lesson_id_fkey"
+            columns: ["lesson_id"]
             isOneToOne: false
-            referencedRelation: "users"
+            referencedRelation: "lessons"
             referencedColumns: ["id"]
           }
         ]

@@ -2,7 +2,7 @@ import { useState, useEffect, useCallback } from 'react';
 import { 
   CourtsService, 
   BookingsService, 
-  MatchesService, 
+  LessonsService,
   UsersService,
   RealtimeService 
 } from '@/app/services/supabase/database';
@@ -37,6 +37,34 @@ export function useCourts(type?: 'padel' | 'pickleball') {
   }, [fetchCourts]);
 
   return { courts, loading, error, refetch: fetchCourts };
+}
+
+// Lessons hook
+export function useLessons() {
+  const [lessons, setLessons] = useState<any[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+
+  const fetchLessons = useCallback(async () => {
+    try {
+      setLoading(true);
+      setError(null);
+      
+      const data = await LessonsService.getAllLessons();
+      setLessons(data);
+    } catch (err: any) {
+      setError(err.message);
+      console.error('Error fetching lessons:', err);
+    } finally {
+      setLoading(false);
+    }
+  }, []);
+
+  useEffect(() => {
+    fetchLessons();
+  }, [fetchLessons]);
+
+  return { lessons, loading, error, refetch: fetchLessons };
 }
 
 // All bookings hook (for showing all users' bookings in calendar)
@@ -115,7 +143,7 @@ export function useUserBookings() {
     return () => {
       RealtimeService.unsubscribe(subscription);
     };
-  }, [user?.id, fetchBookings]); // Include fetchBookings in dependencies
+  }, [user?.id, fetchBookings]);
 
   const createBooking = async (bookingData: any) => {
     try {
@@ -160,77 +188,6 @@ export function useUserBookings() {
     createBooking, 
     updateBookingStatus,
     refetch: () => user?.id && fetchBookings(user.id)
-  };
-}
-
-// User matches hook
-export function useUserMatches() {
-  const { user } = useAuth();
-  const [matches, setMatches] = useState<any[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
-
-  const fetchMatches = useCallback(async (userId: string) => {
-    try {
-      setLoading(true);
-      setError(null);
-      
-      const data = await MatchesService.getUserMatches(userId);
-      setMatches(data);
-    } catch (err: any) {
-      setError(err.message);
-      console.error('Error fetching matches:', err);
-    } finally {
-      setLoading(false);
-    }
-  }, []);
-
-  useEffect(() => {
-    const userId = user?.id;
-    
-    if (!userId) {
-      setMatches([]);
-      setLoading(false);
-      return;
-    }
-
-    fetchMatches(userId);
-  }, [user?.id, fetchMatches]); // Include fetchMatches in dependencies
-
-  const createMatch = async (bookingId: string, players: any[]) => {
-    try {
-      const newMatch = await MatchesService.createMatch(bookingId, players);
-      setMatches(prev => [...prev, newMatch]);
-      return newMatch;
-    } catch (err: any) {
-      setError(err.message);
-      throw err;
-    }
-  };
-
-  const updateMatchResult = async (matchId: string, result: 'win' | 'loss') => {
-    try {
-      await MatchesService.updateMatchResult(matchId, result);
-      
-      setMatches(prev => 
-        prev.map(match => 
-          match.id === matchId 
-            ? { ...match, result, status: 'completed' }
-            : match
-        )
-      );
-    } catch (err: any) {
-      setError(err.message);
-      throw err;
-    }
-  };
-
-  return { 
-    matches, 
-    loading, 
-    error, 
-    createMatch, 
-    updateMatchResult 
   };
 }
 

@@ -4,9 +4,8 @@ import type { Database } from '@/types/database';
 type Tables = Database['public']['Tables'];
 type Court = Tables['courts']['Row'];
 type Booking = Tables['bookings']['Row'];
-type Match = Tables['matches']['Row'];
-type MatchPlayer = Tables['match_players']['Row'];
 type UserProfile = Tables['users']['Row'];
+type Lesson = Tables['lessons']['Row'];
 
 // Error handling wrapper
 const handleDatabaseError = (error: any, operation: string) => {
@@ -73,15 +72,56 @@ export class CourtsService {
   }
 }
 
+// Lessons Service
+export class LessonsService {
+  static async getAllLessons(): Promise<Lesson[]> {
+    try {
+      const { data, error } = await supabase
+        .from('lessons')
+        .select('*')
+        .order('type', { ascending: true });
+
+      if (error) {
+        handleDatabaseError(error, 'fetch lessons');
+      }
+
+      return data || [];
+    } catch (error) {
+      handleDatabaseError(error, 'fetch lessons');
+      return [];
+    }
+  }
+
+  static async getLessonById(id: string): Promise<Lesson | null> {
+    try {
+      const { data, error } = await supabase
+        .from('lessons')
+        .select('*')
+        .eq('id', id)
+        .single();
+
+      if (error && error.code !== 'PGRST116') {
+        handleDatabaseError(error, 'fetch lesson by id');
+      }
+
+      return data || null;
+    } catch (error) {
+      handleDatabaseError(error, 'fetch lesson by id');
+      return null;
+    }
+  }
+}
+
 // Bookings Service
 export class BookingsService {
-  static async getUserBookings(userId: string): Promise<(Booking & { court: Court })[]> {
+  static async getUserBookings(userId: string): Promise<(Booking & { court: Court; lesson?: Lesson })[]> {
     try {
       const { data, error } = await supabase
         .from('bookings')
         .select(`
           *,
-          court:courts(*)
+          court:courts(*),
+          lesson:lessons(*)
         `)
         .eq('user_id', userId)
         .order('date', { ascending: true })
@@ -100,9 +140,19 @@ export class BookingsService {
 
   static async createBooking(booking: Tables['bookings']['Insert']): Promise<Booking> {
     try {
+      // Calculate lighting fee if booking is after 20:30
+      const startTime = booking.start_time;
+      const [hours, minutes] = startTime.split(':').map(Number);
+      const isNightBooking = hours > 20 || (hours === 20 && minutes >= 30);
+      
+      const bookingData = {
+        ...booking,
+        includes_lighting: isNightBooking
+      };
+
       const { data, error } = await supabase
         .from('bookings')
-        .insert(booking)
+        .insert(bookingData)
         .select()
         .single();
 
@@ -138,13 +188,14 @@ export class BookingsService {
   static async getBookingsByDateRange(
     startDate: string, 
     endDate: string
-  ): Promise<(Booking & { court: Court })[]> {
+  ): Promise<(Booking & { court: Court; lesson?: Lesson })[]> {
     try {
       const { data, error } = await supabase
         .from('bookings')
         .select(`
           *,
-          court:courts(*)
+          court:courts(*),
+          lesson:lessons(*)
         `)
         .gte('date', startDate)
         .lte('date', endDate)
@@ -186,134 +237,6 @@ export class BookingsService {
     } catch (error) {
       handleDatabaseError(error, 'check court availability');
       return false;
-    }
-  }
-}
-
-// Matches Service
-export class MatchesService {
-  static async getUserMatches(userId: string): Promise<(Match & { 
-    booking: Booking & { court: Court };
-    players: (MatchPlayer & { user: UserProfile })[];
-  })[]> {
-    try {
-      // First, get matches where the user is a player
-      const { data: userMatchIds, error: matchPlayerError } = await supabase
-        .from('match_players')
-        .select('match_id')
-        .eq('user_id', userId);
-
-      if (matchPlayerError) {
-        handleDatabaseError(matchPlayerError, 'fetch user match IDs');
-      }
-
-      // If no matches found, return empty array
-      if (!userMatchIds || userMatchIds.length === 0) {
-        return [];
-      }
-
-      const matchIds = userMatchIds.map(mp => mp.match_id);
-
-      // Get the matches data without nested players to avoid recursion
-      const { data: matches, error: matchesError } = await supabase
-        .from('matches')
-        .select(`
-          *,
-          booking:bookings(
-            *,
-            court:courts(*)
-          )
-        `)
-        .in('id', matchIds)
-        .order('created_at', { ascending: false });
-
-      if (matchesError) {
-        handleDatabaseError(matchesError, 'fetch user matches');
-      }
-
-      if (!matches || matches.length === 0) {
-        return [];
-      }
-
-      // Separately fetch match players with user data
-      const { data: matchPlayers, error: playersError } = await supabase
-        .from('match_players')
-        .select(`
-          *,
-          user:users(*)
-        `)
-        .in('match_id', matchIds);
-
-      if (playersError) {
-        handleDatabaseError(playersError, 'fetch match players');
-      }
-
-      // Combine the data in application logic
-      const matchesWithPlayers = matches.map(match => ({
-        ...match,
-        players: (matchPlayers || []).filter(player => player.match_id === match.id)
-      }));
-
-      return matchesWithPlayers;
-    } catch (error) {
-      handleDatabaseError(error, 'fetch user matches');
-      return [];
-    }
-  }
-
-  static async createMatch(
-    bookingId: string,
-    players: { user_id: string; team: 'home' | 'away' }[]
-  ): Promise<Match> {
-    try {
-      // Create match
-      const { data: match, error: matchError } = await supabase
-        .from('matches')
-        .insert({ booking_id: bookingId })
-        .select()
-        .single();
-
-      if (matchError) {
-        handleDatabaseError(matchError, 'create match');
-      }
-
-      // Add players
-      const playersData = players.map(player => ({
-        match_id: match.id,
-        user_id: player.user_id,
-        team: player.team
-      }));
-
-      const { error: playersError } = await supabase
-        .from('match_players')
-        .insert(playersData);
-
-      if (playersError) {
-        handleDatabaseError(playersError, 'add match players');
-      }
-
-      return match;
-    } catch (error) {
-      handleDatabaseError(error, 'create match');
-      throw error;
-    }
-  }
-
-  static async updateMatchResult(
-    matchId: string,
-    result: 'win' | 'loss'
-  ): Promise<void> {
-    try {
-      const { error } = await supabase
-        .from('matches')
-        .update({ result, status: 'completed' })
-        .eq('id', matchId);
-
-      if (error) {
-        handleDatabaseError(error, 'update match result');
-      }
-    } catch (error) {
-      handleDatabaseError(error, 'update match result');
     }
   }
 }
