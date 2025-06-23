@@ -371,13 +371,21 @@ export class AuthService {
 
       // Success state will be handled by onAuthStateChange
     } catch (error: any) {
-      let errorMessage = 'Google ile giriş yapılamadı';
-      
-      if (error.message?.includes('cancelled') || error.message?.includes('iptal')) {
-        errorMessage = 'Google giriş işlemi iptal edildi';
-      } else if (error.message?.includes('network')) {
-        errorMessage = 'İnternet bağlantınızı kontrol edin';
-      }
+  let errorMessage = 'Google ile giriş yapılamadı';
+
+  const message = error?.message?.toLowerCase() || '';
+
+  if (message.includes('cancelled') || message.includes('iptal')) {
+    errorMessage = 'Google giriş işlemi iptal edildi';
+  } else if (message.includes('network') || message.includes('internet')) {
+    errorMessage = 'İnternet bağlantınızı kontrol edin';
+  } else if (message.includes('popup_closed_by_user')) {
+    errorMessage = 'Google oturum açma penceresi kapatıldı';
+  } else if (message.includes('playservices')) {
+    errorMessage = 'Google Play Hizmetleri güncel değil';
+  } else if (message.includes('sign_in_failed')) {
+    errorMessage = 'Google hesabı ile giriş başarısız';
+  }
 
       this.updateState({ 
         loading: false, 
