@@ -140,6 +140,18 @@ export class BookingsService {
 
   static async createBooking(booking: Tables['bookings']['Insert']): Promise<Booking> {
     try {
+      // CRITICAL: Check for booking conflicts before creating
+      const hasConflict = await this.checkCourtAvailability(
+        booking.court_id,
+        booking.date,
+        booking.start_time,
+        booking.end_time
+      );
+
+      if (!hasConflict) {
+        throw new Error('Bu kort ve saat için zaten bir rezervasyon bulunmaktadır. Lütfen farklı bir saat seçin.');
+      }
+
       // Calculate lighting fee if booking is after 20:30
       const startTime = booking.start_time;
       const [hours, minutes] = startTime.split(':').map(Number);
@@ -147,7 +159,8 @@ export class BookingsService {
       
       const bookingData = {
         ...booking,
-        includes_lighting: isNightBooking
+        includes_lighting: isNightBooking,
+        status: 'confirmed' as const // Directly confirm the booking
       };
 
       const { data, error } = await supabase
@@ -157,11 +170,21 @@ export class BookingsService {
         .single();
 
       if (error) {
+        // Handle specific conflict errors
+        if (error.message?.includes('unique_confirmed_bookings') || 
+            error.message?.includes('zaten onaylanmış bir rezervasyon')) {
+          throw new Error('Bu kort ve saat için zaten bir rezervasyon bulunmaktadır. Lütfen farklı bir saat seçin.');
+        }
         handleDatabaseError(error, 'create booking');
       }
 
       return data;
-    } catch (error) {
+    } catch (error: any) {
+      // Re-throw our custom error messages
+      if (error.message?.includes('zaten bir rezervasyon') || 
+          error.message?.includes('farklı bir saat')) {
+        throw error;
+      }
       handleDatabaseError(error, 'create booking');
       throw error;
     }
@@ -178,9 +201,19 @@ export class BookingsService {
         .eq('id', bookingId);
 
       if (error) {
+        // Handle specific conflict errors when confirming
+        if (status === 'confirmed' && 
+            (error.message?.includes('unique_confirmed_bookings') || 
+             error.message?.includes('zaten onaylanmış bir rezervasyon'))) {
+          throw new Error('Bu kort ve saat için zaten onaylanmış bir rezervasyon bulunmaktadır.');
+        }
         handleDatabaseError(error, 'update booking status');
       }
-    } catch (error) {
+    } catch (error: any) {
+      // Re-throw our custom error messages
+      if (error.message?.includes('zaten onaylanmış bir rezervasyon')) {
+        throw error;
+      }
       handleDatabaseError(error, 'update booking status');
     }
   }
@@ -221,6 +254,37 @@ export class BookingsService {
     endTime: string
   ): Promise<boolean> {
     try {
+      // Use the database function for accurate conflict checking
+      const { data, error } = await supabase
+        .rpc('check_booking_conflict', {
+          p_court_id: courtId,
+          p_date: date,
+          p_start_time: startTime,
+          p_end_time: endTime
+        });
+
+      if (error) {
+        console.error('Error checking court availability:', error);
+        // If function fails, fall back to manual check
+        return this.fallbackAvailabilityCheck(courtId, date, startTime, endTime);
+      }
+
+      // Function returns true if there IS a conflict, so we return the opposite
+      return !data;
+    } catch (error) {
+      console.error('Error in checkCourtAvailability:', error);
+      // Fall back to manual check if RPC fails
+      return this.fallbackAvailabilityCheck(courtId, date, startTime, endTime);
+    }
+  }
+
+  private static async fallbackAvailabilityCheck(
+    courtId: string,
+    date: string,
+    startTime: string,
+    endTime: string
+  ): Promise<boolean> {
+    try {
       const { data, error } = await supabase
         .from('bookings')
         .select('id')
@@ -230,13 +294,46 @@ export class BookingsService {
         .or(`start_time.lt.${endTime},end_time.gt.${startTime}`);
 
       if (error) {
-        handleDatabaseError(error, 'check court availability');
+        handleDatabaseError(error, 'check court availability (fallback)');
       }
 
       return !data || data.length === 0;
     } catch (error) {
-      handleDatabaseError(error, 'check court availability');
+      handleDatabaseError(error, 'check court availability (fallback)');
       return false;
+    }
+  }
+
+  // New method to get available time slots for a court on a specific date
+  static async getAvailableTimeSlots(
+    courtId: string,
+    date: string
+  ): Promise<{ startTime: string; endTime: string; available: boolean }[]> {
+    try {
+      // Generate all possible time slots (8:00 - 22:00)
+      const timeSlots = [];
+      for (let hour = 8; hour <= 21; hour++) {
+        const startTime = `${hour.toString().padStart(2, '0')}:00`;
+        const endTime = `${(hour + 1).toString().padStart(2, '0')}:00`;
+        
+        const available = await this.checkCourtAvailability(
+          courtId, 
+          date, 
+          startTime, 
+          endTime
+        );
+        
+        timeSlots.push({
+          startTime,
+          endTime,
+          available
+        });
+      }
+      
+      return timeSlots;
+    } catch (error) {
+      handleDatabaseError(error, 'get available time slots');
+      return [];
     }
   }
 }

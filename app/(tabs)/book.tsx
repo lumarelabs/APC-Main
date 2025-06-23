@@ -149,7 +149,31 @@ export default function BookScreen() {
         ]
       );
     } catch (error: any) {
-      Alert.alert('Hata', error.message || 'Rezervasyon oluşturulamadı');
+      // Show user-friendly error messages for booking conflicts
+      let errorMessage = error.message || 'Rezervasyon oluşturulamadı';
+      
+      if (errorMessage.includes('zaten bir rezervasyon') || 
+          errorMessage.includes('farklı bir saat')) {
+        // This is a booking conflict - show specific message
+        Alert.alert(
+          'Rezervasyon Çakışması', 
+          errorMessage,
+          [
+            {
+              text: 'Tamam',
+              onPress: () => {
+                // Go back to date-time selection to choose a different time
+                setCurrentStep('date-time');
+                setSelectedTime(null);
+                scrollViewRef.current?.scrollTo({ y: 0, animated: true });
+              }
+            }
+          ]
+        );
+      } else {
+        // Generic error
+        Alert.alert('Hata', errorMessage);
+      }
     }
   };
 
@@ -226,6 +250,7 @@ export default function BookScreen() {
           <View style={styles.dateTimeContainer}>
             <DateTimeSelector
               onSelectDateTime={handleDateTimeSelected}
+              selectedCourt={selectedCourt}
             />
             {selectedDate && selectedTime && (
               <TouchableOpacity 
