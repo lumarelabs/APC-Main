@@ -86,7 +86,7 @@ export function CourtList({ courtType, onSelectCourt }: CourtListProps) {
           <CourtCard
             name={item.name}
             type={item.type}
-            price={item.price_per_hour / 100} // Convert from cents to TL
+            price={item.price_per_hour} // FIXED: Direct TL value, no division
             image={item.image_url || 'https://images.pexels.com/photos/2277981/pexels-photo-2277981.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=2'}
             location={item.location}
             onPress={() => onSelectCourt(item)}

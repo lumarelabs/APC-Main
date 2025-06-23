@@ -16,14 +16,14 @@ export function LessonBooking({ onComplete }: LessonBookingProps) {
       type: 'private' as LessonType,
       title: 'Özel Ders',
       description: 'Birebir özel ders',
-      price: 600,
+      price: 600, // FIXED: Direct TL value
       duration: '1 saat'
     },
     {
       type: 'group' as LessonType,
       title: 'Grup Dersi',
       description: '4 kişilik grup dersi',
-      price: 300,
+      price: 300, // FIXED: Direct TL value per person
       duration: '1 saat'
     }
   ];
