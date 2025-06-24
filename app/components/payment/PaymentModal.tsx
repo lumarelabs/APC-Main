@@ -45,7 +45,13 @@ export function PaymentModal({
     try {
       setLoading(true);
       
-      const response = await fetch('/payment', {
+      // FIXED: Use proper API URL construction
+      const apiUrl = process.env.EXPO_PUBLIC_API_URL || 'http://localhost:8081';
+      const paymentEndpoint = `${apiUrl}/payment`;
+      
+      console.log('Making payment request to:', paymentEndpoint);
+      
+      const response = await fetch(paymentEndpoint, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -59,7 +65,23 @@ export function PaymentModal({
         })
       });
 
+      // FIXED: Better error handling for non-JSON responses
+      const contentType = response.headers.get('content-type');
+      if (!contentType || !contentType.includes('application/json')) {
+        console.error('Non-JSON response received:', response.status, response.statusText);
+        const textResponse = await response.text();
+        console.error('Response body:', textResponse.substring(0, 200));
+        
+        if (response.status === 404) {
+          onError('Ödeme servisi bulunamadı. Lütfen daha sonra tekrar deneyin.');
+        } else {
+          onError('Ödeme servisi ile bağlantı kurulamadı');
+        }
+        return;
+      }
+
       const result = await response.json();
+      console.log('Payment API response:', result);
 
       if (result.success) {
         setPaymentUrl(result.iframe_url);
@@ -67,8 +89,16 @@ export function PaymentModal({
         onError(result.error || 'Ödeme başlatılamadı');
       }
     } catch (error: any) {
-      console.error('', error);
-      onError('Ödeme servisi ile bağlantı kurulamadı');
+      console.error('Payment initialization error:', error);
+      
+      // FIXED: Better error messages based on error type
+      if (error.name === 'TypeError' && error.message.includes('fetch')) {
+        onError('İnternet bağlantınızı kontrol edin');
+      } else if (error.message?.includes('JSON')) {
+        onError('Ödeme servisi geçici olarak kullanılamıyor');
+      } else {
+        onError('Ödeme servisi ile bağlantı kurulamadı');
+      }
     } finally {
       setLoading(false);
     }
@@ -76,6 +106,7 @@ export function PaymentModal({
 
   const handleWebViewNavigationStateChange = (navState: any) => {
     const { url } = navState;
+    console.log('WebView navigation:', url);
     
     // Check for success URL
     if (url.includes('/payment-success')) {
@@ -92,7 +123,9 @@ export function PaymentModal({
     }
   };
 
-  const handleWebViewError = () => {
+  const handleWebViewError = (syntheticEvent: any) => {
+    const { nativeEvent } = syntheticEvent;
+    console.error('WebView error:', nativeEvent);
     onError('Ödeme sayfası yüklenirken hata oluştu');
     setPaymentUrl(null);
   };
@@ -109,6 +142,7 @@ export function PaymentModal({
           onClose();
         }
       } catch (error) {
+        console.error('Browser open error:', error);
         onError('Tarayıcı açılamadı');
       }
     }
@@ -144,6 +178,9 @@ export function PaymentModal({
           <View style={styles.loadingContainer}>
             <ActivityIndicator size="large" color={colors.primary} />
             <Text style={styles.loadingText}>Ödeme sayfası hazırlanıyor...</Text>
+            <Text style={styles.debugText}>
+              API URL: {process.env.EXPO_PUBLIC_API_URL || 'Tanımlı değil'}
+            </Text>
           </View>
         )}
 
@@ -238,6 +275,13 @@ const styles = StyleSheet.create({
     fontSize: 16,
     color: colors.text.disabled,
     marginTop: 16,
+    textAlign: 'center',
+  },
+  debugText: {
+    fontFamily: 'Inter-Regular',
+    fontSize: 12,
+    color: colors.text.disabled,
+    marginTop: 8,
     textAlign: 'center',
   },
   paymentContainer: {

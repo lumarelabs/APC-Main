@@ -3,18 +3,25 @@ export async function POST(request: Request) {
     const body = await request.json();
     const { amount, orderId, userEmail, userName, userPhone } = body;
 
-    // PayTR configuration
-    const merchant_id = process.env.PAYTR_MERCHANT_ID || ''; // Your PayTR merchant ID
-    const merchant_key = process.env.PAYTR_MERCHANT_KEY || ''; // Your PayTR merchant key
-    const merchant_salt = process.env.PAYTR_MERCHANT_SALT || ''; // Your PayTR merchant salt
+    console.log('Payment API called with:', { amount, orderId, userEmail, userName });
 
+    // PayTR configuration - CRITICAL: These must be set in your .env file
+    const merchant_id = process.env.PAYTR_MERCHANT_ID;
+    const merchant_key = process.env.PAYTR_MERCHANT_KEY;
+    const merchant_salt = process.env.PAYTR_MERCHANT_SALT;
+
+    // FIXED: Better error handling for missing credentials
     if (!merchant_id || !merchant_key || !merchant_salt) {
-      return new Response(JSON.stringify({ 
-        error: 'PayTR configuration missing' 
-      }), {
-        status: 500,
-        headers: { 'Content-Type': 'application/json' }
+      console.error('PayTR credentials missing:', {
+        merchant_id: !!merchant_id,
+        merchant_key: !!merchant_key,
+        merchant_salt: !!merchant_salt
       });
+      
+      return Response.json({ 
+        success: false,
+        error: 'PayTR yapılandırması eksik. Lütfen sistem yöneticisi ile iletişime geçin.' 
+      }, { status: 500 });
     }
 
     // PayTR payment parameters
@@ -27,8 +34,12 @@ export async function POST(request: Request) {
     const user_name = userName;
     const user_address = 'Alaçatı Padel Club';
     const user_phone = userPhone;
-    const merchant_ok_url = `${process.env.EXPO_PUBLIC_API_URL || 'http://localhost:8081'}/payment-success`;
-    const merchant_fail_url = `${process.env.EXPO_PUBLIC_API_URL || 'http://localhost:8081'}/payment-fail`;
+    
+    // FIXED: Use proper URLs for success/fail redirects
+    const baseUrl = process.env.EXPO_PUBLIC_API_URL || 'http://localhost:8081';
+    const merchant_ok_url = `${baseUrl}/payment-success`;
+    const merchant_fail_url = `${baseUrl}/payment-fail`;
+    
     const user_basket = JSON.stringify([
       ['Kort Rezervasyonu', `${amount} TL`, 1]
     ]);
@@ -40,9 +51,21 @@ export async function POST(request: Request) {
     // Create hash string for PayTR
     const hashstr = `${merchant_id}${user_ip}${merchant_oid}${userEmail}${payment_amount}${user_basket}${no_installment}${max_installment}${currency}${test_mode}${merchant_salt}`;
     
-    // Generate hash using crypto
-    const crypto = require('crypto');
-    const paytr_token = crypto.createHmac('sha256', merchant_key).update(hashstr).digest('base64');
+    // FIXED: Use Web Crypto API for hash generation (works in both Node.js and browser)
+    const encoder = new TextEncoder();
+    const data = encoder.encode(hashstr);
+    const keyData = encoder.encode(merchant_key);
+    
+    const cryptoKey = await crypto.subtle.importKey(
+      'raw',
+      keyData,
+      { name: 'HMAC', hash: 'SHA-256' },
+      false,
+      ['sign']
+    );
+    
+    const signature = await crypto.subtle.sign('HMAC', cryptoKey, data);
+    const paytr_token = btoa(String.fromCharCode(...new Uint8Array(signature)));
 
     // PayTR API request data
     const postData = {
@@ -67,6 +90,8 @@ export async function POST(request: Request) {
       lang
     };
 
+    console.log('PayTR request data:', { ...postData, paytr_token: 'HIDDEN' });
+
     // Make request to PayTR
     const paytrResponse = await fetch('https://www.paytr.com/odeme/api/get-token', {
       method: 'POST',
@@ -77,7 +102,18 @@ export async function POST(request: Request) {
     });
 
     const paytrResult = await paytrResponse.text();
-    const result = JSON.parse(paytrResult);
+    console.log('PayTR response:', paytrResult);
+    
+    let result;
+    try {
+      result = JSON.parse(paytrResult);
+    } catch (parseError) {
+      console.error('PayTR response parse error:', parseError);
+      return Response.json({
+        success: false,
+        error: 'PayTR servisi geçici olarak kullanılamıyor'
+      }, { status: 500 });
+    }
 
     if (result.status === 'success') {
       return Response.json({
@@ -86,20 +122,19 @@ export async function POST(request: Request) {
         iframe_url: `https://www.paytr.com/odeme/guvenli/${result.token}`
       });
     } else {
+      console.error('PayTR error:', result);
       return Response.json({
         success: false,
-        error: result.reason || 'Payment token generation failed'
+        error: result.reason || 'Ödeme token oluşturulamadı'
       });
     }
 
   } catch (error: any) {
     console.error('PayTR API Error:', error);
-    return new Response(JSON.stringify({ 
-      error: 'Payment processing failed',
+    return Response.json({ 
+      success: false,
+      error: 'Ödeme işlemi başlatılamadı',
       details: error.message 
-    }), {
-      status: 500,
-      headers: { 'Content-Type': 'application/json' }
-    });
+    }, { status: 500 });
   }
 }
