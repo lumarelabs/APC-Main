@@ -8,6 +8,7 @@ import { AppProvider } from '@/app/context/AppContext';
 import { useAuth } from '@/app/hooks/useAuth';
 import { notificationService } from '@/app/services/notifications/NotificationService';
 import AuthScreen from '@/app/components/auth/AuthScreen'
+import { useFrameworkReady } from '@/hooks/useFrameworkReady'
 
 // Prevent splash screen from auto-hiding
 SplashScreen.preventAutoHideAsync();
