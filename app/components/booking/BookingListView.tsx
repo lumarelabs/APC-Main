@@ -102,13 +102,16 @@ export function BookingListView({ bookings, maxVisible = 3 }: BookingListViewPro
           <Text style={styles.emptyText}>Henüz rezervasyon yok</Text>
         </View>
       ) : (
-        <FlatList
-          data={visibleBookings}
-          renderItem={renderBookingItem}
-          keyExtractor={(item) => item.id}
-          showsVerticalScrollIndicator={false}
-          style={styles.bookingsList}
-        />
+        <View style={styles.listContainer}>
+          <FlatList
+            data={visibleBookings}
+            renderItem={renderBookingItem}
+            keyExtractor={(item) => item.id}
+            showsVerticalScrollIndicator={false}
+            scrollEnabled={false}
+            nestedScrollEnabled={true}
+          />
+        </View>
       )}
 
       {/* All Bookings Modal */}
@@ -240,7 +243,7 @@ const styles = StyleSheet.create({
     fontSize: 14,
     color: colors.primary,
   },
-  bookingsList: {
+  listContainer: {
     maxHeight: 300,
   },
   emptyContainer: {

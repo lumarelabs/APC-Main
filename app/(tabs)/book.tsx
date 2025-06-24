@@ -5,7 +5,6 @@ import { CourtTypeSelector } from '@/app/components/booking/CourtTypeSelector';
 import { DateTimeSelector } from '@/app/components/booking/DateTimeSelector';
 import { BookingCalendar } from '@/app/components/booking/BookingCalendar';
 import { BookingListView } from '@/app/components/booking/BookingListView';
-import { WeeklyCalendar } from '@/app/components/booking/WeeklyCalendar';
 import { CourtList } from '@/app/components/booking/CourtList';
 import { RacketRental } from '@/app/components/booking/RacketRental';
 import { PaymentSummary } from '@/app/components/booking/PaymentSummary';
@@ -13,10 +12,10 @@ import { LessonBooking } from '@/app/components/booking/LessonBooking';
 import { ChevronLeft } from 'lucide-react-native';
 import { useAllBookings, useCourts } from '@/app/hooks/useSupabaseData';
 import { useApp } from '@/app/context/AppContext';
+import { notificationService } from '@/app/services/notifications/NotificationService';
 import { colors } from '@/app/theme/colors';
 
 type BookingStep = 'court-selection' | 'lesson-booking' | 'date-time' | 'racket-rental' | 'payment';
-type CalendarViewMode = 'weekly' | 'monthly';
 type BookingType = 'court' | 'lesson';
 
 export default function BookScreen() {
@@ -27,11 +26,10 @@ export default function BookScreen() {
   const [selectedTime, setSelectedTime] = useState<string | null>(null);
   const [racketCount, setRacketCount] = useState(0);
   const [currentStep, setCurrentStep] = useState<BookingStep>('court-selection');
-  const [calendarViewMode, setCalendarViewMode] = useState<CalendarViewMode>('weekly');
 
   const scrollViewRef = useRef<ScrollView>(null);
 
-  const { createBooking } = useApp();
+  const { createBooking, user } = useApp();
   const { bookings } = useAllBookings();
   const { courts } = useCourts();
 
@@ -128,7 +126,17 @@ export default function BookScreen() {
         includes_racket: racketCount > 0
       };
 
-      await createBooking(bookingData);
+      const newBooking = await createBooking(bookingData);
+      
+      // Schedule notification reminder
+      if (user?.id) {
+        await notificationService.scheduleBookingReminder(
+          newBooking.id,
+          selectedDate,
+          `${startTime}:00`,
+          selectedCourt.name
+        );
+      }
       
       Alert.alert(
         'Başarılı!', 
@@ -360,47 +368,11 @@ export default function BookScreen() {
           </View>
         </View>
 
-        {/* Bottom Half - Calendar and Bookings */}
+        {/* Bottom Half - Calendar and Bookings (Only show match reservations) */}
         {(currentStep === 'court-selection' || currentStep === 'date-time') && (
           <View style={styles.bottomSection}>
-            {/* Calendar View Selector */}
-            <View style={styles.viewSelector}>
-              <TouchableOpacity
-                style={[
-                  styles.viewOption, 
-                  calendarViewMode === 'weekly' && styles.viewOptionActive
-                ]}
-                onPress={() => setCalendarViewMode('weekly')}
-              >
-                <Text style={[
-                  styles.viewOptionText, 
-                  calendarViewMode === 'weekly' && styles.viewOptionTextActive
-                ]}>
-                  Haftalık Görünüm
-                </Text>
-              </TouchableOpacity>
-              <TouchableOpacity
-                style={[
-                  styles.viewOption, 
-                  calendarViewMode === 'monthly' && styles.viewOptionActive
-                ]}
-                onPress={() => setCalendarViewMode('monthly')}
-              >
-                <Text style={[
-                  styles.viewOptionText, 
-                  calendarViewMode === 'monthly' && styles.viewOptionTextActive
-                ]}>
-                  Aylık Görünüm
-                </Text>
-              </TouchableOpacity>
-            </View>
-
             {/* Calendar */}
-            {calendarViewMode === 'weekly' ? (
-              <WeeklyCalendar bookings={existingBookings} />
-            ) : (
-              <BookingCalendar bookings={existingBookings} />
-            )}
+            <BookingCalendar bookings={existingBookings} />
 
             {/* Bookings List */}
             <View style={styles.bookingsListContainer}>
@@ -485,34 +457,6 @@ const styles = StyleSheet.create({
     borderTopWidth: 1,
     borderTopColor: colors.background.secondary,
     paddingBottom: 100,
-  },
-  viewSelector: {
-    flexDirection: 'row',
-    padding: 12,
-    gap: 8,
-  },
-  viewOption: {
-    flex: 1,
-    paddingVertical: 12,
-    paddingHorizontal: 16,
-    borderRadius: 20,
-    backgroundColor: colors.background.primary,
-    alignItems: 'center',
-    borderWidth: 2,
-    borderColor: 'transparent',
-  },
-  viewOptionActive: {
-    backgroundColor: colors.primary,
-    borderColor: colors.primary,
-  },
-  viewOptionText: {
-    fontFamily: 'Inter-Medium',
-    fontSize: 14,
-    color: colors.text.disabled,
-  },
-  viewOptionTextActive: {
-    fontFamily: 'Inter-Bold',
-    color: colors.white,
   },
   confirmButton: {
     backgroundColor: colors.primary,
