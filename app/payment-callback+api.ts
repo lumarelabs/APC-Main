@@ -5,7 +5,7 @@ export async function POST(request: Request) {
     // PayTR callback parameters
     const merchant_oid = formData.get('merchant_oid') as string;
     const status = formData.get('status') as string;
-    const total_amount = formData.get('total_amount') as string;
+    const total_amount = formData.get('total_amount') as string;  
     const hash = formData.get('hash') as string;
     const failed_reason_code = formData.get('failed_reason_code') as string;
     const failed_reason_msg = formData.get('failed_reason_msg') as string;
