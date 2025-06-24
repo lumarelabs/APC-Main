@@ -1,7 +1,7 @@
 import React, { useEffect } from 'react';
 import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { XCircle, ArrowLeft } from 'lucide-react-native';
+import { Circle as XCircle, ArrowLeft } from 'lucide-react-native';
 import { router } from 'expo-router';
 import { colors } from '@/app/theme/colors';
 
