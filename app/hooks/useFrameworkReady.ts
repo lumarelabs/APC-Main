@@ -10,5 +10,6 @@ export function useFrameworkReady() {
   useEffect(() => {
     window.frameworkReady?.();
   }, []); // Add empty dependency array for proper effect behavior
+  // Prevent splash screen from auto-hidin
 SplashScreen.preventAutoHideAsync();
 }
