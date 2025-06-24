@@ -317,18 +317,33 @@ export class AuthService {
           throw error;
         }
       } else {
-        // Mobile implementation using AuthSession with promptAsync
+        // Mobile implementation - Check if AuthSession is available
+        if (!AuthSession || typeof AuthSession.makeRedirectUri !== 'function') {
+          throw new Error('AuthSession is not available');
+        }
+
         const redirectUrl = AuthSession.makeRedirectUri({
           useProxy: true,
         });
 
         const authUrl = `${supabase.supabaseUrl}/auth/v1/authorize?provider=google&redirect_to=${encodeURIComponent(redirectUrl)}`;
 
-        // Use promptAsync instead of startAsync
-        const result = await AuthSession.promptAsync({
-          authUrl,
-          returnUrl: redirectUrl,
-        });
+        // Check if promptAsync is available, fallback to startAsync if needed
+        let result;
+        if (typeof AuthSession.promptAsync === 'function') {
+          result = await AuthSession.promptAsync({
+            authUrl,
+            returnUrl: redirectUrl,
+          });
+        } else if (typeof AuthSession.startAsync === 'function') {
+          // Fallback for older versions
+          result = await AuthSession.startAsync({
+            authUrl,
+            returnUrl: redirectUrl,
+          });
+        } else {
+          throw new Error('No suitable AuthSession method available');
+        }
 
         if (result.type === 'success') {
           const { url } = result;
@@ -386,6 +401,8 @@ export class AuthService {
         errorMessage = 'Google Play Hizmetleri güncel değil';
       } else if (message.includes('sign_in_failed')) {
         errorMessage = 'Google hesabı ile giriş başarısız';
+      } else if (message.includes('authsession') || message.includes('not available') || message.includes('not a function')) {
+        errorMessage = 'Google giriş özelliği şu anda kullanılamıyor';
       } else if (message.includes('promptasync is not a function') || message.includes('startasync is not a function')) {
         errorMessage = 'Google giriş özelliği şu anda kullanılamıyor';
       }
