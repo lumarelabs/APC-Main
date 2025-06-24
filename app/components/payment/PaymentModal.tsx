@@ -67,6 +67,7 @@ export function PaymentModal({
         onError(result.error || 'Ödeme başlatılamadı');
       }
     } catch (error: any) {
+      console.error('', error);
       onError('Ödeme servisi ile bağlantı kurulamadı');
     } finally {
       setLoading(false);
