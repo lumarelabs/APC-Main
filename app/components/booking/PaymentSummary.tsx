@@ -1,5 +1,6 @@
 import React from 'react';
-import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
+import { View, Text, StyleSheet } from 'react-native';
+import { PaymentButton } from '@/app/components/payment/PaymentButton';
 import { colors } from '@/app/theme/colors';
 
 type PaymentSummaryProps = {
@@ -36,6 +37,9 @@ export function PaymentSummary({
       weekday: 'long'
     });
   };
+
+  // Generate unique order ID
+  const orderId = `booking_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
 
   return (
     <View style={styles.container}>
@@ -79,9 +83,24 @@ export function PaymentSummary({
         </View>
       </View>
 
-      <TouchableOpacity style={styles.confirmButton} onPress={onConfirm}>
-        <Text style={styles.confirmButtonText}>Onayla & Öde</Text>
-      </TouchableOpacity>
+      <PaymentButton
+        amount={totalPrice}
+        orderId={orderId}
+        onPaymentSuccess={onConfirm}
+        onPaymentError={(error) => {
+          console.error('Payment error:', error);
+        }}
+        style={styles.paymentButton}
+      />
+
+      <View style={styles.securityInfo}>
+        <Text style={styles.securityText}>
+          🔒 Ödemeniz PayTR güvencesi altında SSL sertifikası ile korunmaktadır.
+        </Text>
+        <Text style={styles.securitySubtext}>
+          Kredi kartı bilgileriniz saklanmaz ve üçüncü kişilerle paylaşılmaz.
+        </Text>
+      </View>
     </View>
   );
 }
@@ -143,21 +162,28 @@ const styles = StyleSheet.create({
     fontSize: 16,
     color: colors.primary,
   },
-  confirmButton: {
-    backgroundColor: colors.primary,
-    padding: 16,
-    borderRadius: 12,
-    alignItems: 'center',
+  paymentButton: {
     marginTop: 24,
-    shadowColor: colors.primary,
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.3,
-    shadowRadius: 4,
-    elevation: 5,
+    marginBottom: 16,
   },
-  confirmButtonText: {
-    fontFamily: 'Inter-Bold',
-    fontSize: 16,
-    color: colors.white,
+  securityInfo: {
+    backgroundColor: colors.background.secondary,
+    borderRadius: 12,
+    padding: 16,
+    alignItems: 'center',
+  },
+  securityText: {
+    fontFamily: 'Inter-Medium',
+    fontSize: 14,
+    color: colors.primary,
+    textAlign: 'center',
+    marginBottom: 8,
+  },
+  securitySubtext: {
+    fontFamily: 'Inter-Regular',
+    fontSize: 12,
+    color: colors.text.disabled,
+    textAlign: 'center',
+    lineHeight: 16,
   },
 });
