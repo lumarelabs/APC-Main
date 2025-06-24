@@ -147,7 +147,7 @@ export default function HomeScreen() {
               <View style={[styles.serviceIcon, { backgroundColor: 'rgba(22, 255, 145, 0.15)' }]}>
                 <BookOpen size={24} color="#16FF91" />
               </View>
-              <Text style={styles.serviceTitle}>Kort Rezervasyonu</Text>
+              <Text style={styles.serviceTitle}>Kortlar</Text>
             </TouchableOpacity>
             <TouchableOpacity 
               style={styles.serviceCard}
