@@ -1,4 +1,4 @@
-import { View, Text, StyleSheet, FlatList, ActivityIndicator } from 'react-native';
+import { View, Text, StyleSheet, ActivityIndicator } from 'react-native';
 import { CourtCard } from '@/app/components/courts/CourtCard';
 import { useCourts } from '@/app/hooks/useSupabaseData';
 import { colors } from '@/app/theme/colors';
@@ -76,7 +76,7 @@ export function CourtList({ courtType, onSelectCourt }: CourtListProps) {
     <View style={styles.container}>
       <Text style={styles.title}>Kort Seçiniz ({filteredCourts.length} kort)</Text>
       
-      {/* FIXED: Remove FlatList to avoid VirtualizedList nesting error */}
+      {/* FIXED: Proper grid layout with correct spacing */}
       <View style={styles.courtsGrid}>
         {filteredCourts.map((item, index) => (
           <View key={item.id} style={styles.courtCardContainer}>
@@ -98,7 +98,6 @@ export function CourtList({ courtType, onSelectCourt }: CourtListProps) {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    padding: 16,
   },
   title: {
     fontFamily: 'Inter-Bold',
@@ -110,7 +109,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     flexWrap: 'wrap',
     justifyContent: 'space-between',
-    paddingBottom: 80,
+    paddingBottom: 20,
   },
   courtCardContainer: {
     width: '48%',

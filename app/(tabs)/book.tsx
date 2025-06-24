@@ -3,6 +3,7 @@ import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Alert } from 'rea
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { CourtTypeSelector } from '@/app/components/booking/CourtTypeSelector';
 import { DateTimeSelector } from '@/app/components/booking/DateTimeSelector';
+import { BookingListView } from '@/app/components/booking/BookingListView';
 import { CourtList } from '@/app/components/booking/CourtList';
 import { RacketRental } from '@/app/components/booking/RacketRental';
 import { PaymentSummary } from '@/app/components/booking/PaymentSummary';
@@ -27,6 +28,7 @@ export default function BookScreen() {
   const scrollViewRef = useRef<ScrollView>(null);
 
   const { createBooking } = useApp();
+  const { bookings } = useAllBookings();
   const { courts } = useCourts();
 
   const handleBack = () => {
@@ -171,6 +173,46 @@ export default function BookScreen() {
     }
   };
 
+  // Transform bookings for calendar display
+  const existingBookings: Record<string, any[]> = {};
+  
+  const today = new Date();
+  today.setHours(0, 0, 0, 0);
+  
+  bookings
+    .filter(booking => {
+      const bookingDate = new Date(booking.date);
+      bookingDate.setHours(0, 0, 0, 0);
+      return bookingDate >= today;
+    })
+    .forEach(booking => {
+      const dateKey = booking.date;
+      if (!existingBookings[dateKey]) {
+        existingBookings[dateKey] = [];
+      }
+      existingBookings[dateKey].push({
+        id: booking.id,
+        courtName: booking.court?.name || 'Bilinmeyen Kort',
+        courtType: booking.court?.type || 'padel',
+        time: `${booking.start_time.slice(0, 5)} - ${booking.end_time.slice(0, 5)}`,
+        date: new Date(booking.date).toLocaleDateString('tr-TR', {
+          month: 'long',
+          day: 'numeric',
+          weekday: 'long',
+          hour: 'numeric',
+          minute: '2-digit',
+          year: 'numeric'
+        }),
+        maxPlayers: 4,
+        players: [
+          {
+            name: 'Kullanıcı',
+            skillLevel: 'Orta'
+          }
+        ]
+      });
+    });
+
   const renderBookingStep = () => {
     switch (currentStep) {
       case 'court-selection':
@@ -257,60 +299,69 @@ export default function BookScreen() {
         showsVerticalScrollIndicator={false}
         keyboardShouldPersistTaps="handled"
       >
-        {/* Header */}
-        <View style={styles.header}>
-          {(currentStep !== 'court-selection' || selectedCourt) && (
-            <TouchableOpacity 
-              style={styles.backButton} 
-              onPress={handleBack}
-            >
-              <ChevronLeft size={24} color={colors.charcoal} />
-            </TouchableOpacity>
-          )}
+        {/* Top Half - Booking Section */}
+        <View style={styles.topSection}>
+          <View style={styles.header}>
+            {(currentStep !== 'court-selection' || selectedCourt) && (
+              <TouchableOpacity 
+                style={styles.backButton} 
+                onPress={handleBack}
+              >
+                <ChevronLeft size={24} color={colors.charcoal} />
+              </TouchableOpacity>
+            )}
+            
+            {/* Booking Type Selector */}
+            <View style={styles.bookingTypeSelector}>
+              <TouchableOpacity
+                style={[
+                  styles.bookingTypeButton,
+                  bookingType === 'court' && styles.activeBookingTypeButton
+                ]}
+                onPress={() => handleBookingTypeToggle('court')}
+              >
+                <Text style={[
+                  styles.bookingTypeText,
+                  bookingType === 'court' && styles.activeBookingTypeText
+                ]}>
+                  Kort Rezervasyonu
+                </Text>
+              </TouchableOpacity>
+              <TouchableOpacity
+                style={[
+                  styles.bookingTypeButton,
+                  bookingType === 'lesson' && styles.activeBookingTypeButton
+                ]}
+                onPress={() => handleBookingTypeToggle('lesson')}
+              >
+                <Text style={[
+                  styles.bookingTypeText,
+                  bookingType === 'lesson' && styles.activeBookingTypeText
+                ]}>
+                  Ders Rezervasyonu
+                </Text>
+              </TouchableOpacity>
+            </View>
+          </View>
           
-          {/* Booking Type Selector */}
-          <View style={styles.bookingTypeSelector}>
-            <TouchableOpacity
-              style={[
-                styles.bookingTypeButton,
-                bookingType === 'court' && styles.activeBookingTypeButton
-              ]}
-              onPress={() => handleBookingTypeToggle('court')}
-            >
-              <Text style={[
-                styles.bookingTypeText,
-                bookingType === 'court' && styles.activeBookingTypeText
-              ]}>
-                Kort Rezervasyonu
-              </Text>
-            </TouchableOpacity>
-            <TouchableOpacity
-              style={[
-                styles.bookingTypeButton,
-                bookingType === 'lesson' && styles.activeBookingTypeButton
-              ]}
-              onPress={() => handleBookingTypeToggle('lesson')}
-            >
-              <Text style={[
-                styles.bookingTypeText,
-                bookingType === 'lesson' && styles.activeBookingTypeText
-              ]}>
-                Ders Rezervasyonu
-              </Text>
-            </TouchableOpacity>
+          {currentStep === 'court-selection' && bookingType === 'court' && (
+            <CourtTypeSelector
+              selectedType={courtType}
+              onSelectType={setCourtType}
+            />
+          )}
+
+          <View style={styles.bookingContent}>
+            {renderBookingStep()}
           </View>
         </View>
-        
-        {currentStep === 'court-selection' && bookingType === 'court' && (
-          <CourtTypeSelector
-            selectedType={courtType}
-            onSelectType={setCourtType}
-          />
-        )}
 
-        <View style={styles.bookingContent}>
-          {renderBookingStep()}
-        </View>
+        {/* Bottom Half - Existing Reservations */}
+        {currentStep === 'court-selection' && (
+          <View style={styles.bottomSection}>
+            <BookingListView bookings={existingBookings} maxVisible={5} />
+          </View>
+        )}
       </ScrollView>
     </SafeAreaView>
   );
@@ -327,7 +378,6 @@ const styles = StyleSheet.create({
   },
   scrollContent: {
     flexGrow: 1,
-    paddingBottom: 100,
   },
   header: {
     paddingHorizontal: 16,
@@ -372,6 +422,10 @@ const styles = StyleSheet.create({
     fontFamily: 'Inter-Bold',
     color: colors.white,
   },
+  topSection: {
+    paddingTop: 16,
+    paddingBottom: 8,
+  },
   bookingContent: {
     paddingHorizontal: 16,
   },
@@ -380,6 +434,11 @@ const styles = StyleSheet.create({
   },
   dateTimeContainer: {
     // Prevent auto-scroll by not using flex
+  },
+  bottomSection: {
+    borderTopWidth: 1,
+    borderTopColor: colors.background.secondary,
+    paddingBottom: 100,
   },
   confirmButton: {
     backgroundColor: colors.primary,
