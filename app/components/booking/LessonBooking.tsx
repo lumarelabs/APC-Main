@@ -40,7 +40,7 @@ export function LessonBooking({ onComplete }: LessonBookingProps) {
   return (
     <View style={styles.container}>
       <Text style={styles.title}>Ders Türü Seçin</Text>
-      <Text style={styles.subtitle}>Deneyimli eğitmenlerimizden ders alın</Text>
+      <Text style={styles.subtitle}>Özel ders rezervasyonu ile ilgili detaylı bilgi için bize telefonla ulaşabilirsiniz: +90535 306 2892</Text>
       
       <View style={styles.lessonTypes}>
         {lessonTypes.map((lesson) => (
