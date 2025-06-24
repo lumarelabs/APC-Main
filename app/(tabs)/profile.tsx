@@ -1,12 +1,10 @@
 import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Image, Alert } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { 
-  Settings, CreditCard, Bell, Shield, LogOut, 
-  Trophy, Clock, Calendar
+  Settings, CreditCard, Bell, Shield, LogOut
 } from 'lucide-react-native';
 import { useApp } from '@/app/context/AppContext';
 import { useUserProfile } from '@/app/hooks/useSupabaseData';
-import Logo2 from '../../assets/images/logo2.png';
 import { colors } from '@/app/theme/colors';
 
 export default function ProfileScreen() {
@@ -61,7 +59,7 @@ export default function ProfileScreen() {
         {/* User Profile */}
         <View style={styles.profileCard}>
           <Image 
-            source={{ uri: displayProfile.profile_image_url }} 
+            source={{ uri: 'https://images.pexels.com/photos/6253312/pexels-photo-6253312.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=2' }} 
             style={styles.profileImage} 
           />
           <View style={styles.profileInfo}>
@@ -75,22 +73,6 @@ export default function ProfileScreen() {
             <View style={styles.levelBadge}>
               <Text style={styles.levelText}>Seviye {displayProfile.level}</Text>
             </View>
-          </View>
-        </View>
-
-        {/* Stats */}
-        <View style={styles.statsContainer}>
-          <View style={styles.statCard}>
-            <Text style={styles.statValue}>0</Text>
-            <Text style={styles.statLabel}>Toplam Maç</Text>
-          </View>
-          <View style={styles.statCard}>
-            <Text style={styles.statValue}>0</Text>
-            <Text style={styles.statLabel}>Kazanılan</Text>
-          </View>
-          <View style={styles.statCard}>
-            <Text style={styles.statValue}>-</Text>
-            <Text style={styles.statLabel}>Kazanma Oranı</Text>
           </View>
         </View>
 
@@ -123,11 +105,6 @@ export default function ProfileScreen() {
             </View>
             <Text style={styles.menuText}>Çıkış Yap</Text>
           </TouchableOpacity>
-        </View>
-
-        {/* Logo2 at the bottom visually centered */}
-        <View style={styles.logo2Container}>
-          <Image source={Logo2} style={styles.logo2} resizeMode="contain" />
         </View>
       </ScrollView>
     </SafeAreaView>
@@ -228,32 +205,6 @@ const styles = StyleSheet.create({
     fontSize: 12,
     color: colors.white,
   },
-  statsContainer: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    paddingHorizontal: 16,
-    marginBottom: 24,
-  },
-  statCard: {
-    flex: 1,
-    backgroundColor: colors.background.secondary,
-    borderRadius: 16,
-    padding: 16,
-    alignItems: 'center',
-    marginHorizontal: 4,
-  },
-  statValue: {
-    fontFamily: 'Inter-Bold',
-    fontSize: 24,
-    color: colors.primary,
-    marginTop: 8,
-  },
-  statLabel: {
-    fontFamily: 'Inter-Regular',
-    fontSize: 14,
-    color: colors.text.disabled,
-    marginTop: 4,
-  },
   menuContainer: {
     backgroundColor: colors.background.secondary,
     borderRadius: 16,
@@ -301,16 +252,5 @@ const styles = StyleSheet.create({
     fontFamily: 'Inter-Medium',
     fontSize: 12,
     color: colors.charcoal,
-  },
-  logo2Container: {
-    position: 'absolute',
-    bottom: 0,
-    left: 0,
-    right: 0,
-    alignItems: 'center',
-  },
-  logo2: {
-    width: '100%',
-    height: 100,
   },
 });

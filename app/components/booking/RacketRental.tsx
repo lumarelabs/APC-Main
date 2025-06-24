@@ -159,7 +159,7 @@ const styles = StyleSheet.create({
   skipButtonText: {
     fontFamily: 'Inter-Bold',
     fontSize: 16,
-    color: colors.text.disabled,
+    color: colors.charcoal, // Changed from disabled color to charcoal for better visibility
   },
   continueButton: {
     flex: 1,

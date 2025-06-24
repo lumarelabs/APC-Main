@@ -76,23 +76,21 @@ export function CourtList({ courtType, onSelectCourt }: CourtListProps) {
     <View style={styles.container}>
       <Text style={styles.title}>Kort Seçiniz ({filteredCourts.length} kort)</Text>
       
-      <FlatList
-        data={filteredCourts}
-        keyExtractor={(item) => item.id}
-        numColumns={2}
-        contentContainerStyle={styles.listContent}
-        columnWrapperStyle={filteredCourts.length > 1 ? styles.columnWrapper : null}
-        renderItem={({ item }) => (
-          <CourtCard
-            name={item.name}
-            type={item.type}
-            price={item.price_per_hour} // FIXED: Direct TL value, no division
-            image={item.image_url || 'https://images.pexels.com/photos/2277981/pexels-photo-2277981.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=2'}
-            location={item.location}
-            onPress={() => onSelectCourt(item)}
-          />
-        )}
-      />
+      {/* FIXED: Remove FlatList to avoid VirtualizedList nesting error */}
+      <View style={styles.courtsGrid}>
+        {filteredCourts.map((item, index) => (
+          <View key={item.id} style={styles.courtCardContainer}>
+            <CourtCard
+              name={item.name}
+              type={item.type}
+              price={item.price_per_hour} // FIXED: Direct TL value, no division
+              image={item.image_url || 'https://images.pexels.com/photos/2277981/pexels-photo-2277981.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=2'}
+              location={item.location}
+              onPress={() => onSelectCourt(item)}
+            />
+          </View>
+        ))}
+      </View>
     </View>
   );
 }
@@ -108,11 +106,15 @@ const styles = StyleSheet.create({
     color: colors.charcoal,
     marginBottom: 16,
   },
-  listContent: {
+  courtsGrid: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    justifyContent: 'space-between',
     paddingBottom: 80,
   },
-  columnWrapper: {
-    justifyContent: 'space-between',
+  courtCardContainer: {
+    width: '48%',
+    marginBottom: 16,
   },
   loadingContainer: {
     flex: 1,
