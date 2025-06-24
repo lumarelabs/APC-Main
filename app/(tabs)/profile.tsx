@@ -1,7 +1,8 @@
 import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Image, Alert } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { 
-  Settings, CreditCard, Bell, Shield, LogOut
+  Settings, CreditCard, Bell, Shield, LogOut, 
+  Trophy, Clock, Calendar
 } from 'lucide-react-native';
 import { useApp } from '@/app/context/AppContext';
 import { useUserProfile } from '@/app/hooks/useSupabaseData';
@@ -45,7 +46,8 @@ export default function ProfileScreen() {
 
   const displayProfile = profile || {
     full_name: user?.email?.split('@')[0] || 'Kullanıcı',
-    level: 'Başlangıç'
+    level: 'Başlangıç',
+    profile_image_url: 'https://images.pexels.com/photos/1681010/pexels-photo-1681010.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=2'
   };
 
   return (
@@ -59,9 +61,8 @@ export default function ProfileScreen() {
         {/* User Profile */}
         <View style={styles.profileCard}>
           <Image 
-            source={Logo2} 
+            source={{ uri: displayProfile.profile_image_url }} 
             style={styles.profileImage} 
-            resizeMode="contain"
           />
           <View style={styles.profileInfo}>
             <View style={styles.nameAndSkill}>
@@ -74,6 +75,22 @@ export default function ProfileScreen() {
             <View style={styles.levelBadge}>
               <Text style={styles.levelText}>Seviye {displayProfile.level}</Text>
             </View>
+          </View>
+        </View>
+
+        {/* Stats */}
+        <View style={styles.statsContainer}>
+          <View style={styles.statCard}>
+            <Text style={styles.statValue}>0</Text>
+            <Text style={styles.statLabel}>Toplam Maç</Text>
+          </View>
+          <View style={styles.statCard}>
+            <Text style={styles.statValue}>0</Text>
+            <Text style={styles.statLabel}>Kazanılan</Text>
+          </View>
+          <View style={styles.statCard}>
+            <Text style={styles.statValue}>-</Text>
+            <Text style={styles.statLabel}>Kazanma Oranı</Text>
           </View>
         </View>
 
@@ -210,6 +227,32 @@ const styles = StyleSheet.create({
     fontFamily: 'Inter-Medium',
     fontSize: 12,
     color: colors.white,
+  },
+  statsContainer: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    paddingHorizontal: 16,
+    marginBottom: 24,
+  },
+  statCard: {
+    flex: 1,
+    backgroundColor: colors.background.secondary,
+    borderRadius: 16,
+    padding: 16,
+    alignItems: 'center',
+    marginHorizontal: 4,
+  },
+  statValue: {
+    fontFamily: 'Inter-Bold',
+    fontSize: 24,
+    color: colors.primary,
+    marginTop: 8,
+  },
+  statLabel: {
+    fontFamily: 'Inter-Regular',
+    fontSize: 14,
+    color: colors.text.disabled,
+    marginTop: 4,
   },
   menuContainer: {
     backgroundColor: colors.background.secondary,

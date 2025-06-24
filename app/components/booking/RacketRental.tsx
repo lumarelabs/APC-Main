@@ -155,13 +155,11 @@ const styles = StyleSheet.create({
     padding: 16,
     borderRadius: 12,
     alignItems: 'center',
-    borderWidth: 2,
-    borderColor: colors.primary,
   },
   skipButtonText: {
     fontFamily: 'Inter-Bold',
     fontSize: 16,
-    color: colors.primary,
+    color: colors.text.disabled,
   },
   continueButton: {
     flex: 1,
