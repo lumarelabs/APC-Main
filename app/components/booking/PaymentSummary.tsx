@@ -41,6 +41,9 @@ export function PaymentSummary({
   // Generate unique order ID
   const orderId = `booking_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
 
+  // FIXED: Ensure correct court type display
+  const displayCourtType = courtType?.toLowerCase() === 'padel' ? 'Padel' : 'Pickleball';
+
   return (
     <View style={styles.container}>
       <Text style={styles.title}>Rezervasyon Özeti</Text>
@@ -53,7 +56,7 @@ export function PaymentSummary({
         </View>
         <View style={styles.detailRow}>
           <Text style={styles.label}>Tür</Text>
-          <Text style={styles.value}>{courtType === 'padel' ? 'Padel' : 'Pickleball'}</Text>
+          <Text style={styles.value}>{displayCourtType}</Text>
         </View>
         <View style={styles.detailRow}>
           <Text style={styles.label}>Tarih</Text>

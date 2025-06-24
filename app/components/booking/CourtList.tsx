@@ -76,10 +76,10 @@ export function CourtList({ courtType, onSelectCourt }: CourtListProps) {
     <View style={styles.container}>
       <Text style={styles.title}>Kort Seçiniz ({filteredCourts.length} kort)</Text>
       
-      {/* FIXED: Proper grid layout with correct spacing */}
+      {/* FIXED: Proper grid layout with correct spacing and padding */}
       <View style={styles.courtsGrid}>
         {filteredCourts.map((item, index) => (
-          <View key={item.id} style={styles.courtCardContainer}>
+          <View key={item.id} style={styles.courtCardWrapper}>
             <CourtCard
               name={item.name}
               type={item.type}
@@ -98,6 +98,7 @@ export function CourtList({ courtType, onSelectCourt }: CourtListProps) {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
+    paddingHorizontal: 16,
   },
   title: {
     fontFamily: 'Inter-Bold',
@@ -111,9 +112,9 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     paddingBottom: 20,
   },
-  courtCardContainer: {
+  courtCardWrapper: {
     width: '48%',
-    marginBottom: 16,
+    marginBottom: 20, // Increased spacing between rows
   },
   loadingContainer: {
     flex: 1,

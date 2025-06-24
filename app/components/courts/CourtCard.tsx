@@ -27,10 +27,10 @@ export function CourtCard({
   console.log('CourtCard rendering:', { name, type, normalizedType, typeText }); // Debug log
 
   return (
-    <View style={styles.container}>
+    <TouchableOpacity style={styles.container} onPress={onPress}>
       <Image source={{ uri: image }} style={styles.image} />
       <View style={styles.content}>
-        <Text style={styles.name}>{name}</Text>
+        <Text style={styles.name} numberOfLines={1}>{name}</Text>
         
         <View style={[styles.typeBadge, { backgroundColor: `${typeColor}20` }]}>
           <Text style={[styles.typeText, { color: typeColor }]}>{typeText}</Text>
@@ -39,7 +39,7 @@ export function CourtCard({
         {location && (
           <View style={styles.locationContainer}>
             <MapPin size={12} color={colors.text.disabled} />
-            <Text style={styles.location}>{location}</Text>
+            <Text style={styles.location} numberOfLines={1}>{location}</Text>
           </View>
         )}
         
@@ -56,17 +56,24 @@ export function CourtCard({
           <Text style={styles.bookButtonText}>Rezervasyon Yap</Text>
         </TouchableOpacity>
       </View>
-    </View>
+    </TouchableOpacity>
   );
 }
 
 const styles = StyleSheet.create({
   container: {
-    width: '48%',
+    flex: 1,
     backgroundColor: colors.background.secondary,
     borderRadius: 12,
     overflow: 'hidden',
-    marginBottom: 16,
+    shadowColor: '#000',
+    shadowOffset: {
+      width: 0,
+      height: 2,
+    },
+    shadowOpacity: 0.1,
+    shadowRadius: 4,
+    elevation: 3,
   },
   image: {
     width: '100%',
@@ -75,6 +82,7 @@ const styles = StyleSheet.create({
   },
   content: {
     padding: 12,
+    flex: 1,
   },
   name: {
     fontFamily: 'Inter-Bold',
@@ -103,6 +111,7 @@ const styles = StyleSheet.create({
     fontSize: 12,
     color: colors.text.disabled,
     marginLeft: 4,
+    flex: 1,
   },
   priceContainer: {
     flexDirection: 'row',
@@ -128,6 +137,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     borderWidth: 1,
     borderColor: colors.primary,
+    marginTop: 'auto', // Push button to bottom
   },
   bookButtonText: {
     fontFamily: 'Inter-Bold',
