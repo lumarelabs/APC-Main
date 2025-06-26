@@ -64,7 +64,7 @@ export async function POST(request: NextRequest) {
       // but log the error internally for your own debugging.
       // PayTR will keep sending notifications if it doesn't get an "OK" response.
       // However, during testing, you might want to return an error to see it fail.
-      return new Response('OK', { status: 200 }); 
+      return Response.json({ status: 'ok' }); 
     }
 
     // Handle payment result
