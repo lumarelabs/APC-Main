@@ -79,7 +79,7 @@ export async function POST(request: NextRequest) {
 
     // IMPORTANT: PayTR requires you to return the text "OK" for the request to be considered successful.
     // Do not return JSON here.
-    return new Response('OK', { status: 200 });
+    return Response.json({ status: 'ok' });
 
   } catch (error) {
     console.error('Error in PayTR callback:', error);
